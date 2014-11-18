@@ -5,17 +5,21 @@ Author: Karen Ng
 License: BSD
 """
 import pandas as pd
+import numpy as np
 import h5py
 
 
-def extract_clst(keys, subhalos, clstNo, clstMemMask,
-                 outputFolder="../data/", verbose=True):
-    """calls function to fix weird shape then output fixed df to hdf5 files
+def extract_clst(keys, subhalos, clstNo, clstMemMask, output=False,
+                 outputFolder="../../data/", verbose=True):
+    """calls function to fix weird shape
+    can choose to output df to hdf5 files
+
     parameters:
     ===========
     keys = list of strings denoting relevant keys
     subhalos = hdf5 file stream, e.g. f["Subhalo"]
-    clstNo = integer, denotes the parent halo ID
+    clstNo = integer, denotes the parent halo ID ordered by mass,
+        e.g. 0, 1, 2, 3, ...
     clstMemMask = dictionary of np array of bools,
         denotes which subhalo belongs to the parent halo ID
         key is the parent subhalo ID
@@ -27,14 +31,18 @@ def extract_clst(keys, subhalos, clstNo, clstMemMask,
     returns:
     ========
     None
+
+    Stability: works
     """
     clst_dict = \
         fix_clst_cat(keys, subhalos, clstNo, clstMemMask)
     clst_df = pd.DataFrame(clst_dict)
-    outputFile = outputFolder + "cluster_" + str(clstNo) + ".h5"
-    if verbose:
-        print "outputting file :" + outputFile
-    clst_df.to_hdf(outputFile, "df")
+
+    if output:
+        outputFile = outputFolder + "cluster_" + str(clstNo) + ".h5"
+        if verbose:
+            print "outputting file :" + outputFile
+        clst_df.to_hdf(outputFile, "df")
 
     return clst_df
 
@@ -59,6 +67,8 @@ def fix_clst_cat(relevantSubhaloKeys, subhalos, clstNo, clstMemMask):
     the returned key is the same as the original key
     if not, the key is original key concatenated with the number of the
     feature
+
+    Stability: works
     """
     clst_dict = {}
     for key in relevantSubhaloKeys:
@@ -86,6 +96,8 @@ def wrap_and_center_coord(coords, center_coord, verbose=True):
     returns:
     =======
     numpy array, coordinates that's been wrapped
+
+    Stability : to be tested
     """
     if np.any(np.abs(coords - 7.5e4) < 2e5):
         if verbose:
@@ -93,7 +105,9 @@ def wrap_and_center_coord(coords, center_coord, verbose=True):
         mask = coords - 5.5e4 > 0
         coords[mask] = coords[mask] - 7.5e4
 
-    return
+    # needs to center coords
+
+    return coords
 
 
 def add_info(h5, info):
