@@ -1,7 +1,7 @@
-# ----------------------------------------------------------------------
+# ---------------------------------------------------------------------------
 # trying out functions in ks 
 # see > vignette("kde", package="ks") for unmodified version of the example 
-# ----------------------------------------------------------------------
+# ---------------------------------------------------------------------------
 library(ks)
 
 set.seed(8192)  # comment out if not testing
@@ -24,7 +24,7 @@ function(dens, verbose=F)
 
   # find peaks along each column
   # take diff, note the sign of change, 
-  # bind rows, take  diff again
+  # bind rows, take 2nd diff
   ix_col_peaks <- diff(rbind(add_row, sign(diff(dens))))
   ix_col_peaks <- rbind(ix_col_peaks, add_row)
 
@@ -44,22 +44,34 @@ function(dens, verbose=F)
   which(ix_col_peaks + ix_row_peaks == -4, arr.ind=T) 
 }
 
-find_dominate_peaks=
-function(dens, ,dom_peak_no=2L)
+
+find_dominant_peaks=
+function(fhat, coords, dom_peak_no=2L)
   # find dominate peaks 
 {
+  # should indicate how many peaks were found 
+  # not sure why nothing is printing
+  sprintf("Total no of peaks found %d", dim(coords)[[1]])
+
+  dens <- fhat$estimate[coords] 
+  xloc <- fhat$eval.points[[1]]
+  yloc <- fhat$eval.points[[2]]
+
   # sort the array in descending order
   sorted_dens <- sort(dens, decreasing=T)
 
-  # find the peaks
-  ix <- lapply(1:peak_search_no,
-               function(i) which(dens == sorted_dens[[i]], arr.ind=T))
-
-  #coords <- lapply(ix, find_xy_coord_ix, dens)
+  # find the peak locs
+  peak_locs <- lapply(1:dom_peak_no,
+               function(i) c(xloc[coords[which(dens == sorted_dens[[i]],
+                                               arr.ind=T), 1]],
+                             yloc[coords[which(dens == sorted_dens[[i]],
+                                               arr.ind=T), 2]]))
+ 
   #diff <- lapply(coords[c(2: length(coords))],
   #               function(x, mcoord) sqrt(sum((x - mcoord) ** 2)),
-  #               coords[[1]])
+  #               coords[[1]])  
 }
+
 
 TwoDtestCase1 = 
 function(samp_no = 5e2, cwt = 1 / 11)
@@ -96,17 +108,14 @@ function(samp_no = 5e2, cwt = 1 / 11)
 
 do_analysis=
 function(fhat_pi1){
-  dens <- fhat_pi1$estimate
-  max_ix <- which(dens == dens[[which.max(dens)]], arr.ind=T)
-  shape <- sqrt(length(dens))
-
-  # too annoying to deal with the fhat object with the indices
-  xlocs <- fhat_pi1$eval.points[[1]]
-  ylocs <- fhat_pi1$eval.points[[2]]
   
+  coords <- find_peaks_from_2nd_deriv(fhat_pi1$estimate) 
+  peaks <- find_dominant_peaks(fhat_pi1, coords)
+
   # plot to visualize 
   plot(fhat_pi1, cont=c(1, 5, 50, 70))
-  coords <- find_peaks_from_2nd_deriv(fhat_pi1$estimate) 
+  points(peaks[[1]][1], peaks[[1]][2], col="red", pch=20)
+  points(peaks[[2]][1], peaks[[2]][2], col="red", pch=20)
 }
 
 
