@@ -19,7 +19,7 @@ function(id_ix, dens)
 }
 
 
-find_peaks = 
+find_no_of_peaks = 
 function(dens, peak_search_no=length(dens))
   # calls a bunch of other functions to find the peaks 
   # @params
@@ -28,8 +28,14 @@ function(dens, peak_search_no=length(dens))
   # @return 
   # pairs of coordinates for the peak values  
   # @note 
-  # need a smarter approach to use 2nd derivatives to find local maximas
+  # maybe the peak needs to satisfy several criteria
+  # - 2nd derivatives to find local maximas
+  # - est density needs to be top 10%?
+  # 
 {
+  # this returns an array that contains local maxima 
+  ix_2nd_deriv <- which(diff(sign(diff(dens))) == -2) + 1
+
   # sort the array in descending order  
   sorted_dens <- sort(dens, decreasing = T)
 
@@ -37,12 +43,18 @@ function(dens, peak_search_no=length(dens))
   ix <- lapply(1:peak_search_no, 
                function(i) which(dens == sorted_dens[[i]])) 
 
-  coords <- lapply(ix, find_xy_coord_ix, dens)
-  diff <- lapply(coords[c(2: length(coords))], 
-                 function(x, mcoord) sqrt(sum((x - mcoord) ** 2)),
-                 coords[[1]])
+  #coords <- lapply(ix, find_xy_coord_ix, dens)
+  #diff <- lapply(coords[c(2: length(coords))], 
+  #               function(x, mcoord) sqrt(sum((x - mcoord) ** 2)),
+  #               coords[[1]])
 }
 
+
+find_max_peaks = 
+function()
+{
+
+}
 
 TwoDtestCase1 = 
 function(samp_no = 5e2, cwt = 1 / 11)
@@ -51,25 +63,27 @@ function(samp_no = 5e2, cwt = 1 / 11)
   # samp_no = integer, number of data points to draw 
   # cwt = float, 
   #       weight for the central normal mixture that acts as contaminant  
-{
-  # make fake data as 3 normal mixtures  
+{ # make fake data as 3 normal mixtures  
   mu_s <- rbind(c(-2, 2), c(0, 0), c(2, -2))
+
+  # not sure why the estimated main gaussians are squashed 
   Sigma_s <- rbind(diag(2), 
                    matrix(c(0.8, -0.72, -0.72, 0.8), nrow=2),
                    diag(2))
 
   # the weights in front of each mixture have to be sum to 1
-  weights <- c((1 - cwt) / 2, cwt, (1 - cwt) / 2)
+  n_cwt = (1 - cwt) / 2
+  weights <- c(n_cwt, cwt, n_cwt)
   
   # draw data
   x <- rmvnorm.mixt(n=samp_no, mus=mu_s, Sigmas=Sigma_s, props=weights)
   
   # use bandwidth selector or replace with Hscv 
-  #Hpi1 <- Hpi(x=x)  
+  # H=Hpi1 
   Hscv1 <- Hscv(x=x)
 
   # KDE estimate has an option called weight 
-  fhat_pi1 <- kde(x=x, H=Hscv1) # H=Hpi1 
+  fhat_pi1 <- kde(x=x, H=Hscv1) 
   # plot(fhat_pi1)
   fhat_pi1
 }

@@ -4,9 +4,13 @@ for the Illustris-1 simulation
 Author: Karen Ng
 License: BSD
 """
-import pandas as pd
+import sys
+sys.path.append("/Users/karenyng/Documents/Illustris_analysis/IEnv/lib/" +
+                "python2.7/site-packages")
+
 import numpy as np
-import h5py
+#import pandas as pd
+#import h5py
 
 
 def extract_clst(keys, subhalos, clstNo, clstMemMask, output=False,
@@ -84,28 +88,32 @@ def fix_clst_cat(relevantSubhaloKeys, subhalos, clstNo, clstMemMask):
     return clst_dict
 
 
-def wrap_and_center_coord(coords, center_coord, verbose=True):
+def wrap_and_center_coord(coords, edge_constraint=1e4,
+                          verbose=False):
     """ fixing the periodic boundary conditions per cluster
     wraps automatically at 75 Mpc / h then center coord at cluster center
+    @param coords = numpy array, denotes original coords
+    @param verbose = bool
 
-    parameters:
-    ==========
-    coords = numpy array, denotes original coords
-    center_coord = float, denote center coord of cluster in that dimension
+    @return numpy array, coordinates that's been wrapped
 
-    returns:
-    =======
-    numpy array, coordinates that's been wrapped
-
-    Stability : to be tested
+    @stability : to be tested
     """
-    if np.any(np.abs(coords - 7.5e4) < 2e5):
+
+    coords = np.array(coords)
+
+    if np.all(np.abs(coords % 7.5e4 - 7.5e4) > edge_constraint):
+        pass
+    else:
+        mask = coords > edge_constraint
+        coords[mask] = coords[mask] - 7.5e4
         if verbose:
             print "close to box edge, needs wrapping"
-        mask = coords - 5.5e4 > 0
-        coords[mask] = coords[mask] - 7.5e4
+            print "before masking " , coords[mask]
+            print "after masking " , coords[mask]
 
-    # needs to center coords
+    # needs to center coords - use median to be the "center"
+    coords = coords - np.median(coords)
 
     return coords
 
