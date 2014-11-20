@@ -1,3 +1,5 @@
 *.hdf5
 *.pyc
 *.h5
+*.RData
+*.Rhistory

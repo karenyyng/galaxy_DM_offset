@@ -44,6 +44,22 @@ function(dens, verbose=F)
   which(ix_col_peaks + ix_row_peaks == -4, arr.ind=T) 
 }
 
+find_dominate_peaks=
+function(dens, ,dom_peak_no=2L)
+  # find dominate peaks 
+{
+  # sort the array in descending order
+  sorted_dens <- sort(dens, decreasing=T)
+
+  # find the peaks
+  ix <- lapply(1:peak_search_no,
+               function(i) which(dens == sorted_dens[[i]], arr.ind=T))
+
+  #coords <- lapply(ix, find_xy_coord_ix, dens)
+  #diff <- lapply(coords[c(2: length(coords))],
+  #               function(x, mcoord) sqrt(sum((x - mcoord) ** 2)),
+  #               coords[[1]])
+}
 
 TwoDtestCase1 = 
 function(samp_no = 5e2, cwt = 1 / 11)
