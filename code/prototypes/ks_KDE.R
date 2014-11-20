@@ -6,55 +6,44 @@ library(ks)
 
 set.seed(8192)  # comment out if not testing
 
+
 # ------------ helper functions  ---------------
-find_xy_coord_ix = 
-function(id_ix, dens)
-  # converts id_ix from vector indices into row and col number
-{
-  shape <- sqrt(length(dens))
-  row_no <- round(id_ix / shape)
-  col_no <- id_ix %% shape
 
-  return (c(row_no, col_no))
-}
-
-
-find_no_of_peaks = 
-function(dens, peak_search_no=length(dens))
-  # calls a bunch of other functions to find the peaks 
+find_peaks_from_2nd_deriv= 
+function(dens, verbose=F)
+  # do numerical differentiation to find peaks 
   # @params
   # dens = vector of floats 
-  # peak_no = integer, describes how many to look for 
   # @return 
   # pairs of coordinates for the peak values  
-  # @note 
-  # maybe the peak needs to satisfy several criteria
-  # - 2nd derivatives to find local maximas
-  # - est density needs to be top 10%?
-  # 
+  # @note can consider rewriting this using a faster language than R ...
 {
-  # this returns an array that contains local maxima 
-  ix_2nd_deriv <- which(diff(sign(diff(dens))) == -2) + 1
+  dens <- as.matrix(dens)
+  add_row <- c(rep(0, each=dim(dens)[[2]]))
+  add_col <- c(rep(0, each=dim(dens)[[1]]))
 
-  # sort the array in descending order  
-  sorted_dens <- sort(dens, decreasing = T)
+  # find peaks along each column
+  # take diff, note the sign of change, 
+  # bind rows, take  diff again
+  ix_col_peaks <- diff(rbind(add_row, sign(diff(dens))))
+  ix_col_peaks <- rbind(ix_col_peaks, add_row)
 
-  # find the peaks  
-  ix <- lapply(1:peak_search_no, 
-               function(i) which(dens == sorted_dens[[i]])) 
+  # find peaks along each row 
+  # tranposed during diff since the diff function only take differences of rows 
+  ix_row_peaks <- diff(rbind(add_col, sign(diff(t(dens)))))
+  ix_row_peaks <- rbind(ix_row_peaks, add_col) 
+  ix_row_peaks <- t(ix_row_peaks)
 
-  #coords <- lapply(ix, find_xy_coord_ix, dens)
-  #diff <- lapply(coords[c(2: length(coords))], 
-  #               function(x, mcoord) sqrt(sum((x - mcoord) ** 2)),
-  #               coords[[1]])
+  if(verbose)
+  {
+    print(ix_row_peaks)
+    print(ix_col_peaks + ix_row_peaks == -4)
+    print(which(ix_col_peaks + ix_row_peaks == -4, arr.ind=T))
+  }
+
+  which(ix_col_peaks + ix_row_peaks == -4, arr.ind=T) 
 }
 
-
-find_max_peaks = 
-function()
-{
-
-}
 
 TwoDtestCase1 = 
 function(samp_no = 5e2, cwt = 1 / 11)
@@ -79,12 +68,12 @@ function(samp_no = 5e2, cwt = 1 / 11)
   x <- rmvnorm.mixt(n=samp_no, mus=mu_s, Sigmas=Sigma_s, props=weights)
   
   # use bandwidth selector or replace with Hscv 
-  # H=Hpi1 
+  #Hpi1 <- Hpi(x=x) 
   Hscv1 <- Hscv(x=x)
 
   # KDE estimate has an option called weight 
   fhat_pi1 <- kde(x=x, H=Hscv1) 
-  # plot(fhat_pi1)
+
   fhat_pi1
 }
   
@@ -92,7 +81,7 @@ function(samp_no = 5e2, cwt = 1 / 11)
 do_analysis=
 function(fhat_pi1){
   dens <- fhat_pi1$estimate
-  max_ix <- which.max(dens)
+  max_ix <- which(dens == dens[[which.max(dens)]], arr.ind=T)
   shape <- sqrt(length(dens))
 
   # too annoying to deal with the fhat object with the indices
@@ -100,11 +89,8 @@ function(fhat_pi1){
   ylocs <- fhat_pi1$eval.points[[2]]
   
   # plot to visualize 
-  find_peaks(dens)
-  #plot(fhat_pi1, cont=c(1, 5, 50, 70))
-  #plot(x)
-
-  list("dens"=dens, "xlocs"=xlocs, "ylocs"=ylocs)
+  plot(fhat_pi1, cont=c(1, 5, 50, 70))
+  coords <- find_peaks_from_2nd_deriv(fhat_pi1$estimate) 
 }
 
 
