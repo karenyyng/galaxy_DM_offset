@@ -9,6 +9,15 @@ set.seed(8192)  # comment out if not testing
 
 # ------------ helper functions  ---------------
 
+do_KDE=
+  # group all the steps for performing KDE to minimize the number of
+  # functions that I need to wrap in python 
+function(data, bandwidth_selector, w=rep.int(1, nrow(data))){
+  H <- bandwidth_selector(x=data)
+  fhat_pi1 <- kde(x=data, H=H, w=w) 
+}
+
+
 find_peaks_from_2nd_deriv= 
 function(dens, verbose=F)
   # do numerical differentiation to find peaks 
@@ -95,16 +104,10 @@ function(samp_no = 5e2, cwt = 1 / 11)
   # draw data
   x <- rmvnorm.mixt(n=samp_no, mus=mu_s, Sigmas=Sigma_s, props=weights)
   
-  # use bandwidth selector or replace with Hscv 
-  #Hpi1 <- Hpi(x=x) 
-  Hscv1 <- Hscv(x=x)
-
-  # KDE estimate has an option called weight 
-  fhat_pi1 <- kde(x=x, H=Hscv1) 
-
-  fhat_pi1
+  # use bandwidth selector either Hpi or Hscv or replace with Hscv 
+  do_KDE(x, Hscv)
 }
-  
+
 
 do_analysis=
   # get the parameters that we want
