@@ -107,8 +107,8 @@ function(samp_no = 5e2, cwt = 1 / 11)
   
 
 do_analysis=
-function(fhat_pi1){
-  
+  # get the parameters that we want
+function(fhat_pi1){ 
   coords <- find_peaks_from_2nd_deriv(fhat_pi1$estimate) 
   peaks <- find_dominant_peaks(fhat_pi1, coords)
 
@@ -116,6 +116,8 @@ function(fhat_pi1){
   plot(fhat_pi1, cont=c(1, 5, 50, 70))
   points(peaks[[1]][1], peaks[[1]][2], col="red", pch=20)
   points(peaks[[2]][1], peaks[[2]][2], col="red", pch=20)
+
+  peaks
 }
 
 

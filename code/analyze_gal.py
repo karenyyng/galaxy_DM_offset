@@ -4,21 +4,23 @@ License: BSD
 """
 import matplotlib.pyplot as plt
 import numpy as np
+import rpy2.robjects as robjects
 
 
 def make_color_mag_diag(df, bluer_band, redder_band, band_limit,
                         plot=False, phot_band=None, save=False,
                         savePath="../plots/", clst=None):
     """
-    parameters
-    ==========
+    :parameters:
     df = pandas df of each cluster
     bluer_band = string, df colname
     red_band = string, df colname
     band_limit = float,
         how many band magnitude fainter than BCG do we want to examine
 
-    stability : to be tested
+    :returns: None
+
+    :stability: works
     """
     if phot_band is not None:
         df.rename(columns=phot_band, inplace=True)
@@ -41,9 +43,11 @@ def make_color_mag_diag(df, bluer_band, redder_band, band_limit,
 
 def rKDE():
     """do KDE by calling R package
+    return density estimate
     """
 
     return
+
 
 def weighted_centroid():
     """

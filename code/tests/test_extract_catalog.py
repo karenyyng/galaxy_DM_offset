@@ -38,6 +38,10 @@ def test_wrap_and_center_coord2():
     return
 
 
+def test_fix_clst_cat():
+    #assert
+    return
+
 if __name__ == "__main__":
     test_wrap_and_center_coord1()
     test_wrap_and_center_coord2()
