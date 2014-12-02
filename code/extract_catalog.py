@@ -19,34 +19,24 @@ def default_keys():
             #u'SubhaloParent',
             u'SubhaloGrNr',
             u'SubhaloStellarPhotometrics',
-            u'SubhaloLen']
+            u'SubhaloLenType']
 
 
 def extract_clst(f, clstNo, output=False, keys=default_keys(),
+                 fix_phot_band=True,
                  outputFolder="../../data/", verbose=True):
-    """calls function to fix weird shape can choose to output df to hdf5 files
-
-    :params:
-    keys = list of strings denoting relevant keys
-    f = file stream object, connected to a HDF5 file, usage: f["Subhalo"]
-    clstNo = integer, denotes the parent halo ID ordered by mass,
-        e.g. 0, 1, 2, 3, ...
-    outputFolder = string, denotes output directory
-    verbose = bool, if printing is wanted
-
-    :returns None
-
-    :stability works
-    """
     clst_df = pd.DataFrame(fix_clst_cat(f, clstNo, keys))
 
     # checks if positions are part of the keys
     for i in range(3):
         ckey = "SubhaloCM" + str(i)
         if ckey in clst_df.keys():
-            # alternative syntax is to use clst_df.apply(wrap_and_center_coord, )
+            # alternative syntax is to use
+            # clst_df.apply(wrap_and_center_coord, blah blah)
             # potential speed up is to replace for loop with map operation
             clst_df.loc[:, ckey] = wrap_and_center_coord(clst_df[ckey])
+
+    fix_phot_band_names(clst_df)
 
     if output:
         outputFile = outputFolder + "/cluster_" + str(clstNo) + ".h5"
@@ -72,6 +62,20 @@ def get_subhalos_of_a_cluster(f, clstID):
     """
     return [int(f["Group"]["GroupFirstSub"][ID])
             for ID in [clstID, clstID + 1]]
+
+
+def fix_phot_band_names(df):
+    """rename key names to be more informative"""
+    photo = "SubhaloStellarPhotometrics"
+    bands = ["U", "B", "V", "K", "g", "r", "i", "z"]
+    bands = [b + "_band" for b in bands]
+    phot_bands = {photo + str(i): bands[i] for i in range(len(bands))}
+
+    for replacement in phot_bands.iteritems():
+        if replacement[0] in df.keys():
+            df.rename(columns={replacement[0]: replacement[1]}, inplace=True)
+
+    return None
 
 
 def fix_clst_cat(f, clstNo, keys=default_keys()):
@@ -148,3 +152,32 @@ def add_info(h5, info, h5_key="df", h5_subkey="info"):
     h5_df.close()
 
     return None
+
+
+# -------------docstrings --------------------------------------
+extract_clst.__doc__ = \
+    """calls function to extract clst as dataframe
+    this
+    * fix weird shapes in each key
+    * wraps clusters at the end of the periodic box
+    * center clusters
+    * fix the names of photometric bands to be more informative
+    * can choose to output df to hdf5 files
+
+    :params:
+    keys = list of strings denoting relevant keys
+    f = file stream object, connected to a HDF5 file, usage: f["Subhalo"]
+    clstNo = integer, denotes the parent halo ID ordered by mass,
+        e.g. 0, 1, 2, 3, ...
+        can think of having a list of clstNo instead
+    outputFolder = string, denotes output directory
+    fix_phot_band = bool, whether to change the names of photometric bands
+    verbose = bool, if printing is wanted
+
+    :returns None
+
+    :stability works
+
+    :note unclear to me that the numerical operations would be better
+    if we stack dfs of different clusters before computing stat is better
+    """

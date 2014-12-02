@@ -8,8 +8,9 @@ import rpy2.robjects as robjects
 
 
 def make_color_mag_diag(df, bluer_band, redder_band, band_limit,
-                        plot=False, phot_band=None, save=False,
-                        savePath="../plots/", clst=None):
+                        plot=False, save=False, subhalo_len_lim=1e3,
+                        savePath="../plots/", clst=None, verbose=False, *args,
+                        **kwargs):
     """
     :parameters:
     df = pandas df of each cluster
@@ -17,25 +18,39 @@ def make_color_mag_diag(df, bluer_band, redder_band, band_limit,
     red_band = string, df colname
     band_limit = float,
         how many band magnitude fainter than BCG do we want to examine
+    particleLim = int,
+        want to ensure subhalos has at least that many particles
 
     :returns: None
 
     :stability: works
     """
-    if phot_band is not None:
-        df.rename(columns=phot_band, inplace=True)
     bcg_i = df[redder_band].min()
     mask_i = df[redder_band] < bcg_i + band_limit
+
+    if verbose:
+        print "subhalos need at least {0} DM".format(subhalo_len_lim) + \
+            " particles to be plotted"
+    # examine number of DM particles
+    mask_ii = df["SubhaloLenType1"] > subhalo_len_lim
+
+    mask_i = np.logical_and(mask_i, mask_ii)
+
     g_i = df[bluer_band][mask_i] - df[redder_band][mask_i]
 
-    plt.plot(df[redder_band][mask_i], g_i, "ro", fillstyle="none")
-    plt.title("Color-magnitude diagram for" +
+    plt.plot(df[redder_band][mask_i], g_i, "b.", alpha=0.3)
+    plt.title("Color-magnitude diagram for".format(clst) +
               " {0} subhalos".format(np.sum(mask_i)))
     plt.ylabel(bluer_band + " - " + redder_band)
     plt.xlabel(redder_band)
+
+    if clst is not None:
+        plt.title("Cluster {0}: Color-magnitude diagram for".format(clst) +
+              " {0} subhalos".format(np.sum(mask_i)))
+
     if save is True:
         assert clst is not None, "arg for clst missing"
-        plt.savefig(savePath + "cm_diagram{0}.png".format(clst),
+        plt.savefig(savePath + "/cm_diagram{0}.png".format(clst),
                     bbox_inches="tight")
     plt.show()
     return
