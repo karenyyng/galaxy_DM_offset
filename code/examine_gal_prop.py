@@ -1,4 +1,4 @@
-"""analyze galaxy physical properties from Illustris-1 simulation
+"""identify galaxy properties in gal clusters from Illustris-1 simulation
 Author: Karen Ng <karenyng@ucdavis.edu>
 License: BSD
 """
@@ -7,7 +7,7 @@ import numpy as np
 import rpy2.robjects as robjects
 
 
-def make_color_mag_diag(df, bluer_band, redder_band, band_limit,
+def plot_color_mag_diag(df, bluer_band, redder_band, band_limit,
                         plot=False, save=False, subhalo_len_lim=1e3,
                         savePath="../plots/", clst=None, verbose=False, *args,
                         **kwargs):
@@ -52,19 +52,32 @@ def make_color_mag_diag(df, bluer_band, redder_band, band_limit,
         assert clst is not None, "arg for clst missing"
         plt.savefig(savePath + "/cm_diagram{0}.png".format(clst),
                     bbox_inches="tight")
-    plt.show()
+    plt.close()
     return
 
 
-def rKDE():
-    """do KDE by calling R package
-    return density estimate
-    """
+def plot_KDE_peaks(fhat, save=False,
+               fileName="./plots/py_KDE_peak_testcase_contours.png"):
 
+    plt.axes().set_aspect('equal')
+    plt.contour(fhat["eval_points"][0], fhat["eval_points"][1],
+                fhat["estimate"], label='dens contour')
+
+    plt.plot(fhat["data_x"][0], fhat["data_x"][1], 'k.', alpha=.4,
+             label='data')
+    plt.plot(fhat["domPeaks"].transpose()[0], fhat["domPeaks"].transpose()[1],
+             'rx', mew=3, label='inferred dens peak')
+    plt.title("KDE of testcase by calling R from within python")
+
+    plt.legend()
+
+
+    if save:
+        plt.savefig(fileName, bbox_inches='tight')
+
+    plt.close()
     return
 
 
-def weighted_centroid():
-    """
-    """
+def contour_plot():
     return

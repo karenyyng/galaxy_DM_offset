@@ -1,5 +1,5 @@
 #----------------unit tests -------------------------------------
-source("ks_KDE.r")
+source("../ks_KDE.r")
 
 
 test_find_peaks_from_2nd_deriv= 

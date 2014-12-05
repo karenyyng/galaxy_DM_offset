@@ -1,10 +1,10 @@
-"""Python wrapper around the R ks package
+""" various functions for inferring centroids of galaxy population
+Provides python wrapper around the R ks package for the KDE functions
 Try to keep a one-to-one correspondane between the R functions and the
 Python functions
 """
 from __future__ import division
 import numpy as np
-from scipy.stats import multivariate_normal as mvnorm
 import rpy2.robjects as robjects
 from rpy2.robjects.packages import importr
 ks = importr("ks")
@@ -14,11 +14,14 @@ base = importr("base")
 robjects.r('source("ks_KDE.r")')
 
 
+#------------python wrapper to ks_KDE.r code ---------------------------
+
 def convert_fhat_to_dict(r_fhat):
     """preserves the returned object structure with a dict
     :param: r_fhat = robject of the output evaluated from ks.KDE
 
     :stability: works but should be tested
+    if I am not lazy I would write a proper class instead
     """
 
     return {"data_x": np.array(r_fhat[0]).transpose(),
@@ -68,7 +71,7 @@ def TwoDtestCase1(samp_no=5e2, cwt=1. / 11., w=None, H=None):
     if w is not None:
         fhat = func(samp_no, cwt, w)
     else:
-        fhat = func(samp_no, cwt)
+        fhat = func(samp_no, cwt, w=np.ones(len(samp_no)))
 
     return get_peaks(fhat)
 
@@ -84,12 +87,16 @@ def rmvnorm_mixt(n, mus, Sigmas, props):
         that contains coordinates of the normal mixture
     """
     # need to import a library
-    robjects.r[""]
+    #robjects.r[""]
 
-    return
+    return None
 
 
 def find_peaks_from_2nd_deriv(dens, verbose=False):
+    """untested"""
     func = robjects.r["find_peaks_from_2nd_deriv"]
 
+    return func(dens, verbose)
+
+def bootstrapped_KDE_peaks():
     return

@@ -10,8 +10,14 @@ set.seed(8192)  # comment out if not testing
 # ------------ helper functions  ---------------
 
 do_KDE=
-  # group all the steps for performing KDE to minimize the number of
+  # group most of the steps for performing KDE to minimize the number of
   # functions that I need to wrap in python 
+  # @param
+  # data = list of floats denoting the data 
+  # bandwidth selector = ks.bandwidth_selector object
+  # w = list of floats that is same size as data that denotes the weight
+  # @return
+  # fhat_pi1 = R object from the ks package 
 function(data, bandwidth_selector, w=rep.int(1, nrow(data))){
   H <- bandwidth_selector(x=data)
   fhat_pi1 <- kde(x=data, H=H, w=w) 
@@ -24,8 +30,9 @@ function(dens, verbose=F)
   # @params
   # dens = vector of floats 
   # @return 
-  # pairs of coordinates for the peak values  
+  # list with pairs of coordinates for the peak values  
   # @note can consider rewriting this using a faster language than R ...
+  # @stability passed test case 
 {
   dens <- as.matrix(dens)
   add_row <- c(rep(0, each=dim(dens)[[2]]))
@@ -57,6 +64,12 @@ function(dens, verbose=F)
 find_dominant_peaks=
 function(fhat, coords, dom_peak_no=2L)
   # find dominate peaks 
+  # @params
+  # fhat = R object generated from ks.KDE 
+  # coords = list of floats, the floats represent the coordinates  
+  # dom_peak_no = integers, number of dominant peaks to find 
+  # @stability 
+  # it runs without the world crashing and burning but use with caution
 {
   # should indicate how many peaks were found 
   # not sure why nothing is printing
@@ -74,11 +87,7 @@ function(fhat, coords, dom_peak_no=2L)
                function(i) c(xloc[coords[which(dens == sorted_dens[[i]],
                                                arr.ind=T), 1]],
                              yloc[coords[which(dens == sorted_dens[[i]],
-                                               arr.ind=T), 2]]))
- 
-  #diff <- lapply(coords[c(2: length(coords))],
-  #               function(x, mcoord) sqrt(sum((x - mcoord) ** 2)),
-  #               coords[[1]])  
+                                               arr.ind=T), 2]])) 
 }
 
 
@@ -122,7 +131,4 @@ function(fhat_pi1){
 
   peaks
 }
-
-
-
 
