@@ -1,6 +1,7 @@
 # ---------------------------------------------------------------------------
-# trying out functions in ks 
+# Kernel density estimates using R and the ks package
 # see > vignette("kde", package="ks") for unmodified version of the example 
+# Author: Karen Ng <karenyng@ucdavis.edu>
 # ---------------------------------------------------------------------------
 library(ks)
 
@@ -76,8 +77,7 @@ function(fhat, coords, dom_peak_no=2L)
   # it runs without the world crashing and burning but use with caution
 {
   # should indicate how many peaks were found 
-  msg <- sprintf("Total num. of peaks found: %d", dim(coords)[[1]])
-  print(msg)
+  print(sprintf("Total num. of peaks found: %d", dim(coords)[[1]]))
 
   dens <- fhat$estimate[coords] 
   xloc <- fhat$eval.points[[1]]
@@ -125,19 +125,22 @@ function(samp_no = 5e2, cwt = 1 / 11)
 do_analysis=
   # get the parameters that we want
   # @fhat_pi1  
-function(fhat_pi1, plot_name="./plots/R_KDE_plot.png")
+function(fhat_pi1, plot=T, plot_name="./plots/R_KDE_plot.png")
 { 
   coords <- find_peaks_from_2nd_deriv(fhat_pi1$estimate) 
   peaks <- find_dominant_peaks(fhat_pi1, coords)
 
-  # activate the png device 
-  png(plot_name)
-  plot(fhat_pi1, cont=c(1, 5, 50, 70), xlab="x", ylab="y")
-  points(peaks[[1]][1], peaks[[1]][2], col="red", pch=20)
-  points(peaks[[2]][1], peaks[[2]][2], col="red", pch=20)
-  title("R KDE contour plot")
-  # output plot from the device
-  dev.off()
+  if(plot){
+    # activate the png device 
+    png(plot_name)
+    plot(fhat_pi1, cont=c(1, 5, 50, 70), xlab="x", ylab="y")
+    for(i in 1:length(peaks)){
+     points(peaks[[i]][1], peaks[[i]][2], col="red", pch=20)
+    }
+    title("R KDE contour plot")
+    # output plot from the device
+    dev.off()
+  }
 
   peaks
 }
