@@ -17,7 +17,7 @@ do_KDE=
   # bandwidth selector = ks.bandwidth_selector object
   # w = list of floats that is same size as data that denotes the weight
   # @return
-  # fhat_pi1 = R object from the ks package 
+  # fhat_pi1 = R object from the ks package  
 function(data, bandwidth_selector, w=rep.int(1, nrow(data))){
   H <- bandwidth_selector(x=data)
   fhat_pi1 <- kde(x=data, H=H, w=w) 
@@ -40,14 +40,18 @@ function(dens, verbose=F)
 
   # find peaks along each column
   # take diff, note the sign of change, 
-  # bind rows, take 2nd diff
+  # bind row, take 2nd diff
   ix_col_peaks <- diff(rbind(add_row, sign(diff(dens))))
+
+  # bind row to preserve dimensionality
   ix_col_peaks <- rbind(ix_col_peaks, add_row)
 
   # find peaks along each row 
   # tranposed during diff since the diff function only take differences of rows 
   ix_row_peaks <- diff(rbind(add_col, sign(diff(t(dens)))))
+  # bind row to preserve dimensionality
   ix_row_peaks <- rbind(ix_row_peaks, add_col) 
+  # transpose back to original orientation
   ix_row_peaks <- t(ix_row_peaks)
 
   if(verbose)
@@ -63,7 +67,7 @@ function(dens, verbose=F)
 
 find_dominant_peaks=
 function(fhat, coords, dom_peak_no=2L)
-  # find dominate peaks 
+  # find dominant peaks 
   # @params
   # fhat = R object generated from ks.KDE 
   # coords = list of floats, the floats represent the coordinates  
@@ -72,8 +76,8 @@ function(fhat, coords, dom_peak_no=2L)
   # it runs without the world crashing and burning but use with caution
 {
   # should indicate how many peaks were found 
-  # not sure why nothing is printing
-  sprintf("Total no of peaks found %d", dim(coords)[[1]])
+  msg <- sprintf("Total num. of peaks found: %d", dim(coords)[[1]])
+  print(msg)
 
   dens <- fhat$estimate[coords] 
   xloc <- fhat$eval.points[[1]]
@@ -120,15 +124,27 @@ function(samp_no = 5e2, cwt = 1 / 11)
 
 do_analysis=
   # get the parameters that we want
-function(fhat_pi1){ 
+  # @fhat_pi1  
+function(fhat_pi1, plot_name="./plots/R_KDE_plot.png")
+{ 
   coords <- find_peaks_from_2nd_deriv(fhat_pi1$estimate) 
   peaks <- find_dominant_peaks(fhat_pi1, coords)
 
-  # plot to visualize 
-  plot(fhat_pi1, cont=c(1, 5, 50, 70))
+  # activate the png device 
+  png(plot_name)
+  plot(fhat_pi1, cont=c(1, 5, 50, 70), xlab="x", ylab="y")
   points(peaks[[1]][1], peaks[[1]][2], col="red", pch=20)
   points(peaks[[2]][1], peaks[[2]][2], col="red", pch=20)
+  title("R KDE contour plot")
+  # output plot from the device
+  dev.off()
 
   peaks
 }
 
+
+bootstrap=
+  # 
+function()
+{
+}
