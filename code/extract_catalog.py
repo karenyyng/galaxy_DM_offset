@@ -13,13 +13,15 @@ import pandas as pd
 
 def default_keys():
     """ select some keys to be extracted from h5 files to df """
-    return [u'SubhaloCM',
+    return [u'SubhaloPos',
+            #u'SubhaloCM',
             u'SubhaloHalfmassRad',
             u'SubhaloHalfmassRadType',
             #u'SubhaloParent',
             u'SubhaloGrNr',
             u'SubhaloStellarPhotometrics',
-            u'SubhaloLenType']
+            u'SubhaloLenType',
+            u'SubhaloMass']
 
 
 def extract_clst(f, clstNo, output=False, keys=default_keys(),

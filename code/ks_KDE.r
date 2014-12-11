@@ -17,7 +17,7 @@ do_KDE=
   # data = list of floats denoting the data 
   # bandwidth selector = ks.bandwidth_selector object
   # w = list of floats that is same size as data that denotes the weight
-  # @return
+  # @return/
   # fhat_pi1 = R object from the ks package  
 function(data, bandwidth_selector, w=rep.int(1, nrow(data))){
   H <- bandwidth_selector(x=data)
@@ -26,7 +26,6 @@ function(data, bandwidth_selector, w=rep.int(1, nrow(data))){
 
 
 find_peaks_from_2nd_deriv= 
-function(dens, verbose=F)
   # do numerical differentiation to find peaks 
   # @params
   # dens = vector of floats 
@@ -34,6 +33,7 @@ function(dens, verbose=F)
   # list with pairs of coordinates for the peak values  
   # @note can consider rewriting this using a faster language than R ...
   # @stability passed test case 
+function(dens, verbose=F)
 {
   dens <- as.matrix(dens)
   add_row <- c(rep(0, each=dim(dens)[[2]]))
@@ -67,7 +67,6 @@ function(dens, verbose=F)
 
 
 find_dominant_peaks=
-function(fhat, coords, dom_peak_no=2L)
   # find dominant peaks 
   # @params
   # fhat = R object generated from ks.KDE 
@@ -75,6 +74,7 @@ function(fhat, coords, dom_peak_no=2L)
   # dom_peak_no = integers, number of dominant peaks to find 
   # @stability 
   # it runs without the world crashing and burning but use with caution
+function(fhat, coords, dom_peak_no=2L)
 {
   # should indicate how many peaks were found 
   print(sprintf("Total num. of peaks found: %d", dim(coords)[[1]]))
@@ -124,7 +124,9 @@ function(samp_no = 5e2, cwt = 1 / 11)
 
 do_analysis=
   # get the parameters that we want
-  # @fhat_pi1  
+  # @param fhat_pi1 = object returned by ks.KDE 
+  # @param plot = bool 
+  # @param plot_name = str
 function(fhat_pi1, plot=T, plot_name="./plots/R_KDE_plot.png")
 { 
   coords <- find_peaks_from_2nd_deriv(fhat_pi1$estimate) 
@@ -147,7 +149,12 @@ function(fhat_pi1, plot=T, plot_name="./plots/R_KDE_plot.png")
 
 
 bootstrap=
-  # 
-function()
-{
+  # perform bootstrapping for getting confidence regions 
+function(fhat, bootNo=10)
+{ 
+  nrows <- dim(fhat$x)[[1]]
+
+  for(i in 1:bootNo){
+    do_KDE(fhat$x[sapply(runif(nrows, min=1, max=nrows), round), 1:2], Hscv)
+  }
 }

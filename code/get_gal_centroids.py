@@ -1,6 +1,6 @@
 """ various functions for inferring centroids of galaxy population
 Provides python wrapper around the R ks package for the KDE functions
-Try to keep a one-to-one correspondane between the R functions and the
+I try to keep a one-to-one correspondane between the R functions and the
 Python functions
 """
 from __future__ import division
@@ -21,7 +21,7 @@ def convert_fhat_to_dict(r_fhat):
     :param: r_fhat = robject of the output evaluated from ks.KDE
 
     :stability: works but should be tested
-    if I am not lazy I would write a proper class instead
+    if I am not lazy I would write a proper class instead ;)
     """
 
     return {"data_x": np.array(r_fhat[0]).transpose(),
@@ -98,5 +98,18 @@ def find_peaks_from_2nd_deriv(dens, verbose=False):
 
     return func(dens, verbose)
 
+
 def bootstrapped_KDE_peaks():
     return
+
+#-----------other centroid methods ------------------------------------
+
+def shrinking_apert():
+    return
+
+
+def BCG():
+    return
+
+
+def
