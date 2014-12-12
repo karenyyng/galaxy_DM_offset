@@ -15,8 +15,8 @@ def default_keys():
     """ select some keys to be extracted from h5 files to df """
     return [u'SubhaloPos',
             #u'SubhaloCM',
-            u'SubhaloHalfmassRad',
-            u'SubhaloHalfmassRadType',
+            #u'SubhaloHalfmassRad',
+            #u'SubhaloHalfmassRadType',
             #u'SubhaloParent',
             u'SubhaloGrNr',
             u'SubhaloStellarPhotometrics',
@@ -121,11 +121,13 @@ def wrap_and_center_coord(coords, edge_constraint=1e4, verbose=False):
 
     :return numpy array, coordinates that's been wrapped
 
-    :stability passed 2 tests
+    :stability : have to rewrite test case and test
     """
 
     coords = np.array(coords)
 
+    # need the - 7.4e4 part inside np.abs() since some might be closer
+    # to the larger end of the box
     if np.all(np.abs(coords % 7.5e4 - 7.5e4) > edge_constraint):
         pass
     else:
@@ -136,8 +138,9 @@ def wrap_and_center_coord(coords, edge_constraint=1e4, verbose=False):
             print "before masking ", coords[mask]
             print "after masking ", coords[mask]
 
-    # needs to center coords - use median to be the "center"
-    return coords - np.median(coords)
+    ## needs to center coords - use median to be the "center"
+    #return coords - median(coords)
+    return coords - coords[0]
 
 
 def add_info(h5, info, h5_key="df", h5_subkey="info"):

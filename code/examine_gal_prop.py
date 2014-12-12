@@ -2,6 +2,7 @@
 Author: Karen Ng <karenyng@ucdavis.edu>
 License: BSD
 """
+from __future__ import division
 import matplotlib.pyplot as plt
 import numpy as np
 import rpy2.robjects as robjects
@@ -56,22 +57,28 @@ def plot_color_mag_diag(df, bluer_band, redder_band, band_limit,
     return
 
 
-def plot_KDE_peaks(fhat, save=False,
+def plot_KDE_peaks(fhat, allpeaks=False, save=False,
                fileName="./plots/py_KDE_peak_testcase_contours.png"):
 
     plt.axes().set_aspect('equal')
-    plt.contour(fhat["eval_points"][0], fhat["eval_points"][1],
-                fhat["estimate"], label='dens contour')
+    plt.contour(fhat["eval_points"][1], fhat["eval_points"][0],
+                fhat["estimate"], label='dens contour',
+                cmap=plt.cm.cubehelix)
 
-    plt.plot(fhat["data_x"][0], fhat["data_x"][1], 'k.', alpha=.4,
-             label='data')
+    plt.plot(fhat["data_x"][0], fhat["data_x"][1], 'k.', alpha=.4)
     plt.plot(fhat["domPeaks"].transpose()[0], fhat["domPeaks"].transpose()[1],
              'rx', mew=3, label='inferred dens peak')
+
+    if allpeaks:
+        for p in fhat["peaks_py_ix"]:
+            plt.plot(fhat["eval_points"][0][p[0]], fhat["eval_points"][1][p[1]],
+                     'bo', label='peaks', fillstyle='none', mew=3)
+
     plt.title("KDE of testcase by calling R from within python")
 
     plt.legend()
 
-
+    plt.show()
     if save:
         plt.savefig(fileName, bbox_inches='tight')
 
@@ -79,5 +86,36 @@ def plot_KDE_peaks(fhat, save=False,
     return
 
 
-def contour_plot():
+def contour_plot(dens, lvls, x, y):
+    """
+    :param dens: = np.array, the density estimate, should integrate to 1
+    :param lvls: = list of floats, denotes percentile
+
+    """
+    #dens = dens.ravel()
+    #sorted_ix = np.argsort(dens)
+
+    #for ix in sorted_ix:
+    #    dens[ix]
+    # Flatten H
+    h = dens.ravel()
+    lvls = np.array(lvls) / 100.
+    lvl_vals = np.zeros(len(lvls))
+    runsum = 0
+
+    # Sort h from smallest to largest
+    h = np.sort(h)
+    h_sum = np.sum(h)
+
+    for j in xrange(h.size):
+        runsum += h[j]
+        for i in range(len(lvls)):
+            if runsum / h_sum <= 1. - lvls[i]:
+                lvl_vals[i] = h[j]
+
+    print lvl_vals
+    plt.axes().set_aspect('equal')
+    plt.contour(x, y, dens, lvl_vals, linewidths=(2, 2))
+
+    plt.show()
     return

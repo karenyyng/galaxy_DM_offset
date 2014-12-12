@@ -53,11 +53,13 @@ def get_peaks(fhat):
     findPeaks = robjects.r["find_peaks_from_2nd_deriv"]
     findDomPeaks = robjects.r["find_dominant_peaks"]
 
-    peaks_coords = findPeaks(fhat[2])  # fhat[2] = fhat$estimate
-    dom_peaks = np.array(findDomPeaks(fhat, peaks_coords))
+    peaks_ix = findPeaks(fhat)  # fhat[2] = fhat$estimate
+    dom_peaks = np.array(findDomPeaks(fhat, peaks_ix))
 
     fhat = convert_fhat_to_dict(fhat)
-    fhat["peaks"] = np.array(peaks_coords)
+    # subtracting 1 from the peak_coords since python is zeroth index, R is
+    # not
+    fhat["peaks_py_ix"] = np.array(peaks_ix) - 1
     fhat["domPeaks"] = dom_peaks
 
     return fhat
@@ -71,7 +73,7 @@ def TwoDtestCase1(samp_no=5e2, cwt=1. / 11., w=None, H=None):
     if w is not None:
         fhat = func(samp_no, cwt, w)
     else:
-        fhat = func(samp_no, cwt, w=np.ones(len(samp_no)))
+        fhat = func(samp_no, cwt)
 
     return get_peaks(fhat)
 
@@ -112,4 +114,3 @@ def BCG():
     return
 
 
-def

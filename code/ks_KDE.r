@@ -28,14 +28,16 @@ function(data, bandwidth_selector, w=rep.int(1, nrow(data))){
 find_peaks_from_2nd_deriv= 
   # do numerical differentiation to find peaks 
   # @params
-  # dens = vector of floats 
+  # fhat = object returned by ks.KDE 
+  # return_peak_ix = bool, whether to return R index or actuall coords
   # @return 
-  # list with pairs of coordinates for the peak values  
+  # list with pairs of coordinates indices for the peak values  
+  # want to change this to the actual coords
   # @note can consider rewriting this using a faster language than R ...
   # @stability passed test case 
-function(dens, verbose=F)
+function(fhat, verbose=F, return_peak_ix=T)
 {
-  dens <- as.matrix(dens)
+  dens <- as.matrix(fhat$estimate)
   add_row <- c(rep(0, each=dim(dens)[[2]]))
   add_col <- c(rep(0, each=dim(dens)[[1]]))
 
@@ -62,7 +64,16 @@ function(dens, verbose=F)
     print(which(ix_col_peaks + ix_row_peaks == -4, arr.ind=T))
   }
 
-  which(ix_col_peaks + ix_row_peaks == -4, arr.ind=T) 
+  if (return_peak_ix)
+  {
+    return(which(ix_col_peaks + ix_row_peaks == -4, arr.ind=T)) 
+  } else
+  {
+    xloc <- fhat$eval.points[[1]]
+    yloc <- fhat$eval.points[[2]]
+    return(lapply(1:dim(coord_ix)[[1]], function(i){
+           c(xloc[[coord_ix[[i, 1]]]], yloc[[coord_ix[[i, 2]]]])}))
+  }
 }
 
 
@@ -122,39 +133,47 @@ function(samp_no = 5e2, cwt = 1 / 11)
 }
 
 
-do_analysis=
+get_peak_and_plot=
   # get the parameters that we want
   # @param fhat_pi1 = object returned by ks.KDE 
   # @param plot = bool 
   # @param plot_name = str
-function(fhat_pi1, plot=T, plot_name="./plots/R_KDE_plot.png")
+function(fhat_pi1, plot=T, plot_name="./plots/R_KDE_plot.png",
+         save=F)
 { 
-  coords <- find_peaks_from_2nd_deriv(fhat_pi1$estimate) 
-  peaks <- find_dominant_peaks(fhat_pi1, coords)
+  coords_ix <- find_peaks_from_2nd_deriv(fhat_pi1) 
+  peaks <- find_dominant_peaks(fhat_pi1, coords_ix)
 
-  if(plot){
+  if(save){
     # activate the png device 
     png(plot_name)
-    plot(fhat_pi1, cont=c(1, 5, 50, 70), xlab="x", ylab="y")
-    for(i in 1:length(peaks)){
-     points(peaks[[i]][1], peaks[[i]][2], col="red", pch=20)
-    }
-    title("R KDE contour plot")
-    # output plot from the device
-    dev.off()
   }
 
+  plot(fhat_pi1, cont=c(1:4 * 20), xlab="x", ylab="y")
+  for(i in 1:length(peaks)){
+    points(peaks[[i]][1], peaks[[i]][2], col="red", pch=20)
+  }
+  title("R KDE contour plot")
+  # output plot from the device
+
+  if(save) 
+  {
+    dev.off()
+    system(paste("open", plot_name))
+  }
+ 
   peaks
 }
 
 
-bootstrap=
-  # perform bootstrapping for getting confidence regions 
-function(fhat, bootNo=10)
-{ 
-  nrows <- dim(fhat$x)[[1]]
-
-  for(i in 1:bootNo){
-    do_KDE(fhat$x[sapply(runif(nrows, min=1, max=nrows), round), 1:2], Hscv)
-  }
-}
+#bootstrap=
+#  # DON"T USE
+#  # perform bootstrapping for getting confidence regions 
+#function(fhat, bootNo=10)
+#{ 
+#  nrows <- dim(fhat$x)[[1]]
+#
+#  for(i in 1:bootNo){
+#    do_KDE(fhat$x[sapply(runif(nrows, min=1, max=nrows), round), 1:2], Hscv)
+#  }
+#}
