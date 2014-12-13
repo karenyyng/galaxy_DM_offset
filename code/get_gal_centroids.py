@@ -22,6 +22,7 @@ def convert_fhat_to_dict(r_fhat):
 
     :stability: works but should be tested
     if I am not lazy I would write a proper class instead ;)
+    can think about it if i have designated class methods for class vars
     """
 
     return {"data_x": np.array(r_fhat[0]).transpose(),
