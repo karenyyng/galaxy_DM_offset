@@ -133,34 +133,28 @@ function(samp_no = 5e2, cwt = 1 / 11)
 }
 
 
-get_peak_and_plot=
+plot_cf_contour_and_peaks=
   # get the parameters that we want
   # @param fhat_pi1 = object returned by ks.KDE 
   # @param plot = bool 
   # @param plot_name = str
-function(fhat_pi1, plot=T, plot_name="./plots/R_KDE_plot.png",
+function(fhat_pi1, plot=T, cf_lvl=c(1:4 * 20.), plot_name="./plots/R_KDE_plot.png",
          save=F)
 { 
   coords_ix <- find_peaks_from_2nd_deriv(fhat_pi1) 
   peaks <- find_dominant_peaks(fhat_pi1, coords_ix)
 
-  if(save){
-    # activate the png device 
-    png(plot_name)
-  }
+  # activate the png device 
+  if(save) png(plot_name)
 
-  plot(fhat_pi1, cont=c(1:4 * 20), xlab="x", ylab="y")
+  plot(fhat_pi1, cont=cf_lvl, xlab="x", ylab="y")
   for(i in 1:length(peaks)){
     points(peaks[[i]][1], peaks[[i]][2], col="red", pch=20)
   }
   title("R KDE contour plot")
-  # output plot from the device
 
-  if(save) 
-  {
-    dev.off()
-    system(paste("open", plot_name))
-  }
+  # output plot from the device
+  if(save) dev.off(); system(paste("open", plot_name))
  
   peaks
 }
