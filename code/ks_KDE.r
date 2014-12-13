@@ -133,7 +133,7 @@ function(samp_no = 5e2, cwt = 1 / 11)
 }
 
 
-plot_cf_contour_and_peaks=
+plot_KDE_peaks=
   # get the parameters that we want
   # @param fhat_pi1 = object returned by ks.KDE 
   # @param plot = bool 

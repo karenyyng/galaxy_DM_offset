@@ -57,7 +57,7 @@ def plot_color_mag_diag(df, bluer_band, redder_band, band_limit,
     return
 
 
-def plot_cf_contour(dens, x, y, lvls=[68, 95], show=False):
+def plot_cf_contour(dens, x, y, lvls=[68, 95], show=False, clabel=False):
     """this sort through the density, add them up til they are
     below the required confidence level, then plot
 
@@ -84,8 +84,11 @@ def plot_cf_contour(dens, x, y, lvls=[68, 95], show=False):
 
     # the plt.contour function is weird, if you don't transpose
     # the density, the plotted density will be rotated by 180 clockwise
-    plt.contour(x, y, dens.transpose(), lvl_vals, linewidths=(2, 2),
-                colors=colors)
+    CS = plt.contour(x, y, dens.transpose(), lvl_vals, linewidths=(2, 2),
+                     colors=colors)
+    if clabel:
+        str_lvls = {l: str(s) for l, s in zip(CS.levels, lvls)}
+        plt.clabel(CS, CS.levels, fmt=str_lvls, inline=1, fontsize=6.5)
 
     if show:
         plt.show()
@@ -93,17 +96,21 @@ def plot_cf_contour(dens, x, y, lvls=[68, 95], show=False):
     return
 
 
-def plot_KDE_peaks(fhat, allpeaks=False, save=False,
-                   fileName="./plots/py_KDE_peak_testcase_contours.png"):
+def plot_KDE_peaks(fhat, allpeaks=False, plotdata=False, save=False,
+                   fileName="./plots/py_KDE_peak_testcase_contours.png",
+                   clabel=False):
 
     plt.axes().set_aspect('equal')
     plot_cf_contour(fhat["estimate"],
                     fhat["eval_points"][0], fhat["eval_points"][1],
-                    lvls=range(0, 100, 10))
+                    lvls=range(0, 100, 10), clabel=clabel)
 
-    plt.plot(fhat["data_x"][0], fhat["data_x"][1], 'k.', alpha=.4)
     plt.plot(fhat["domPeaks"].transpose()[0], fhat["domPeaks"].transpose()[1],
              'rx', mew=3, label='inferred dens peak')
+
+    if plotdata:
+        plt.plot(fhat["data_x"][0], fhat["data_x"][1], 'k.', alpha=.4)
+
 
     if allpeaks:
         for p in fhat["peaks_py_ix"]:
@@ -111,10 +118,11 @@ def plot_KDE_peaks(fhat, allpeaks=False, save=False,
                      'bo', label='peaks', fillstyle='none', mew=1)
 
     plt.title("KDE of testcase by calling R from within python")
+    plt.xlabel('x')
+    plt.ylabel('y')
 
-    plt.legend()
+    plt.legend(loc='best')
 
-    plt.show()
     if save:
         plt.savefig(fileName, bbox_inches='tight')
 
