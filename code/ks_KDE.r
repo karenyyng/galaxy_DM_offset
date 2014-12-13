@@ -106,14 +106,18 @@ function(fhat, coords, dom_peak_no=2L)
 }
 
 
-TwoDtestCase1 = 
+make_data = 
+function(mu_s = rbind(c(-2, 2), c(0, 0), c(2, -2)), 
+         Sigma_s = rbind(diag(2), 
+                         matrix(c(0.8, -0.72, -0.72, 0.8), nrow=2),         
+                         diag(2)))
+{
+}
+ 
+gaussian_mixture_data=
 function(samp_no = 5e2, cwt = 1 / 11)
-  # test case with 3 normal mixtures 
-  # @param 
-  # samp_no = integer, number of data points to draw 
-  # cwt = float, 
-  #       weight for the central normal mixture that acts as contaminant  
-{ # make fake data as 3 normal mixtures  
+{
+  # make fake data as 3 normal mixtures  
   mu_s <- rbind(c(-2, 2), c(0, 0), c(2, -2))
 
   # not sure why the estimated main gaussians are squashed 
@@ -127,7 +131,18 @@ function(samp_no = 5e2, cwt = 1 / 11)
   
   # draw data
   x <- rmvnorm.mixt(n=samp_no, mus=mu_s, Sigmas=Sigma_s, props=weights)
-  
+}
+
+TwoDtestCase1 = 
+function(samp_no = 5e2, cwt = 1 / 11)
+  # test case with 3 normal mixtures 
+  # @param 
+  # samp_no = integer, number of data points to draw 
+  # cwt = float, 
+  #       weight for the central normal mixture that acts as contaminant  
+{ 
+  x <- gaussian_mixture_data(samp_no, cwt) 
+
   # use bandwidth selector either Hpi or Hscv or replace with Hscv 
   do_KDE(x, Hscv)
 }

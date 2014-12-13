@@ -7,8 +7,8 @@ from __future__ import division
 import numpy as np
 import rpy2.robjects as robjects
 from rpy2.robjects.packages import importr
-ks = importr("ks")
-base = importr("base")
+base = importr("base")  # not really needed in the script
+#ks = importr("ks")
 
 # call the R code that I have written
 robjects.r('source("ks_KDE.r")')
@@ -18,7 +18,7 @@ robjects.r('source("ks_KDE.r")')
 
 def convert_fhat_to_dict(r_fhat):
     """preserves the returned object structure with a dict
-    :param: r_fhat = robject of the output evaluated from ks.KDE
+    :param r_fhat: robject of the output evaluated from ks.KDE
 
     :stability: works but should be tested
     if I am not lazy I would write a proper class instead ;)
@@ -35,13 +35,34 @@ def convert_fhat_to_dict(r_fhat):
             "weight_w": np.array(r_fhat[8])}
 
 
-def do_KDE(data, bandwidth_selector, w=None, verbose=False):
+def py_2D_arr_to_R_matrix(x):
+    """flattens the array, convert to R float vector then to R matrix
+    x = np.array, with shape (dataNo, 2)
+    """
+    nrow = x.shape[0]
+    x = robjects.FloatVector(x.ravel())
+    return robjects.r['matrix'](x, nrow=nrow)
+
+
+def do_KDE(data, bw_selector="Hscv", w=None, verbose=False):
+    """
+    data = np.array, with shape (dataNo, 2)
+    bw_selector = str, either 'Hscv' or 'Hpi'
+    w = np.array of floats, denote the weights for each data point
+    verbose = bool
+    """
+    assert bw_selector == 'Hscv' or bw_selector == 'Hpi', \
+        "bandwidth selector {0} not available".format(bw_selector)
+
+    data = py_2D_arr_to_R_matrix(data)
     doKDE = robjects.r["do_KDE"]
 
     if w is not None:
-        fhat = doKDE(data, bandwidth_selector, w)
+        # needs to be tested
+        fhat = doKDE(data, robjects.r[bw_selector],
+                     robjects.FloatVector(w))
     else:
-        fhat = doKDE(data, bandwidth_selector)
+        fhat = doKDE(data, robjects.r[bw_selector])
 
     return fhat
 
@@ -94,19 +115,31 @@ def rmvnorm_mixt(n, mus, Sigmas, props):
     return None
 
 
-def find_peaks_from_2nd_deriv(dens, verbose=False):
-    """untested"""
+def find_peaks_from_2nd_deriv(fhat, verbose=False):
+    """not tested but works without errors
+    fhat = robject returned by ks.KDE
+    """
     func = robjects.r["find_peaks_from_2nd_deriv"]
 
-    return func(dens, verbose)
+    return func(fhat, verbose)
 
 
 def bootstrapped_KDE_peaks():
+    """
+    """
+
     return
 
 #-----------other centroid methods ------------------------------------
 
-def shrinking_apert():
+
+def shrinking_apert(r0, x0, y0, data):
+    """
+    r0 = float, aperture to consider in the data
+    x0 = float, initial x coord of center
+    y0 = float, initial y coord of center
+    data = 2D np.array
+    """
     return
 
 

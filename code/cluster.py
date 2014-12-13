@@ -4,6 +4,8 @@ different clusters
 import tables
 
 
+# maybe best organized as a dict first ...?
+# then use pd.concat
 class cluster(IsDescription):
     """processed info about a cluster
     * good for parallelization
@@ -18,5 +20,3 @@ class cluster(IsDescription):
     galPeakNo = Int32Col()
     DMPeakNo = Int32Col()
     richness = Float32Col()
-
-
