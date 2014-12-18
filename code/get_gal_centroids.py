@@ -125,8 +125,14 @@ def find_peaks_from_2nd_deriv(fhat, verbose=False):
     return func(fhat, verbose)
 
 
-def bootstrapped_KDE_peaks():
+def bootstrapped_KDE_peaks(data, bootNo=100, ):
     """
+    :params:
+    data = 2D numpy array with shape (2, obs_no)
+    bootNo = integer, number of bootstrap samples to call
+
+    :returns:
+        list of peak values
     """
 
     return

@@ -19,9 +19,16 @@ do_KDE=
   # w = list of floats that is same size as data that denotes the weight
   # @return/
   # fhat_pi1 = R object from the ks package  
-function(data, bandwidth_selector, w=rep.int(1, nrow(data))){
+function(data, bandwidth_selector=Hscv, w=rep.int(1, nrow(data)), 
+         verbose=F){
   H <- bandwidth_selector(x=data)
-  fhat_pi1 <- kde(x=data, H=H, w=w) 
+  fhat_pi1 <- kde(x=data, H=H) 
+  coords_ix <- find_peaks_from_2nd_deriv(fhat_pi1) 
+  peaks <- find_dominant_peaks(fhat_pi1, coords_ix, verbose=verbose)
+
+  sort_peak()
+
+  return(peaks)
 }
 
 
@@ -85,10 +92,10 @@ find_dominant_peaks=
   # dom_peak_no = integers, number of dominant peaks to find 
   # @stability 
   # it runs without the world crashing and burning but use with caution
-function(fhat, coords, dom_peak_no=2L)
+function(fhat, coords, dom_peak_no=2L, verbose=T)
 {
   # should indicate how many peaks were found 
-  print(sprintf("Total num. of peaks found: %d", dim(coords)[[1]]))
+  if(verbose) print(sprintf("Total num. of peaks found: %d", dim(coords)[[1]]))
 
   dens <- fhat$estimate[coords] 
   xloc <- fhat$eval.points[[1]]
@@ -98,11 +105,12 @@ function(fhat, coords, dom_peak_no=2L)
   sorted_dens <- sort(dens, decreasing=T)
 
   # find the peak locs
-  peak_locs <- lapply(1:dom_peak_no,
+  peak_locs <- sapply(1:dom_peak_no,
                function(i) c(xloc[coords[which(dens == sorted_dens[[i]],
                                                arr.ind=T), 1]],
                              yloc[coords[which(dens == sorted_dens[[i]],
                                                arr.ind=T), 2]])) 
+  return(peak_locs)
 }
 
 
@@ -154,7 +162,7 @@ plot_KDE_peaks=
   # @param plot = bool 
   # @param plot_name = str
 function(fhat_pi1, plot=T, cf_lvl=c(1:4 * 20.), plot_name="./plots/R_KDE_plot.png",
-         save=F)
+         save=F, open=F)
 { 
   coords_ix <- find_peaks_from_2nd_deriv(fhat_pi1) 
   peaks <- find_dominant_peaks(fhat_pi1, coords_ix)
@@ -169,20 +177,22 @@ function(fhat_pi1, plot=T, cf_lvl=c(1:4 * 20.), plot_name="./plots/R_KDE_plot.pn
   title("R KDE contour plot")
 
   # output plot from the device
-  if(save) dev.off(); system(paste("open", plot_name))
+  if(save){
+    dev.off()
+
+    # open up the saved plot 
+    if(open) system(paste("open", plot_name))
+  }
  
   peaks
 }
 
 
-#bootstrap=
-#  # DON"T USE
-#  # perform bootstrapping for getting confidence regions 
-#function(fhat, bootNo=10)
-#{ 
-#  nrows <- dim(fhat$x)[[1]]
-#
-#  for(i in 1:bootNo){
-#    do_KDE(fhat$x[sapply(runif(nrows, min=1, max=nrows), round), 1:2], Hscv)
-#  }
-#}
+bootstrap_KDE=
+  # DON"T USE
+  # perform bootstrapping for getting confidence regions 
+function(data_x, bootNo=4, nrows=nrow(data_x))
+{ 
+  lapply(1:bootNo, function(i) do_KDE(data_x[sample(1:nrows, nrows,
+                                                    replace=T), 1:2], Hscv)) 
+}
