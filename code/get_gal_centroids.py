@@ -45,6 +45,10 @@ def py_2D_arr_to_R_matrix(x):
     return robjects.r['matrix'](x, nrow=nrow)
 
 
+def gaussian_mixture_data(samp_no=int(5e2), cwt=1. / 11.):
+    return robjects.r["gaussian_mixture_data"](samp_no, cwt)
+
+
 def do_KDE(data, bw_selector="Hscv", w=None, verbose=False):
     """
     data = np.array, with shape (dataNo, 2)
@@ -125,11 +129,18 @@ def find_peaks_from_2nd_deriv(fhat, verbose=False):
     return func(fhat, verbose)
 
 
-def bootstrapped_KDE_peaks():
+def bootstrap_KDE(data, bootNo=100, ncpus=20):
     """
-    """
+    :params:
+    data = robject vector list ...
+    bootNo = integer, number of bootstrap samples to call
 
-    return
+    :returns:
+        list of peak values
+    """
+    func = robjects.r["bootstrap_KDE"]
+
+    return func(data, bootNo, ncpus)
 
 #-----------other centroid methods ------------------------------------
 
