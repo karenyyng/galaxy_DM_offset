@@ -1,5 +1,4 @@
 python version 2.7.8
-R version 3.1.1
 
 Cython==0.21.1
 easydev==0.7.4
@@ -16,3 +15,5 @@ singledispatch==3.4.0.3
 six==1.8.0
 tables==3.1.1
 wsgiref==0.1.2
+
+R version 3.1.2

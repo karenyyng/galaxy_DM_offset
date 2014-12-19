@@ -155,6 +155,7 @@ def add_info(h5, info, h5_key="df", h5_subkey="info"):
     h5_df = h5py.File(h5, "a")
     h5_df[h5_key].attrs[h5_subkey] = info
     h5_df.close()
+    print "closing file"
 
     return None
 
