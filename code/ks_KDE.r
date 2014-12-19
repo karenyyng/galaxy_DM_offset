@@ -4,11 +4,18 @@
 # Author: Karen Ng <karenyng@ucdavis.edu>
 # ---------------------------------------------------------------------------
 library(ks)
+library(parallel)
 
 set.seed(8192)  # comment out if not testing
 
 
 # ------------ helper functions  ---------------
+sort_peaks=
+  # sort 
+function(peaks)
+{
+ peaks <- peaks[, sort(peaks[1,], index.return=T)$ix]  
+}
 
 do_KDE=
   # group most of the steps for performing KDE to minimize the number of
@@ -17,7 +24,7 @@ do_KDE=
   # data = list of floats denoting the data 
   # bandwidth selector = ks.bandwidth_selector object
   # w = list of floats that is same size as data that denotes the weight
-  # @return/
+  # @return
   # fhat_pi1 = R object from the ks package  
 function(data, bandwidth_selector=Hscv, w=rep.int(1, nrow(data)), 
          verbose=F){
@@ -26,10 +33,9 @@ function(data, bandwidth_selector=Hscv, w=rep.int(1, nrow(data)),
   coords_ix <- find_peaks_from_2nd_deriv(fhat_pi1) 
   peaks <- find_dominant_peaks(fhat_pi1, coords_ix, verbose=verbose)
 
-  sort_peak()
-
-  return(peaks)
+  sort_peaks(peaks)
 }
+
 
 
 find_peaks_from_2nd_deriv= 
@@ -189,10 +195,18 @@ function(fhat_pi1, plot=T, cf_lvl=c(1:4 * 20.), plot_name="./plots/R_KDE_plot.pn
 
 
 bootstrap_KDE=
-  # DON"T USE
   # perform bootstrapping for getting confidence regions 
-function(data_x, bootNo=4, nrows=nrow(data_x))
+  # data_x 
+function(data_x, bootNo=4, nrows=nrow(data_x), ncpus=2L)
 { 
-  lapply(1:bootNo, function(i) do_KDE(data_x[sample(1:nrows, nrows,
-                                                    replace=T), 1:2], Hscv)) 
+  cl <- makeCluster(ncpus, "FORK")
+  ix_list <- lapply(1:bootNo, function(i) 
+                    ix <- sample(1:nrows, nrows, replace=T))
+  res <- parLapply(cl, ix_list, 
+                   function(ix) do_KDE(data_x[ix, 1:2], Hscv))
+  stopCluster(cl)
+  ix_list <- NULL  # delete the ix list 
+  gc()  # tell R to collect memory from the deleted variables
+
+  return(res)
 }
