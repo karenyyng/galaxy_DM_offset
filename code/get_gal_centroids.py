@@ -129,7 +129,7 @@ def find_peaks_from_2nd_deriv(fhat, verbose=False):
     return func(fhat, verbose)
 
 
-def bootstrap_KDE(data, bootNo=100, ncpus=20):
+def bootstrap_KDE(data, bootNo=4, ncpus=2):
     """
     :params:
     data = robject vector list ...
@@ -140,7 +140,7 @@ def bootstrap_KDE(data, bootNo=100, ncpus=20):
     """
     func = robjects.r["bootstrap_KDE"]
 
-    return func(data, bootNo, ncpus)
+    return func(data, bootNo=bootNo, ncpus=ncpus)
 
 #-----------other centroid methods ------------------------------------
 

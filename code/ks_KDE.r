@@ -197,16 +197,27 @@ function(fhat_pi1, plot=T, cf_lvl=c(1:4 * 20.), plot_name="./plots/R_KDE_plot.pn
 bootstrap_KDE=
   # perform bootstrapping for getting confidence regions 
   # data_x 
-function(data_x, bootNo=4, nrows=nrow(data_x), ncpus=2L)
+function(data_x, bootNo=4L, nrows=nrow(data_x), ncpus=2L)
 { 
   cl <- makeCluster(ncpus, "FORK")
   ix_list <- lapply(1:bootNo, function(i) 
                     ix <- sample(1:nrows, nrows, replace=T))
-  res <- parLapply(cl, ix_list, 
+  res <- parSapply(cl, ix_list, 
                    function(ix) do_KDE(data_x[ix, 1:2], Hscv))
   stopCluster(cl)
   ix_list <- NULL  # delete the ix list 
   gc()  # tell R to collect memory from the deleted variables
 
   return(res)
+}
+
+
+plot_bootst_KDE_peaks=
+  # rough draft of how we can plot the peaks
+  # params bt_peaks = vector from bootstrap_KDE function
+function(bt_peaks, truth)
+{
+  # assuming that we really just select the first 2 peaks
+  plot(rbind(t(bt_peaks[1:2,]), t(bt_peaks)[3:4, ]), 
+       xlim=c(-6, 6), ylim=c(-6, 6), xlab='x', ylab='y') 
 }
