@@ -14,10 +14,10 @@ import pandas as pd
 def default_keys():
     """ select some keys to be extracted from h5 files to df """
     return [u'SubhaloPos',
-            #u'SubhaloCM',
-            #u'SubhaloHalfmassRad',
-            #u'SubhaloHalfmassRadType',
-            #u'SubhaloParent',
+            # u'SubhaloCM',
+            # u'SubhaloHalfmassRad',
+            # u'SubhaloHalfmassRadType',
+            # u'SubhaloParent',
             u'SubhaloGrNr',
             u'SubhaloStellarPhotometrics',
             u'SubhaloLenType',
@@ -31,7 +31,7 @@ def extract_clst(f, clstNo, output=False, keys=default_keys(),
 
     # checks if positions are part of the keys
     for i in range(3):
-        ckey = "SubhaloCM" + str(i)
+        ckey = "SubhaloPos" + str(i)
         if ckey in clst_df.keys():
             # alternative syntax is to use
             # clst_df.apply(wrap_and_center_coord, blah blah)
@@ -174,7 +174,8 @@ extract_clst.__doc__ = \
     :param f: file stream object, connected to a HDF5 file, usage: f["Subhalo"]
     :param clstNo: integer, denotes the parent halo ID ordered by mass,
         e.g. 0, 1, 2, 3, ...
-        can think of having a list of clstNo instead
+        use map for extracting a list of clusters
+    :param output: bool, whether to save data to hdf5 file or not
     :param outputFolder: string, denotes output directory
     :fix_phot_band: bool, whether to change the names of photometric bands
     :verbose: bool, if printing is wanted
