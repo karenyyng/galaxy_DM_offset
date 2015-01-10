@@ -61,10 +61,12 @@ def plot_cf_contour(dens, x, y, lvls=[68, 95], show=False, clabel=False):
     """this sort through the density, add them up til they are
     below the required confidence level, then plot
 
-    :param dens: = np.array, the density estimate, should integrate to 1
-    :param x: = np.array, x coord of the density estimate
-    :param y: = np.array, y coord of the density estimate
-    :param lvls: = list of floats, denotes percentile
+    :param dens: np.array, the density estimate, should integrate to 1
+    :param x: np.array, x coord of the density estimate
+    :param y: np.array, y coord of the density estimate
+    :param lvls: list of floats, denotes percentile
+
+    :returns: None
     """
     d = dens.ravel()
     lvls = np.array(lvls) / 100.
@@ -102,6 +104,7 @@ def plot_KDE_peaks(fhat, lvls=range(0, 100, 10), allpeaks=False,
                    plotdata=False, save=False,
                    fileName="./plots/py_KDE_peak_testcase_contours.png",
                    clabel=False):
+    """documentation lacking """
 
     plt.axes().set_aspect('equal')
     plot_cf_contour(fhat["estimate"],

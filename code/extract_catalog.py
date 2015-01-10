@@ -115,13 +115,14 @@ def fix_clst_cat(f, clstNo, keys=default_keys()):
 
 def wrap_and_center_coord(coords, edge_constraint=1e4, verbose=False):
     """ fixing the periodic boundary conditions per cluster
-    wraps automatically at 75 Mpc / h then center coord at cluster center
-    :param coords = numpy array, denotes original coords
-    :param verbose = bool
+    wraps automatically at 75 Mpc / h then center coord at most bound particle
 
-    :return numpy array, coordinates that's been wrapped
+    :param coords: numpy array, denotes original coords
+    :param verbose: bool
 
-    :stability : have to rewrite test case and test
+    :return: numpy array, coordinates that's been wrapped
+
+    :stability: passed test
     """
 
     coords = np.array(coords)
@@ -138,8 +139,8 @@ def wrap_and_center_coord(coords, edge_constraint=1e4, verbose=False):
             print "before masking ", coords[mask]
             print "after masking ", coords[mask]
 
-    ## needs to center coords - use median to be the "center"
-    #return coords - median(coords)
+    # needs to center coords - center on the most bound particle coords[0]
+    # return coords - median(coords)
     return coords - coords[0]
 
 
@@ -163,26 +164,25 @@ def add_info(h5, info, h5_key="df", h5_subkey="info"):
 extract_clst.__doc__ = \
     """calls function to extract clst as dataframe
     this
-    * fix weird shapes in each key
+    * fixes weird shapes in each key
     * wraps clusters at the end of the periodic box
-    * center clusters
-    * fix the names of photometric bands to be more informative
+    * centers clusters
+    * fixes the names of photometric bands to be more informative
     * can choose to output df to hdf5 files
 
-    :params:
-    keys = list of strings denoting relevant keys
-    f = file stream object, connected to a HDF5 file, usage: f["Subhalo"]
-    clstNo = integer, denotes the parent halo ID ordered by mass,
+    :param keys: list of strings, denoting relevant keys
+    :param f: file stream object, connected to a HDF5 file, usage: f["Subhalo"]
+    :param clstNo: integer, denotes the parent halo ID ordered by mass,
         e.g. 0, 1, 2, 3, ...
         can think of having a list of clstNo instead
-    outputFolder = string, denotes output directory
-    fix_phot_band = bool, whether to change the names of photometric bands
-    verbose = bool, if printing is wanted
+    :param outputFolder: string, denotes output directory
+    :fix_phot_band: bool, whether to change the names of photometric bands
+    :verbose: bool, if printing is wanted
 
-    :returns None
+    :return: None
 
-    :stability works
+    :stability: works
 
-    :note unclear to me that the numerical operations would be better
+    :note: unclear to me that the numerical operations would be better
     if we stack dfs of different clusters before computing stat is better
     """
