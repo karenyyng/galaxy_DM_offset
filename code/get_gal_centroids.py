@@ -144,7 +144,6 @@ def bootstrap_KDE(data, bootNo=4, ncpus=2):
 
 #-----------other centroid methods ------------------------------------
 
-
 def shrinking_apert(r0, x0, y0, data):
     """
     r0 = float, aperture to consider in the data

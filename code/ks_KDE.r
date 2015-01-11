@@ -223,3 +223,4 @@ function(bt_peaks, truth=NULL)
        xlim=c(-6, 6), ylim=c(-6, 6), xlab='x', ylab='y') 
   title('bootstrapped peak locations')
 }
+
