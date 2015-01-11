@@ -215,9 +215,11 @@ function(data_x, bootNo=4L, nrows=nrow(data_x), ncpus=2L)
 plot_bootst_KDE_peaks=
   # rough draft of how we can plot the peaks
   # params bt_peaks = vector from bootstrap_KDE function
-function(bt_peaks, truth)
+function(bt_peaks, truth=NULL)
 {
+  
   # assuming that we really just select the first 2 peaks
-  plot(rbind(t(bt_peaks[1:2,]), t(bt_peaks)[3:4, ]), 
+  plot(rbind(t(bt_peaks[1:2,]), t(bt_peaks[3:4, ])), 
        xlim=c(-6, 6), ylim=c(-6, 6), xlab='x', ylab='y') 
+  title('bootstrapped peak locations')
 }
