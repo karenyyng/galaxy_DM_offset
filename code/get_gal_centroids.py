@@ -23,9 +23,14 @@ def convert_fhat_to_dict(r_fhat):
     :stability: works but should be tested
     if I am not lazy I would write a proper class instead ;)
     can think about it if i have designated class methods for class vars
+
+    under this conversion
+
+    fhat["data_x"] : np.array with shape as (obs_no, 2)
+    fhat["domPeaks"] : np.array with shape as (peak_no, 2)
     """
 
-    return {"data_x": np.array(r_fhat[0]).transpose(),
+    return {"data_x": np.array(r_fhat[0]),
             "eval_points": np.array(r_fhat[1]),
             "estimate": np.array(r_fhat[2]),
             "bandwidth_matrix_H": np.array(r_fhat[3]),

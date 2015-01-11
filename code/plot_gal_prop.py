@@ -100,7 +100,7 @@ def plot_cf_contour(dens, x, y, lvls=[68, 95], show=False, clabel=False):
     return
 
 
-def plot_KDE_peaks(fhat, lvls=range(0, 100, 10), allpeaks=False,
+def plot_KDE_peaks(fhat, lvls=range(0, 100, 20), allpeaks=False,
                    plotdata=False, save=False,
                    fileName="./plots/py_KDE_peak_testcase_contours.png",
                    clabel=False):
@@ -112,10 +112,11 @@ def plot_KDE_peaks(fhat, lvls=range(0, 100, 10), allpeaks=False,
                     lvls=lvls, clabel=clabel)
 
     plt.plot(fhat["domPeaks"].transpose()[0], fhat["domPeaks"].transpose()[1],
-             'rx', mew=3, label='inferred dens peak')
+             'ro', mew=0, label='inferred dens peak')
 
     if plotdata:
-        plt.plot(fhat["data_x"][0], fhat["data_x"][1], 'k.', alpha=.4)
+        plt.plot(fhat["data_x"].transpose()[0],
+                 fhat["data_x"].transpose()[1], 'k.', alpha=.4)
 
 
     if allpeaks:
