@@ -177,7 +177,7 @@ plot_KDE_peaks=
   # @param plot = bool 
   # @param plot_name = str
   # @param dom_peak_no = integer 
-function(fhat_pi1, plot=T, cf_lvl=c(1:4 * 20.), plot_name="./plots/R_KDE_plot.png",
+function(fhat_pi1, cf_lvl=c(1:4 * 20.), plot_name="./plots/R_KDE_plot.png",
          save=F, open=F, dom_peak_no=1L)
 { 
   coords_ix <- find_peaks_from_2nd_deriv(fhat_pi1) 
@@ -204,21 +204,43 @@ function(fhat_pi1, plot=T, cf_lvl=c(1:4 * 20.), plot_name="./plots/R_KDE_plot.pn
 }
 
 
+do_KDE_and_get_peaks=
+  # perform KDE then get peaks 
+  # @param x: matrix, 2D matrix for holding data values   
+  # @param bw_selector: ks object called bandwidth_selector 
+  # @stability : seems ok 
+function(x, bw_selector=Hscv, w=rep.int(1, nrow(x)), 
+         dom_peak_no=1L) 
+{
+  fhat_pi1 <- do_KDE(x, bandwidth_selector=bw_selector, w=w)
+  coords_ix <- find_peaks_from_2nd_deriv(fhat_pi1) 
+  peaks <- find_dominant_peaks(fhat_pi1, coords_ix, dom_peak_no=dom_peak_no)
+
+  return(peaks)
+}
+
+
 bootstrap_KDE=
   # perform bootstrapping for getting confidence regions 
   # data_x 
-function(data_x, bootNo=4L, nrows=nrow(data_x), ncpus=2L)
+  # @stability : needs much more debugging to see how the results are stacked
+  # and returned
+function(data_x, bootNo=4L, nrows=nrow(data_x), ncpus=2L, dom_peak_no=1L,
+         bw_selector=Hscv, w=rep.int(1, nrow(data_x)))
 { 
   cl <- makeCluster(ncpus, "FORK")
   ix_list <- lapply(1:bootNo, function(i) 
                     ix <- sample(1:nrows, nrows, replace=T))
   res <- parSapply(cl, ix_list, 
-                   function(ix) do_KDE(data_x[ix, 1:2], Hscv))
+                   function(ix) do_KDE_and_get_peaks(data_x[ix, 1:2], 
+                                                     bw_selector,
+                                                     w=w,
+                                                     dom_peak_no=dom_peak_no))
   stopCluster(cl)
   ix_list <- NULL  # delete the ix list 
   gc()  # tell R to collect memory from the deleted variables
 
-  return(res)
+  return(t(res))
 }
 
 
