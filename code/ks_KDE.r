@@ -34,6 +34,7 @@ function(data, bandwidth_selector=Hscv, w=rep.int(1, nrow(data)),
   peaks <- find_dominant_peaks(fhat_pi1, coords_ix, verbose=verbose)
 
   sort_peaks(peaks)
+  return(fhat_pi1)
 }
 
 
@@ -43,9 +44,11 @@ find_peaks_from_2nd_deriv=
   # @params
   # fhat = object returned by ks.KDE 
   # return_peak_ix = bool, whether to return R index or actuall coords
+  #
   # @return 
   # list with pairs of coordinates indices for the peak values  
   # want to change this to the actual coords
+  #
   # @note can consider rewriting this using a faster language than R ...
   # @stability passed test case 
 function(fhat, verbose=F, return_peak_ix=T)
@@ -65,7 +68,7 @@ function(fhat, verbose=F, return_peak_ix=T)
   # find peaks along each row 
   # tranposed during diff since the diff function only take differences of rows 
   ix_row_peaks <- diff(rbind(add_col, sign(diff(t(dens)))))
-  # bind row to preserve dimensionality
+  # bind row to preserve dimensionalityt
   ix_row_peaks <- rbind(ix_row_peaks, add_col) 
   # transpose back to original orientation
   ix_row_peaks <- t(ix_row_peaks)
@@ -92,18 +95,20 @@ function(fhat, verbose=F, return_peak_ix=T)
 
 find_dominant_peaks=
   # find dominant peaks 
+  #
   # @params
   # fhat = R object generated from ks.KDE 
-  # coords = list of floats, the floats represent the coordinates  
+  # coords_ix = list of integers, the integers represent the coordinates  
   # dom_peak_no = integers, number of dominant peaks to find 
+  #
   # @stability 
   # it runs without the world crashing and burning but use with caution
-function(fhat, coords, dom_peak_no=2L, verbose=T)
+function(fhat, coords_ix, dom_peak_no=1L, verbose=T)
 {
   # should indicate how many peaks were found 
-  if(verbose) print(sprintf("Total num. of peaks found: %d", dim(coords)[[1]]))
+  if(verbose) print(sprintf("Total num. of peaks found: %d", dim(coords_ix)[[1]]))
 
-  dens <- fhat$estimate[coords] 
+  dens <- fhat$estimate[coords_ix] 
   xloc <- fhat$eval.points[[1]]
   yloc <- fhat$eval.points[[2]]
 
@@ -112,9 +117,9 @@ function(fhat, coords, dom_peak_no=2L, verbose=T)
 
   # find the peak locs
   peak_locs <- sapply(1:dom_peak_no,
-               function(i) c(xloc[coords[which(dens == sorted_dens[[i]],
-                                               arr.ind=T), 1]],
-                             yloc[coords[which(dens == sorted_dens[[i]],
+               function(i) c(xloc[coords_ix[which(dens == sorted_dens[[i]],
+                                                  arr.ind=T), 1]],
+                             yloc[coords_ix[which(dens == sorted_dens[[i]],
                                                arr.ind=T), 2]])) 
   return(peak_locs)
 }

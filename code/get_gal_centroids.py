@@ -41,7 +41,7 @@ def py_2D_arr_to_R_matrix(x):
     x = np.array, with shape (dataNo, 2)
     """
     nrow = x.shape[0]
-    x = robjects.FloatVector(x.ravel())
+    x = robjects.FloatVector(np.concatenate([x[:, 0], x[:, 1]]))
     return robjects.r['matrix'](x, nrow=nrow)
 
 
@@ -56,6 +56,8 @@ def do_KDE(data, bw_selector="Hscv", w=None, verbose=False):
     w = np.array of floats, denote the weights for each data point
     verbose = bool
     """
+    assert data.shape[1] == 2, \
+        "data array is of the wrong shape, want array with shape (# of obs, 2)"
     assert bw_selector == 'Hscv' or bw_selector == 'Hpi', \
         "bandwidth selector {0} not available".format(bw_selector)
 
@@ -72,20 +74,24 @@ def do_KDE(data, bw_selector="Hscv", w=None, verbose=False):
     return fhat
 
 
-def get_peaks(fhat):
+def get_peaks(fhat, no_of_peaks):
     """
-    fhat = robject spat out from ks.KDE
+    :param fhat: robject spat out from ks.KDE
+    :param no_of_peaks: integer
     """
     findPeaks = robjects.r["find_peaks_from_2nd_deriv"]
     findDomPeaks = robjects.r["find_dominant_peaks"]
 
     peaks_ix = findPeaks(fhat)  # fhat[2] = fhat$estimate
-    dom_peaks = np.array(findDomPeaks(fhat, peaks_ix))
+    dom_peaks = np.array(findDomPeaks(fhat, peaks_ix, no_of_peaks))
 
     fhat = convert_fhat_to_dict(fhat)
-    # subtracting 1 from the peak_coords since python is zeroth index, R is
-    # not
+    # subtracting 1 from the peak_coords since python is zeroth index,
+    # R has 1 as the first index
     fhat["peaks_py_ix"] = np.array(peaks_ix) - 1
+
+    # need to double check how the coordinates are put into vectors
+    # something might have been transposed ...
     fhat["domPeaks"] = dom_peaks
 
     return fhat
