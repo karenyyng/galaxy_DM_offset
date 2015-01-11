@@ -78,6 +78,9 @@ def get_peaks(fhat, no_of_peaks):
     """
     :param fhat: robject spat out from ks.KDE
     :param no_of_peaks: integer
+
+    :returns: list of peaks,
+        each row correspond to one peak [[x1, y1], [x2, y2], ...]
     """
     findPeaks = robjects.r["find_peaks_from_2nd_deriv"]
     findDomPeaks = robjects.r["find_dominant_peaks"]

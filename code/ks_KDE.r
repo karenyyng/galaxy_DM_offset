@@ -101,7 +101,11 @@ find_dominant_peaks=
   # coords_ix = list of integers, the integers represent the coordinates  
   # dom_peak_no = integers, number of dominant peaks to find 
   #
-  # @stability 
+  # @returns 
+  # a matrix of coordinates, coordinate ordering is as follows 
+  # each row correspond to each peak coordinates
+  # first column of the matrix corresponds to the x coordinate, 
+  # second col = y coord
   # it runs without the world crashing and burning but use with caution
 function(fhat, coords_ix, dom_peak_no=1L, verbose=T)
 {
@@ -121,7 +125,7 @@ function(fhat, coords_ix, dom_peak_no=1L, verbose=T)
                                                   arr.ind=T), 1]],
                              yloc[coords_ix[which(dens == sorted_dens[[i]],
                                                arr.ind=T), 2]])) 
-  return(peak_locs)
+  return(t(peak_locs))
 }
 
 
@@ -172,18 +176,19 @@ plot_KDE_peaks=
   # @param fhat_pi1 = object returned by ks.KDE 
   # @param plot = bool 
   # @param plot_name = str
+  # @param dom_peak_no = integer 
 function(fhat_pi1, plot=T, cf_lvl=c(1:4 * 20.), plot_name="./plots/R_KDE_plot.png",
-         save=F, open=F)
+         save=F, open=F, dom_peak_no=1L)
 { 
   coords_ix <- find_peaks_from_2nd_deriv(fhat_pi1) 
-  peaks <- find_dominant_peaks(fhat_pi1, coords_ix)
+  peaks <- find_dominant_peaks(fhat_pi1, coords_ix, dom_peak_no=dom_peak_no)
 
   # activate the png device 
   if(save) png(plot_name)
 
   plot(fhat_pi1, cont=cf_lvl, xlab="x", ylab="y")
-  for(i in 1:length(peaks)){
-    points(peaks[[i]][1], peaks[[i]][2], col="red", pch=20)
+  for(i in 1:dim(peaks)[[1]]){
+    points(peaks[[i, 1]], peaks[[i, 2]], col="red", pch=20)
   }
   title("R KDE contour plot")
 
