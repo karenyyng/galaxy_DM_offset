@@ -10,13 +10,16 @@ import extract_catalog as ec
 import get_gal_centroids as cent
 import compute_clst_prop as cp
 import pickle
+import sys
 
 
 h5File = "../../data/Illustris-1_fof_subhalo_myCompleteHaloCatalog_00135.hdf5"
 f = h5py.File(h5File, "r")
 
 # there are only 129 clst > 1e13 Msun
-allClst = 129
+allClst = int(sys.argv[1])
+print "examining {0} clusters in total".format(allClst)
+
 df_list = [ec.extract_clst(f, clstNo) for clstNo in range(allClst)]
 
 cut_kwargs = {'DM_cut': 1e3, 'star_cut': 5e1}

@@ -40,7 +40,8 @@ def compute_KDE_peak_offsets(df, f, clstNo, cut_method, cut_kwargs,
     :return: list of [offset, offsetR200]
         offset: offset in unit of c kpc/h
         offset: offset in terms of the R200C of the cluster
-
+    :to do:
+        want to make col a param
     :note:
         can think of making this function even more general
         by having the peak inference function passed in
@@ -49,8 +50,10 @@ def compute_KDE_peak_offsets(df, f, clstNo, cut_method, cut_kwargs,
     mask = cut_method(df, **cut_kwargs)
     if verbose:
         print "# of subhalos after the cut = {0}".format(np.sum(mask))
-    data = np.array([df.SubhaloPos0[mask],
-                     df.SubhaloPos1[mask]]).transpose()
+
+    col = ["SubhaloPos0", "SubhaloPos1"]
+    data = np.array(df[col][mask])
+    print "data shape is ", data.shape
 
     peaks = do_KDE_and_get_peaks(data)
     peaks = np.array(peaks)[0]
@@ -165,6 +168,8 @@ def find_peaks_from_2nd_deriv(fhat, verbose=False):
 
 def do_KDE_and_get_peaks(x, w=None, dom_peak_no=1):
     """ don't want to write this for a general bandwidth selector yet
+    :params x: np.array, each row should be one observation / subhalo
+    :params w: np.float, weight of each row of data
 
     :stability: untested
     """
