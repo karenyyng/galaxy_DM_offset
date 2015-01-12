@@ -17,6 +17,7 @@ function(peaks)
  peaks <- peaks[, sort(peaks[1,], index.return=T)$ix]  
 }
 
+
 do_KDE=
   # group most of the steps for performing KDE to minimize the number of
   # functions that I need to wrap in python 
@@ -33,7 +34,6 @@ function(data, bandwidth_selector=Hscv, w=rep.int(1, nrow(data)),
 
   return(fhat_pi1)
 }
-
 
 
 find_peaks_from_2nd_deriv= 

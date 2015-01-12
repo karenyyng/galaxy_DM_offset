@@ -1,0 +1,38 @@
+import h5py
+import numpy as np
+import sys
+import time
+
+sys.path.append("../")
+
+import extract_catalog as ec
+# following line only works when you are in the ks_KDE.r directory
+import get_gal_centroids as cent
+import compute_clst_prop as cp
+import pickle
+
+
+h5File = "../../data/Illustris-1_fof_subhalo_myCompleteHaloCatalog_00135.hdf5"
+f = h5py.File(h5File, "r")
+
+# there are only 129 clst > 1e13 Msun
+allClst = 129
+df_list = [ec.extract_clst(f, clstNo) for clstNo in range(allClst)]
+
+cut_kwargs = {'DM_cut': 1e3, 'star_cut': 5e1}
+
+offsets_list = [cent.compute_KDE_peak_offsets(df_list[i], f, i,
+                                              cent.cut_reliable_galaxies,
+                                              cut_kwargs)
+                for i in range(allClst)]
+
+relaxedness_list = [cp.compute_relaxedness1(df_list[i], f, i) for i in
+                    range(allClst)]
+
+f = open('offset_list_{0}.pkl'.format(allClst), 'w')
+pickle.dump(offsets_list, f)
+f.close()
+
+f = open('relaxedness_{0}.pkl'.format(allClst), 'w')
+pickle.dump(relaxedness_list, f)
+f.close()
