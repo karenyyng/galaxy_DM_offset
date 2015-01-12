@@ -11,7 +11,7 @@ set.seed(8192)  # comment out if not testing
 
 # ------------ helper functions  ---------------
 sort_peaks=
-  # sort 
+  # sort according to the x coordinate  
 function(peaks)
 {
  peaks <- peaks[, sort(peaks[1,], index.return=T)$ix]  
@@ -222,7 +222,9 @@ function(x, bw_selector=Hscv, w=rep.int(1, nrow(x)),
 
 bootstrap_KDE=
   # perform bootstrapping for getting confidence regions 
-  # data_x 
+  # @param data_x:  matrix 
+  # @param bootNo: integer 
+  # etc.
   # @stability : needs much more debugging to see how the results are stacked
   # and returned
 function(data_x, bootNo=4L, nrows=nrow(data_x), ncpus=2L, dom_peak_no=1L,

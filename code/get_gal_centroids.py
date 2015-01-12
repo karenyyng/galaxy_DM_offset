@@ -8,13 +8,13 @@ import numpy as np
 import rpy2.robjects as robjects
 from rpy2.robjects.packages import importr
 base = importr("base")  # not really needed in the script
-#ks = importr("ks")
+# ks = importr("ks")
 
 # call the R code that I have written
 robjects.r('source("ks_KDE.r")')
 
 
-#------------python wrapper to ks_KDE.r code ---------------------------
+# ------------python wrapper to ks_KDE.r code ---------------------------
 
 def convert_fhat_to_dict(r_fhat):
     """preserves the returned object structure with a dict
@@ -56,10 +56,12 @@ def gaussian_mixture_data(samp_no=int(5e2), cwt=1. / 11.):
 
 def do_KDE(data, bw_selector="Hscv", w=None, verbose=False):
     """
-    data = np.array, with shape (dataNo, 2)
-    bw_selector = str, either 'Hscv' or 'Hpi'
-    w = np.array of floats, denote the weights for each data point
-    verbose = bool
+    :param data: np.array, with shape (dataNo, 2)
+    :param bw_selector: str, either 'Hscv' or 'Hpi'
+    :param w: np.array of floats that denote the weight for each data point
+    :param verbose: bool
+
+    :return: fhat, ks R object spat out by KDE()
     """
     assert data.shape[1] == 2, \
         "data array is of the wrong shape, want array with shape (# of obs, 2)"
@@ -105,6 +107,45 @@ def get_peaks(fhat, no_of_peaks):
     return fhat
 
 
+def find_peaks_from_2nd_deriv(fhat, verbose=False):
+    """not tested but works without errors
+    fhat = robject returned by ks.KDE
+    """
+    func = robjects.r["find_peaks_from_2nd_deriv"]
+
+    return func(fhat, verbose)
+
+
+def do_KDE_and_get_peaks(x, w=None, dom_peak_no=1):
+    """ don't want to write this for a general bandwidth selector yet
+
+    :stability: untested
+    """
+    do_KDE_and_get_peaks = robjects.r["do_KDE_and_get_peaks"]
+
+    x = py_2D_arr_to_R_matrix(np.array(x))
+    if w is not None:
+        w = robjects.FloatVector(w)
+        res = do_KDE_and_get_peaks(x, w=w, dom_peak_no=dom_peak_no)
+    else:
+        res = do_KDE_and_get_peaks(x, dom_peak_no=dom_peak_no)
+
+    return res
+
+
+def bootstrap_KDE(data, bootNo=4, ncpus=2):
+    """
+    :params data: robject vector list ...
+    :params bootNo: integer number of bootstrap samples to call
+
+    :returns:
+        list of peak values
+    """
+    func = robjects.r["bootstrap_KDE"]
+
+    return func(data, bootNo=bootNo, ncpus=ncpus)
+
+
 def TwoDtestCase1(samp_no=5e2, cwt=1. / 11., w=None, H=None):
     """call the TwoDtestCase1 for getting data with 3 Gaussian mixtures
     """
@@ -129,41 +170,32 @@ def rmvnorm_mixt(n, mus, Sigmas, props):
         that contains coordinates of the normal mixture
     """
     # need to import a library
-    #robjects.r[""]
+    # robjects.r[""]
 
     return None
 
 
-def find_peaks_from_2nd_deriv(fhat, verbose=False):
-    """not tested but works without errors
-    fhat = robject returned by ks.KDE
+# -----------other centroid methods ------------------------------------
+
+def cut_reliable_galaxies(df, DM_cut=1e3, star_cut=1e2):
+    """ consider all cluster galaxies with minimal cuts
+    :params df: pandas dataframe contains one cluster
+    :params DM_cut: integer, how many DM particles needed for us to consider
+        subhalos to be reliable
+    :params star_cut: integer, how many stellar particles needed for us to
+        consider subhalos to be reliable
     """
-    func = robjects.r["find_peaks_from_2nd_deriv"]
-
-    return func(fhat, verbose)
-
-
-def bootstrap_KDE(data, bootNo=4, ncpus=2):
-    """
-    :params:
-    data = robject vector list ...
-    bootNo = integer, number of bootstrap samples to call
-
-    :returns:
-        list of peak values
-    """
-    func = robjects.r["bootstrap_KDE"]
-
-    return func(data, bootNo=bootNo, ncpus=ncpus)
-
-#-----------other centroid methods ------------------------------------
+    # DM cut
+    mask = df["SubhaloLenType1"] > DM_cut
+    return np.logical_and(mask,
+                          df["SubhaloLenType1"] > star_cut)
 
 def shrinking_apert(r0, x0, y0, data):
     """
-    r0 = float, aperture to consider in the data
-    x0 = float, initial x coord of center
-    y0 = float, initial y coord of center
-    data = 2D np.array
+    :param r0: float, aperture to consider in the data
+    :param x0: float, initial x coord of center
+    :param y0: float, initial y coord of center
+    :param data: 2D np.array
     """
     return
 
