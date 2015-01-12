@@ -142,7 +142,7 @@ def plot_data_and_peak(df, peaks, R500C=None, save=False, title=None,
     """
     :params df: pandas data frame with suitable column names
     :params peaks: np.array, what's spat out from do_KDE_and_get_peaks
-    :params R500C:
+    :params R500C: float, the radius to plot a circle to visualize on the plot
     """
     mask = df["SubhaloLenType1"] > 1e3
     plt.axes().set_aspect('equal')

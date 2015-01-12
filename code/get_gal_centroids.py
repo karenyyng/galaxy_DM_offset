@@ -14,6 +14,53 @@ base = importr("base")  # not really needed in the script
 robjects.r('source("ks_KDE.r")')
 
 
+# --------- methods for computing gal-DM offsets-------------------------
+def cut_reliable_galaxies(df, DM_cut=1e3, star_cut=1e2):
+    """ consider all cluster galaxies with minimal cuts
+    :params df: pandas dataframe contains one cluster
+    :params DM_cut: integer, how many DM particles needed for us to consider
+        subhalos to be reliable
+    :params star_cut: integer, how many stellar particles needed for us to
+        consider subhalos to be reliable
+
+    :notes:
+    http://illustris-project.org/w/index.php/Data_Details#Snapshot_Contents
+    """
+    # DM cut
+    mask = df["SubhaloLenType1"] > DM_cut
+    return np.logical_and(mask, df["SubhaloLenType4"] > star_cut)
+
+
+def compute_KDE_peak_offsets(df, f, clstNo, cut_method, cut_kwargs,
+                             verbose=False):
+    """
+    :params df: pandas dataframe for each cluster
+    :params cut_method: function
+
+    :return: list of [offset, offsetR200]
+        offset: offset in unit of c kpc/h
+        offset: offset in terms of the R200C of the cluster
+
+    :note:
+        can think of making this function even more general
+        by having the peak inference function passed in
+    """
+    # prepare the data for KDE
+    mask = cut_method(df, **cut_kwargs)
+    if verbose:
+        print "# of subhalos after the cut = {0}".format(np.sum(mask))
+    data = np.array([df.SubhaloPos0[mask],
+                     df.SubhaloPos1[mask]]).transpose()
+
+    peaks = do_KDE_and_get_peaks(data)
+    peaks = np.array(peaks)[0]
+
+    offset = np.sqrt(np.dot(peaks, peaks))
+    R200C = f["Group"]["Group_R_Crit200"][clstNo]
+    offsetR200 = offset / R200C
+
+    return [offset, offsetR200]
+
 # ------------python wrapper to ks_KDE.r code ---------------------------
 
 def convert_fhat_to_dict(r_fhat):
@@ -177,18 +224,7 @@ def rmvnorm_mixt(n, mus, Sigmas, props):
 
 # -----------other centroid methods ------------------------------------
 
-def cut_reliable_galaxies(df, DM_cut=1e3, star_cut=1e2):
-    """ consider all cluster galaxies with minimal cuts
-    :params df: pandas dataframe contains one cluster
-    :params DM_cut: integer, how many DM particles needed for us to consider
-        subhalos to be reliable
-    :params star_cut: integer, how many stellar particles needed for us to
-        consider subhalos to be reliable
-    """
-    # DM cut
-    mask = df["SubhaloLenType1"] > DM_cut
-    return np.logical_and(mask,
-                          df["SubhaloLenType1"] > star_cut)
+
 
 def shrinking_apert(r0, x0, y0, data):
     """

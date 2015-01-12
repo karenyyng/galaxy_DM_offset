@@ -27,13 +27,10 @@ do_KDE=
   # @return
   # fhat_pi1 = R object from the ks package  
 function(data, bandwidth_selector=Hscv, w=rep.int(1, nrow(data)), 
-         verbose=F){
+         verbose=F, dom_peak_no=1L){
   H <- bandwidth_selector(x=data)
   fhat_pi1 <- kde(x=data, H=H) 
-  coords_ix <- find_peaks_from_2nd_deriv(fhat_pi1) 
-  peaks <- find_dominant_peaks(fhat_pi1, coords_ix, verbose=verbose)
 
-  sort_peaks(peaks)
   return(fhat_pi1)
 }
 
