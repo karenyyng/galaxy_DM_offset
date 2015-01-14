@@ -11,11 +11,12 @@ set.seed(8192)  # comment out if not testing
 
 # ------------ helper functions  ---------------
 sort_peaks=
-  # sort 
+  # sort according to the x coordinate  
 function(peaks)
 {
  peaks <- peaks[, sort(peaks[1,], index.return=T)$ix]  
 }
+
 
 do_KDE=
   # group most of the steps for performing KDE to minimize the number of
@@ -27,15 +28,12 @@ do_KDE=
   # @return
   # fhat_pi1 = R object from the ks package  
 function(data, bandwidth_selector=Hscv, w=rep.int(1, nrow(data)), 
-         verbose=F){
+         verbose=F, dom_peak_no=1L){
   H <- bandwidth_selector(x=data)
   fhat_pi1 <- kde(x=data, H=H) 
-  coords_ix <- find_peaks_from_2nd_deriv(fhat_pi1) 
-  peaks <- find_dominant_peaks(fhat_pi1, coords_ix, verbose=verbose)
 
-  sort_peaks(peaks)
+  return(fhat_pi1)
 }
-
 
 
 find_peaks_from_2nd_deriv= 
@@ -43,9 +41,11 @@ find_peaks_from_2nd_deriv=
   # @params
   # fhat = object returned by ks.KDE 
   # return_peak_ix = bool, whether to return R index or actuall coords
+  #
   # @return 
   # list with pairs of coordinates indices for the peak values  
   # want to change this to the actual coords
+  #
   # @note can consider rewriting this using a faster language than R ...
   # @stability passed test case 
 function(fhat, verbose=F, return_peak_ix=T)
@@ -65,7 +65,7 @@ function(fhat, verbose=F, return_peak_ix=T)
   # find peaks along each row 
   # tranposed during diff since the diff function only take differences of rows 
   ix_row_peaks <- diff(rbind(add_col, sign(diff(t(dens)))))
-  # bind row to preserve dimensionality
+  # bind row to preserve dimensionalityt
   ix_row_peaks <- rbind(ix_row_peaks, add_col) 
   # transpose back to original orientation
   ix_row_peaks <- t(ix_row_peaks)
@@ -92,18 +92,24 @@ function(fhat, verbose=F, return_peak_ix=T)
 
 find_dominant_peaks=
   # find dominant peaks 
+  #
   # @params
   # fhat = R object generated from ks.KDE 
-  # coords = list of floats, the floats represent the coordinates  
+  # coords_ix = list of integers, the integers represent the coordinates  
   # dom_peak_no = integers, number of dominant peaks to find 
-  # @stability 
+  #
+  # @returns 
+  # a matrix of coordinates, coordinate ordering is as follows 
+  # each row correspond to each peak coordinates
+  # first column of the matrix corresponds to the x coordinate, 
+  # second col = y coord
   # it runs without the world crashing and burning but use with caution
-function(fhat, coords, dom_peak_no=2L, verbose=T)
+function(fhat, coords_ix, dom_peak_no=1L, verbose=T)
 {
   # should indicate how many peaks were found 
-  if(verbose) print(sprintf("Total num. of peaks found: %d", dim(coords)[[1]]))
+  if(verbose) print(sprintf("Total num. of peaks found: %d", dim(coords_ix)[[1]]))
 
-  dens <- fhat$estimate[coords] 
+  dens <- fhat$estimate[coords_ix] 
   xloc <- fhat$eval.points[[1]]
   yloc <- fhat$eval.points[[2]]
 
@@ -112,11 +118,11 @@ function(fhat, coords, dom_peak_no=2L, verbose=T)
 
   # find the peak locs
   peak_locs <- sapply(1:dom_peak_no,
-               function(i) c(xloc[coords[which(dens == sorted_dens[[i]],
-                                               arr.ind=T), 1]],
-                             yloc[coords[which(dens == sorted_dens[[i]],
+               function(i) c(xloc[coords_ix[which(dens == sorted_dens[[i]],
+                                                  arr.ind=T), 1]],
+                             yloc[coords_ix[which(dens == sorted_dens[[i]],
                                                arr.ind=T), 2]])) 
-  return(peak_locs)
+  return(t(peak_locs))
 }
 
 
@@ -167,18 +173,19 @@ plot_KDE_peaks=
   # @param fhat_pi1 = object returned by ks.KDE 
   # @param plot = bool 
   # @param plot_name = str
-function(fhat_pi1, plot=T, cf_lvl=c(1:4 * 20.), plot_name="./plots/R_KDE_plot.png",
-         save=F, open=F)
+  # @param dom_peak_no = integer 
+function(fhat_pi1, cf_lvl=c(1:4 * 20.), plot_name="./plots/R_KDE_plot.png",
+         save=F, open=F, dom_peak_no=1L)
 { 
   coords_ix <- find_peaks_from_2nd_deriv(fhat_pi1) 
-  peaks <- find_dominant_peaks(fhat_pi1, coords_ix)
+  peaks <- find_dominant_peaks(fhat_pi1, coords_ix, dom_peak_no=dom_peak_no)
 
   # activate the png device 
   if(save) png(plot_name)
 
   plot(fhat_pi1, cont=cf_lvl, xlab="x", ylab="y")
-  for(i in 1:length(peaks)){
-    points(peaks[[i]][1], peaks[[i]][2], col="red", pch=20)
+  for(i in 1:dim(peaks)[[1]]){
+    points(peaks[[i, 1]], peaks[[i, 2]], col="red", pch=20)
   }
   title("R KDE contour plot")
 
@@ -194,21 +201,45 @@ function(fhat_pi1, plot=T, cf_lvl=c(1:4 * 20.), plot_name="./plots/R_KDE_plot.pn
 }
 
 
+do_KDE_and_get_peaks=
+  # perform KDE then get peaks 
+  # @param x: matrix, 2D matrix for holding data values   
+  # @param bw_selector: ks object called bandwidth_selector 
+  # @stability : seems ok 
+function(x, bw_selector=Hscv, w=rep.int(1, nrow(x)), 
+         dom_peak_no=1L) 
+{
+  fhat_pi1 <- do_KDE(x, bandwidth_selector=bw_selector, w=w)
+  coords_ix <- find_peaks_from_2nd_deriv(fhat_pi1) 
+  peaks <- find_dominant_peaks(fhat_pi1, coords_ix, dom_peak_no=dom_peak_no)
+
+  return(peaks)
+}
+
+
 bootstrap_KDE=
   # perform bootstrapping for getting confidence regions 
-  # data_x 
-function(data_x, bootNo=4L, nrows=nrow(data_x), ncpus=2L)
+  # @param data_x:  matrix 
+  # @param bootNo: integer 
+  # etc.
+  # @stability : needs much more debugging to see how the results are stacked
+  # and returned
+function(data_x, bootNo=4L, nrows=nrow(data_x), ncpus=2L, dom_peak_no=1L,
+         bw_selector=Hscv, w=rep.int(1, nrow(data_x)))
 { 
   cl <- makeCluster(ncpus, "FORK")
   ix_list <- lapply(1:bootNo, function(i) 
                     ix <- sample(1:nrows, nrows, replace=T))
   res <- parSapply(cl, ix_list, 
-                   function(ix) do_KDE(data_x[ix, 1:2], Hscv))
+                   function(ix) do_KDE_and_get_peaks(data_x[ix, 1:2], 
+                                                     bw_selector,
+                                                     w=w,
+                                                     dom_peak_no=dom_peak_no))
   stopCluster(cl)
   ix_list <- NULL  # delete the ix list 
   gc()  # tell R to collect memory from the deleted variables
 
-  return(res)
+  return(t(res))
 }
 
 
@@ -223,3 +254,4 @@ function(bt_peaks, truth=NULL)
        xlim=c(-6, 6), ylim=c(-6, 6), xlab='x', ylab='y') 
   title('bootstrapped peak locations')
 }
+

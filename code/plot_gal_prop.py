@@ -100,7 +100,7 @@ def plot_cf_contour(dens, x, y, lvls=[68, 95], show=False, clabel=False):
     return
 
 
-def plot_KDE_peaks(fhat, lvls=range(0, 100, 10), allpeaks=False,
+def plot_KDE_peaks(fhat, lvls=range(0, 100, 20), allpeaks=False,
                    plotdata=False, save=False,
                    fileName="./plots/py_KDE_peak_testcase_contours.png",
                    clabel=False):
@@ -112,10 +112,11 @@ def plot_KDE_peaks(fhat, lvls=range(0, 100, 10), allpeaks=False,
                     lvls=lvls, clabel=clabel)
 
     plt.plot(fhat["domPeaks"].transpose()[0], fhat["domPeaks"].transpose()[1],
-             'rx', mew=3, label='inferred dens peak')
+             'ro', mew=0, label='inferred dens peak')
 
     if plotdata:
-        plt.plot(fhat["data_x"][0], fhat["data_x"][1], 'k.', alpha=.4)
+        plt.plot(fhat["data_x"].transpose()[0],
+                 fhat["data_x"].transpose()[1], 'k.', alpha=.4)
 
 
     if allpeaks:
@@ -135,3 +136,33 @@ def plot_KDE_peaks(fhat, lvls=range(0, 100, 10), allpeaks=False,
     plt.close()
     return
 
+
+def plot_data_and_peak(df, peaks, R500C=None, save=False, title=None,
+                       alpha=0.6, cut=1e3, clstNo=None, units=None):
+    """
+    :params df: pandas data frame with suitable column names
+    :params peaks: np.array, what's spat out from do_KDE_and_get_peaks
+    :params R500C: float, the radius to plot a circle to visualize on the plot
+    """
+    mask = df["SubhaloLenType1"] > 1e3
+    plt.axes().set_aspect('equal')
+    plt.plot(df.SubhaloPos0[mask], df.SubhaloPos1[mask], '.', alpha=alpha)
+    plt.plot(peaks[0], peaks[1], 'rx', mew=2, label="KDE density peak")
+
+    if R500C is not None:
+        R200_circl = plt.Circle((0, 0), radius=R500C, color='r', lw=1,
+                                ls='solid', fill=False, label="R500C")
+    fig = plt.gcf()
+    fig.gca().add_artist(R200_circl)
+
+    if title is not None:
+        if clstNo is not None:
+            title = "clst {0}: ".format(clstNo) + title
+        plt.title(title)
+
+    if units is not None:
+        plt.xlabel(units)
+        plt.ylabel(units)
+
+    plt.legend(loc='best')
+    return None
