@@ -29,7 +29,7 @@ offsets_list = [cent.compute_KDE_peak_offsets(df_list[i], f, i,
                                               cut_kwargs)
                 for i in range(allClst)]
 
-relaxedness_list = [cp.compute_relaxedness1(df_list[i], f, i) for i in
+relaxedness_list = [cp.compute_relaxedness0(df_list[i], f, i) for i in
                     range(allClst)]
 
 f = open('offset_list_{0}.pkl'.format(allClst), 'w')

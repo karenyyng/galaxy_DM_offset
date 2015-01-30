@@ -36,7 +36,8 @@ def extract_clst(f, clstNo, output=False, keys=default_keys(),
             # alternative syntax is to use
             # clst_df.apply(wrap_and_center_coord, blah blah)
             # potential speed up is to replace for loop with map operation
-            clst_df.loc[:, ckey] = wrap_and_center_coord(clst_df[ckey])
+            clst_df.loc[:, ckey] = \
+                wrap_and_center_coord(clst_df[ckey])   #, #clst_df[ckey][0])
 
     fix_phot_band_names(clst_df)
 
@@ -108,14 +109,19 @@ def fix_clst_cat(f, clstNo, keys=default_keys()):
         else:  # create more sub-keys for that particular key
             for i in range(subhalos[key].shape[0]):
                 fix_key = key + str(i)
-                clst_dict[fix_key] = subhalos[key][i][ixes[0]: ixes[1]]
+                clst_dict[fix_key] = subhalos[key][i, ixes[0]: ixes[1]]
+                #clst_dict[fix_key] = subhalos[key][i][ixes[0]: ixes[1]]
 
     return clst_dict
 
 
-def wrap_and_center_coord(coords, edge_constraint=1e4, verbose=False):
+def wrap_and_center_coord(coords, edge_constraint=1e4,
+                          verbose=False, center_coord=None):
     """ fixing the periodic boundary conditions per cluster
     wraps automatically at 75 Mpc / h then center coord at most bound particle
+    The cluster should not be 10 Mpc within the edge
+
+    :note: this meant to be applied to each spatial dimension
 
     :param coords: numpy array, denotes original coords
     :param verbose: bool
@@ -123,6 +129,8 @@ def wrap_and_center_coord(coords, edge_constraint=1e4, verbose=False):
     :return: numpy array, coordinates that's been wrapped
 
     :stability: passed test
+
+    UNITS?!
     """
 
     coords = np.array(coords)
@@ -133,15 +141,21 @@ def wrap_and_center_coord(coords, edge_constraint=1e4, verbose=False):
         pass
     else:
         mask = coords > edge_constraint
-        coords[mask] = coords[mask] - 7.5e4
         if verbose:
             print "close to box edge, needs wrapping"
             print "before masking ", coords[mask]
+        coords[mask] = coords[mask] - 7.5e4
+        if verbose:
             print "after masking ", coords[mask]
 
     # needs to center coords - center on the most bound particle coords[0]
     # return coords - median(coords)
-    return coords - coords[0]
+    if center_coord is None:
+        return coords - coords[0]
+    else:
+        assert center_coord == float, \
+            "wrong dimension - this is supposed to be a float"
+        return coords - center_coord
 
 
 def add_info(h5, info, h5_key="df", h5_subkey="info"):

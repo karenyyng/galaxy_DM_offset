@@ -16,10 +16,8 @@ def test_wrap_and_center_coord1():
     coord2 = true_coord[11:].copy()
 
     test_coord = np.concatenate((coord1, coord2))
-    #print "test_coord are \n {0}".format(test_coord)
-    #print "true_coord are \n {0}".format(true_coord)
 
-    ans = ec.wrap_and_center_coord(test_coord)
+    ans = ec.wrap_and_center_coord(test_coord, verbose=True)
 
     assert np.allclose(ans, true_coord), \
         "test1 {0} failed".format(ec.wrap_and_center_coord.__name__)
@@ -29,3 +27,4 @@ def test_wrap_and_center_coord1():
 
 if __name__ == "__main__":
     test_wrap_and_center_coord1()
+    print "passed test1"
