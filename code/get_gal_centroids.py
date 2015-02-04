@@ -55,14 +55,17 @@ def compute_KDE_peak_offsets(df, f, clstNo, cut_method, cut_kwargs,
     data = np.array(df[col][mask])
     print "data shape is ", data.shape
 
-    peaks = do_KDE_and_get_peaks(data)
+    results = do_KDE_and_get_peaks(data)
+    peaks = results[0]  # the first component give an R matrix of the peaks
     peaks = np.array(peaks)[0]
 
     offset = np.sqrt(np.dot(peaks, peaks))
     R200C = f["Group"]["Group_R_Crit200"][clstNo]
     offsetR200 = offset / R200C
 
-    return [offset, offsetR200]
+    fhat = convert_fhat_to_dict(results[1])
+
+    return [offset, offsetR200]  # , fhat
 
 # ------------python wrapper to ks_KDE.r code ---------------------------
 
@@ -170,6 +173,11 @@ def do_KDE_and_get_peaks(x, w=None, dom_peak_no=1):
     """ don't want to write this for a general bandwidth selector yet
     :params x: np.array, each row should be one observation / subhalo
     :params w: np.float, weight of each row of data
+
+    :returns list of 2 R objects:
+        :R matrix of peaks: each row correspond to coordinates of one peak
+        :R object: fhat this should be fed to convert_fhat_to_dict()
+            if you wish to examine the object in python
 
     :stability: untested
     """

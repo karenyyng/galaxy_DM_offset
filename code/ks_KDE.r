@@ -6,7 +6,7 @@
 library(ks)
 library(parallel)
 
-set.seed(8192)  # comment out if not testing
+# set.seed(8192)  # comment out if not testing
 
 
 # ------------ helper functions  ---------------
@@ -22,9 +22,9 @@ do_KDE=
   # group most of the steps for performing KDE to minimize the number of
   # functions that I need to wrap in python 
   # @param
-  # data = list of floats denoting the data 
+  # data = vector of floats denoting the data 
   # bandwidth selector = ks.bandwidth_selector object
-  # w = list of floats that is same size as data that denotes the weight
+  # w = vector of floats that is same size as data that denotes the weight
   # @return
   # fhat_pi1 = R object from the ks package  
 function(data, bandwidth_selector=Hscv, w=rep.int(1, nrow(data)), 
@@ -40,7 +40,7 @@ find_peaks_from_2nd_deriv=
   # do numerical differentiation to find peaks 
   # @params
   # fhat = object returned by ks.KDE 
-  # return_peak_ix = bool, whether to return R index or actuall coords
+  # return_peak_ix = bool, whether to return R index or actual coords
   #
   # @return 
   # list with pairs of coordinates indices for the peak values  
@@ -126,13 +126,13 @@ function(fhat, coords_ix, dom_peak_no=1L, verbose=T)
 }
 
 
-make_data = 
-function(mu_s = rbind(c(-2, 2), c(0, 0), c(2, -2)), 
-         Sigma_s = rbind(diag(2), 
-                         matrix(c(0.8, -0.72, -0.72, 0.8), nrow=2),         
-                         diag(2)))
-{
-}
+# make_data = 
+# function(mu_s = rbind(c(-2, 2), c(0, 0), c(2, -2)), 
+#          Sigma_s = rbind(diag(2), 
+#                          matrix(c(0.8, -0.72, -0.72, 0.8), nrow=2),         
+#                          diag(2)))
+# {
+# }
  
 gaussian_mixture_data=
 function(samp_no = 5e2, cwt = 1 / 11)
@@ -205,6 +205,9 @@ do_KDE_and_get_peaks=
   # perform KDE then get peaks 
   # @param x: matrix, 2D matrix for holding data values   
   # @param bw_selector: ks object called bandwidth_selector 
+  # @param w: vector of floats 
+  # 
+  # @return results: list of peaks and fhat
   # @stability : seems ok 
 function(x, bw_selector=Hscv, w=rep.int(1, nrow(x)), 
          dom_peak_no=1L) 
@@ -213,7 +216,9 @@ function(x, bw_selector=Hscv, w=rep.int(1, nrow(x)),
   coords_ix <- find_peaks_from_2nd_deriv(fhat_pi1) 
   peaks <- find_dominant_peaks(fhat_pi1, coords_ix, dom_peak_no=dom_peak_no)
 
-  return(peaks)
+  results = list(KDE_peaks=peaks, fhat=fhat_pi1) 
+  return(results)
+  # return(peaks)
 }
 
 
