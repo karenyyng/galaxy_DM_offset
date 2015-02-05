@@ -103,37 +103,44 @@ def plot_cf_contour(dens, x, y, lvls=[68, 95], show=False, clabel=False):
 def plot_KDE_peaks(fhat, lvls=range(0, 100, 20), allpeaks=False,
                    plotdata=False, save=False,
                    fileName="./plots/py_KDE_peak_testcase_contours.png",
-                   clabel=False):
-    """documentation lacking """
+                   clabel=False, showData=False):
+    """make a plot of the fhat
+    :param fhat:
+    """
 
     plt.axes().set_aspect('equal')
     plot_cf_contour(fhat["estimate"],
                     fhat["eval_points"][0], fhat["eval_points"][1],
                     lvls=lvls, clabel=clabel)
 
-    plt.plot(fhat["domPeaks"].transpose()[0], fhat["domPeaks"].transpose()[1],
-             'ro', mew=0, label='inferred dens peak')
+    # if "domPeaks" in fhat.keys():
+    #     plt.plot(fhat["domPeaks"].transpose()[0],
+    #              fhat["domPeaks"].transpose()[1],
+    #              'ro', mew=0, label='inferred dens peak')
+    #     plt.legend(loc='best')
 
     if plotdata:
         plt.plot(fhat["data_x"].transpose()[0],
                  fhat["data_x"].transpose()[1], 'k.', alpha=.4)
 
-
     if allpeaks:
         for p in fhat["peaks_py_ix"]:
-            plt.plot(fhat["eval_points"][0][p[0]], fhat["eval_points"][1][p[1]],
+            plt.plot(fhat["eval_points"][0][p[0]],
+                     fhat["eval_points"][1][p[1]],
                      'bo', label='peaks', fillstyle='none', mew=1)
 
-    plt.title("KDE of testcase by calling R from within python")
-    plt.xlabel('x')
-    plt.ylabel('y')
+    # plt.title("KDE by calling R from within python")
+    plt.xlabel('x (kpc / h)')
+    plt.xticks(rotation=45)
+    plt.ylabel('y (kpc / h)')
 
-    plt.legend(loc='best')
+    if showData:
+        plt.show()
 
     if save:
         plt.savefig(fileName, bbox_inches='tight')
 
-    plt.close()
+    #plt.close()
     return
 
 

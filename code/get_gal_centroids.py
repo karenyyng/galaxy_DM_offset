@@ -57,15 +57,16 @@ def compute_KDE_peak_offsets(df, f, clstNo, cut_method, cut_kwargs,
 
     results = do_KDE_and_get_peaks(data)
     peaks = results[0]  # the first component give an R matrix of the peaks
-    peaks = np.array(peaks)[0]
+    peaks = np.array(peaks)[0]  # got only the first peak
 
     offset = np.sqrt(np.dot(peaks, peaks))
     R200C = f["Group"]["Group_R_Crit200"][clstNo]
     offsetR200 = offset / R200C
 
     fhat = convert_fhat_to_dict(results[1])
+    fhat['domPeak'] = peaks
 
-    return [offset, offsetR200]  # , fhat
+    return [offset, offsetR200, fhat]
 
 # ------------python wrapper to ks_KDE.r code ---------------------------
 
@@ -73,16 +74,15 @@ def convert_fhat_to_dict(r_fhat):
     """preserves the returned object structure with a dict
     :param r_fhat: robject of the output evaluated from ks.KDE
 
-    :stability: works but should be tested
-    if I am not lazy I would write a proper class instead ;)
-    can think about it if i have designated class methods for class vars
+    :stability: works but may not be correct
+    The R object has been modified
 
     under this conversion
 
     fhat["data_x"] : np.array with shape as (obs_no, 2)
     fhat["domPeaks"] : np.array with shape as (peak_no, 2)
     """
-
+    print "fhat may be broken: check if key matches data value"
     return {"data_x": np.array(r_fhat[0]),
             "eval_points": np.array(r_fhat[1]),
             "estimate": np.array(r_fhat[2]),

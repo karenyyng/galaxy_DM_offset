@@ -24,10 +24,13 @@ df_list = [ec.extract_clst(f, clstNo) for clstNo in range(allClst)]
 
 cut_kwargs = {'DM_cut': 1e3, 'star_cut': 5e1}
 
-offsets_list = [cent.compute_KDE_peak_offsets(df_list[i], f, i,
-                                              cent.cut_reliable_galaxies,
-                                              cut_kwargs)
-                for i in range(allClst)]
+result_list = [cent.compute_KDE_peak_offsets(df_list[i], f, i,
+                                             cent.cut_reliable_galaxies,
+                                             cut_kwargs)
+               for i in range(allClst)]
+
+offsets_list = [result_list[i][:2] for i in range(allClst)]
+fhat_list = [result_list[i][2] for i in range(allClst)]
 
 relaxedness_list = [cp.compute_relaxedness0(df_list[i], f, i) for i in
                     range(allClst)]
@@ -38,4 +41,8 @@ f.close()
 
 f = open('relaxedness_{0}_testing.pkl'.format(allClst), 'w')
 pickle.dump(relaxedness_list, f)
+f.close()
+
+f = open('fhat_{0}.pkl'.format(allClst), 'w')
+pickle.dump(fhat_list, f)
 f.close()

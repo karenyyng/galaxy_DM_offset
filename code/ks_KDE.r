@@ -208,7 +208,7 @@ do_KDE_and_get_peaks=
   # @param w: vector of floats 
   # 
   # @return results: list of peaks and fhat
-  # @stability : seems ok 
+  # @stability : seems ok - a little ad hoc  
 function(x, bw_selector=Hscv, w=rep.int(1, nrow(x)), 
          dom_peak_no=1L) 
 {
@@ -216,6 +216,8 @@ function(x, bw_selector=Hscv, w=rep.int(1, nrow(x)),
   coords_ix <- find_peaks_from_2nd_deriv(fhat_pi1) 
   peaks <- find_dominant_peaks(fhat_pi1, coords_ix, dom_peak_no=dom_peak_no)
 
+  fhat_pi1$coords_ix <- coords_ix
+  fhat_pi1$domPeaks <- peaks
   results = list(KDE_peaks=peaks, fhat=fhat_pi1) 
   return(results)
   # return(peaks)
