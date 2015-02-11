@@ -8,7 +8,6 @@ import numpy as np
 import rpy2.robjects as robjects
 from rpy2.robjects.packages import importr
 base = importr("base")  # not really needed in the script
-# ks = importr("ks")
 
 # call the R code that I have written
 robjects.r('source("ks_KDE.r")')
@@ -57,7 +56,7 @@ def compute_KDE_peak_offsets(df, f, clstNo, cut_method, cut_kwargs,
 
     results = do_KDE_and_get_peaks(data)
     peaks = results[0]  # the first component give an R matrix of the peaks
-    peaks = np.array(peaks)[0]  # got only the first peak
+    peaks = np.array(peaks)[0]  # get only the first peak
 
     offset = np.sqrt(np.dot(peaks, peaks))
     R200C = f["Group"]["Group_R_Crit200"][clstNo]
@@ -82,7 +81,6 @@ def convert_fhat_to_dict(r_fhat):
     fhat["data_x"] : np.array with shape as (obs_no, 2)
     fhat["domPeaks"] : np.array with shape as (peak_no, 2)
     """
-    print "fhat may be broken: check if key matches data value"
     return {"data_x": np.array(r_fhat[0]),
             "eval_points": np.array(r_fhat[1]),
             "estimate": np.array(r_fhat[2]),
@@ -91,7 +89,40 @@ def convert_fhat_to_dict(r_fhat):
             "gridded": bool(r_fhat[5]),
             "binned": bool(r_fhat[6]),
             "names": list(r_fhat[7]),
-            "weight_w": np.array(r_fhat[8])}
+            "weight_w": np.array(r_fhat[8]),
+            "peak_coords_ix": np.array(r_fhat[9]),
+            "domPeaks": np.array(r_fhat[10])}
+
+
+def convert_R_peak_ix_to_py_peaks(fhat, ix_key="peak_coords_ix",
+                                  pt_key="eval_points"):
+    """
+    :param fhat: python dictionary
+    :returns coords: numpy array
+        shape=(n_peak, 2)
+
+    :stability: this should be tested!
+    """
+    py_peak_ix = fhat[ix_key] - 1  # python is zeroth indexed
+    return np.array([[fhat[pt_key][0, ix[0]], fhat[pt_key][1, ix[1]]]
+                      for ix in py_peak_ix])
+
+
+def get_py_peaks_and_density_weights(fhat, ix_key="peak_coords_ix",
+                                  pt_key="eval_points"):
+    """
+    :note: fhat is passed by reference, fhat is modified!
+    """
+    fhat["peaks_coords"] = \
+        convert_R_peak_ix_to_py_peaks(fhat, ix_key="peak_coords_ix",
+                                      pt_key="eval_points")
+    ix_list = fhat[ix_key] - 1
+    peak_dens = \
+        np.array([fhat["estimate"][ix[0], ix[1]] for ix in ix_list])
+
+    fhat["peaks_dens"] = peak_dens / np.max(peak_dens)  # give relative weights
+
+    return
 
 
 def py_2D_arr_to_R_matrix(x):
@@ -103,35 +134,8 @@ def py_2D_arr_to_R_matrix(x):
     return robjects.r['matrix'](x, nrow=nrow)
 
 
-def gaussian_mixture_data(samp_no=int(5e2), cwt=1. / 11.):
-    return robjects.r["gaussian_mixture_data"](samp_no, cwt)
-
-
-def do_KDE(data, bw_selector="Hscv", w=None, verbose=False):
-    """
-    :param data: np.array, with shape (dataNo, 2)
-    :param bw_selector: str, either 'Hscv' or 'Hpi'
-    :param w: np.array of floats that denote the weight for each data point
-    :param verbose: bool
-
-    :return: fhat, ks R object spat out by KDE()
-    """
-    assert data.shape[1] == 2, \
-        "data array is of the wrong shape, want array with shape (# of obs, 2)"
-    assert bw_selector == 'Hscv' or bw_selector == 'Hpi', \
-        "bandwidth selector {0} not available".format(bw_selector)
-
-    data = py_2D_arr_to_R_matrix(data)
-    doKDE = robjects.r["do_KDE"]
-
-    if w is not None:
-        # needs to be tested
-        fhat = doKDE(data, robjects.r[bw_selector],
-                     robjects.FloatVector(w))
-    else:
-        fhat = doKDE(data, robjects.r[bw_selector])
-
-    return fhat
+def gaussian_mixture_data(samp_no=int(5e2), cwt=1. / 11., set_seed=True):
+    return robjects.r["gaussian_mixture_data"](samp_no, cwt, set_seed=True)
 
 
 def get_peaks(fhat, no_of_peaks):
@@ -234,6 +238,32 @@ def rmvnorm_mixt(n, mus, Sigmas, props):
 
     return None
 
+
+# def do_KDE(data, bw_selector="Hscv", w=None, verbose=False):
+#     """
+#     :param data: np.array, with shape (dataNo, 2)
+#     :param bw_selector: str, either 'Hscv' or 'Hpi'
+#     :param w: np.array of floats that denote the weight for each data point
+#     :param verbose: bool
+#
+#     :return: fhat, ks R object spat out by KDE()
+#     """
+#     assert data.shape[1] == 2, \
+#         "data array is of the wrong shape, want array with shape (# of obs, 2)"
+#     assert bw_selector == 'Hscv' or bw_selector == 'Hpi', \
+#         "bandwidth selector {0} not available".format(bw_selector)
+#
+#     data = py_2D_arr_to_R_matrix(data)
+#     doKDE = robjects.r["do_KDE"]
+#
+#     if w is not None:
+#         # needs to be tested
+#         fhat = doKDE(data, robjects.r[bw_selector],
+#                      robjects.FloatVector(w))
+#     else:
+#         fhat = doKDE(data, robjects.r[bw_selector])
+#
+#     return fhat
 
 # -----------other centroid methods ------------------------------------
 

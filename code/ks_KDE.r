@@ -6,10 +6,7 @@
 library(ks)
 library(parallel)
 
-# set.seed(8192)  # comment out if not testing
 
-
-# ------------ helper functions  ---------------
 sort_peaks=
   # sort according to the x coordinate  
 function(peaks)
@@ -121,7 +118,7 @@ function(fhat, coords_ix, dom_peak_no=1L, verbose=T)
                function(i) c(xloc[coords_ix[which(dens == sorted_dens[[i]],
                                                   arr.ind=T), 1]],
                              yloc[coords_ix[which(dens == sorted_dens[[i]],
-                                               arr.ind=T), 2]])) 
+                                                  arr.ind=T), 2]])) 
   return(t(peak_locs))
 }
 
@@ -135,8 +132,15 @@ function(fhat, coords_ix, dom_peak_no=1L, verbose=T)
 # }
  
 gaussian_mixture_data=
-function(samp_no = 5e2, cwt = 1 / 11)
+function(samp_no = 5e2, cwt = 1 / 11, set_seed = F)
 {
+  if(set_seed){
+    seed <- 8192
+    set.seed(seed)  
+    # needs to `print` if called from python not just sprintf...
+    print(sprintf("seed set to %d", seed))
+  }
+
   # make fake data as 3 normal mixtures  
   mu_s <- rbind(c(-2, 2), c(0, 0), c(2, -2))
 

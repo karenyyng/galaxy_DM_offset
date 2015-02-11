@@ -5,7 +5,7 @@ License: BSD
 from __future__ import division
 import matplotlib.pyplot as plt
 import numpy as np
-import rpy2.robjects as robjects
+# import rpy2.robjects as robjects
 
 
 def plot_color_mag_diag(df, bluer_band, redder_band, band_limit,
@@ -101,10 +101,11 @@ def plot_cf_contour(dens, x, y, lvls=[68, 95], show=False, clabel=False):
 
 
 def plot_KDE_peaks(fhat, lvls=range(0, 100, 20), allpeaks=False,
-                   plotdata=False, save=False,
+                   plotdata=False, save=False, R200C=None,
                    fileName="./plots/py_KDE_peak_testcase_contours.png",
-                   clabel=False, showData=False):
-    """make a plot of the fhat
+                   clabel=False, showData=False, xlabel="x (kpc / h)",
+                   ylabel="y (kpc / h)"):
+    """make a plot of the fhat along with other important info
     :param fhat:
     """
 
@@ -113,11 +114,11 @@ def plot_KDE_peaks(fhat, lvls=range(0, 100, 20), allpeaks=False,
                     fhat["eval_points"][0], fhat["eval_points"][1],
                     lvls=lvls, clabel=clabel)
 
-    # if "domPeaks" in fhat.keys():
-    #     plt.plot(fhat["domPeaks"].transpose()[0],
-    #              fhat["domPeaks"].transpose()[1],
-    #              'ro', mew=0, label='inferred dens peak')
-    #     plt.legend(loc='best')
+    if "domPeaks" in fhat.keys() and allpeaks:
+        plt.plot(fhat["domPeaks"].transpose()[0],
+                 fhat["domPeaks"].transpose()[1],
+                 'ro', mew=0, label='inferred dens peak')
+        plt.legend(loc='best')
 
     if plotdata:
         plt.plot(fhat["data_x"].transpose()[0],
@@ -129,10 +130,16 @@ def plot_KDE_peaks(fhat, lvls=range(0, 100, 20), allpeaks=False,
                      fhat["eval_points"][1][p[1]],
                      'bo', label='peaks', fillstyle='none', mew=1)
 
-    # plt.title("KDE by calling R from within python")
-    plt.xlabel('x (kpc / h)')
+    plt.xlabel(xlabel)
     plt.xticks(rotation=45)
-    plt.ylabel('y (kpc / h)')
+    plt.ylabel(ylabel)
+
+    if R200C is not None:
+        R200_circl = plt.Circle((0, 0), radius=R200C, color='m', lw=1,
+                                ls='solid', fill=False, label="R200C")
+        plt.plot(0, 0, 'mo', fillstyle='none', label='center of R200C circle')
+        fig = plt.gcf()
+        fig.gca().add_artist(R200_circl)
 
     if showData:
         plt.show()
@@ -140,11 +147,10 @@ def plot_KDE_peaks(fhat, lvls=range(0, 100, 20), allpeaks=False,
     if save:
         plt.savefig(fileName, bbox_inches='tight')
 
-    #plt.close()
     return
 
 
-def plot_data_and_peak(df, peaks, R500C=None, save=False, title=None,
+def plot_data_and_peak(df, peaks, R200C=None, save=False, title=None,
                        alpha=0.6, cut=1e3, clstNo=None, units=None):
     """
     :params df: pandas data frame with suitable column names
@@ -156,11 +162,12 @@ def plot_data_and_peak(df, peaks, R500C=None, save=False, title=None,
     plt.plot(df.SubhaloPos0[mask], df.SubhaloPos1[mask], '.', alpha=alpha)
     plt.plot(peaks[0], peaks[1], 'rx', mew=2, label="KDE density peak")
 
-    if R500C is not None:
-        R200_circl = plt.Circle((0, 0), radius=R500C, color='r', lw=1,
-                                ls='solid', fill=False, label="R500C")
-    fig = plt.gcf()
-    fig.gca().add_artist(R200_circl)
+    if R200C is not None:
+        R200_circl = plt.Circle((0, 0), radius=R200C, color='m', lw=1,
+                                ls='solid', fill=False, label="R200C")
+        plt.plot(0, 0, 'mo', fillstyle=None, label='center of R200C circle')
+        fig = plt.gcf()
+        fig.gca().add_artist(R200_circl)
 
     if title is not None:
         if clstNo is not None:

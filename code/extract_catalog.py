@@ -25,8 +25,7 @@ def default_keys():
 
 
 def extract_clst(f, clstNo, output=False, keys=default_keys(),
-                 fix_phot_band=True,
-                 outputFolder="../../data/", verbose=True):
+                 fix_phot_band=True, outputFolder="../../data/", verbose=True):
     clst_df = pd.DataFrame(fix_clst_cat(f, clstNo, keys))
 
     # checks if positions are part of the keys
@@ -37,7 +36,7 @@ def extract_clst(f, clstNo, output=False, keys=default_keys(),
             # clst_df.apply(wrap_and_center_coord, blah blah)
             # potential speed up is to replace for loop with map operation
             clst_df.loc[:, ckey] = \
-                wrap_and_center_coord(clst_df[ckey])   #, #clst_df[ckey][0])
+                wrap_and_center_coord(clst_df[ckey])   # , clst_df[ckey][0])
 
     fix_phot_band_names(clst_df)
 
@@ -198,6 +197,10 @@ extract_clst.__doc__ = \
     :return: None
 
     :stability: works
+
+    :example:
+    >>> # this extracts the most massive clusters with mass > 1e13 solar mass
+    >>> map(lambda i: extract_clst(f, i), range(129))
 
     :note: unclear to me that the numerical operations would be better
     if we stack dfs of different clusters before computing stat is better

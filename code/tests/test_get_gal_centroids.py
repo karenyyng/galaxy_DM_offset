@@ -3,10 +3,20 @@ import sys
 sys.path.append("../")
 from get_gal_centroids import *
 
-def verify_wrapper_outputs():
-    """verify that the python wrapper gives the same output as R code"""
 
+def test_get_py_peaks_and_density_weights():
+    # setup test data
+    x = gaussian_mixture_data()  # random seed is set to 8192 by default
+    res = do_KDE_and_get_peaks(x)
+    peaks = res[0]
+    fhat = convert_fhat_to_dict(res[1])
+
+    get_py_peaks_and_density_weights(fhat)
+
+    print fhat["peaks_coords"]
+    print fhat["peaks_dens"]
     return
 
 
-
+if __name__=="__main__":
+    test_get_py_peaks_and_density_weights()
