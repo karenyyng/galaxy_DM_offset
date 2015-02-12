@@ -27,7 +27,7 @@ do_KDE=
 function(data, bandwidth_selector=Hscv, w=rep.int(1, nrow(data)), 
          verbose=F, dom_peak_no=1L){
   H <- bandwidth_selector(x=data)
-  fhat_pi1 <- kde(x=data, H=H) 
+  fhat_pi1 <- kde(x=data, H=H, w=w) 
 
   return(fhat_pi1)
 }

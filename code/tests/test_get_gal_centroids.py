@@ -24,8 +24,8 @@ def test_weights_of_do_KDE_and_get_peaks():
     dist_x = np.array([np.sqrt(np.dot(x_row - orig, x_row - orig))
                        for x_row in py_x])
     w = np.ones(len(np.array(x)))
-    mask = dist_x < 2.
-    w[mask] = 10.  # weight points near the (-2, 2) peak more
+    mask = dist_x < 0.3
+    w[mask] = 50.  # weight points near the (-2, 2) peak more
 
     res = do_KDE_and_get_peaks(x, w=w)
     fhat = convert_fhat_to_dict(res)

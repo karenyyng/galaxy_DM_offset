@@ -25,3 +25,21 @@ function()
 
   coords
 }
+
+
+test_do_KDE_with_weights=
+function()
+{
+  # want to test on same data set
+  x <- gaussian_mixture_data(set_seed=T)
+  orig <- c(-2, 2)
+  dist <- apply(x, 1, function(row){ sqrt(sum((row - orig) * (row - orig))) })
+  mask <- dist < .5
+  wt <- rep(1, nrow(x))
+
+  # make the weight of the points near the left origin to be ridiculous
+  wt[mask] = 20.
+  fhat <- do_KDE_and_get_peaks(x, w=wt) 
+  plot(fhat)
+
+}
