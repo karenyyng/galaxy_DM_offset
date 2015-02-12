@@ -100,8 +100,8 @@ def plot_cf_contour(dens, x, y, lvls=[68, 95], show=False, clabel=False):
     return
 
 
-def plot_KDE_peaks(fhat, lvls=range(0, 100, 20), allpeaks=False,
-                   plotdata=False, save=False, R200C=None,
+def plot_KDE_peaks(fhat, lvls=range(20, 100, 20), allPeaks=False,
+                   plotDataPoints=False, save=False, R200C=None,
                    fileName="./plots/py_KDE_peak_testcase_contours.png",
                    clabel=False, showData=False, xlabel="x (kpc / h)",
                    ylabel="y (kpc / h)"):
@@ -114,25 +114,28 @@ def plot_KDE_peaks(fhat, lvls=range(0, 100, 20), allpeaks=False,
                     fhat["eval_points"][0], fhat["eval_points"][1],
                     lvls=lvls, clabel=clabel)
 
-    if "domPeaks" in fhat.keys() and allpeaks:
+    if "domPeaks" in fhat.keys() and showDomPeak:
         plt.plot(fhat["domPeaks"].transpose()[0],
                  fhat["domPeaks"].transpose()[1],
-                 'ro', mew=0, label='inferred dens peak')
+                 'rx', mew=1, label='dominant KDE peak')
         plt.legend(loc='best')
 
-    if plotdata:
+    if plotDataPoints:
         plt.plot(fhat["data_x"].transpose()[0],
                  fhat["data_x"].transpose()[1], 'k.', alpha=.4)
 
-    if allpeaks:
-        for p in fhat["peaks_py_ix"]:
-            plt.plot(fhat["eval_points"][0][p[0]],
-                     fhat["eval_points"][1][p[1]],
-                     'bo', label='peaks', fillstyle='none', mew=1)
+    if allPeaks:
+        cm = plt.cm.get_cmap('winter')
+        for i in range(len(fhat["peaks_dens"])):
+            sc = plt.scatter(fhat["peaks_coords"][i][0],
+                        fhat["peaks_coords"][i][1],
+                        c=fhat["peaks_dens"][i],
+                        cmap=cm, vmin=0, vmax=1.0)
+        plt.colorbar(sc)
 
     plt.xlabel(xlabel)
-    plt.xticks(rotation=45)
     plt.ylabel(ylabel)
+    plt.xticks(rotation=45)
 
     if R200C is not None:
         R200_circl = plt.Circle((0, 0), radius=R200C, color='m', lw=1,
