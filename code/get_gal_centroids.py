@@ -55,15 +55,15 @@ def compute_KDE_peak_offsets(df, f, clstNo, cut_method, cut_kwargs,
     print "data shape is ", data.shape
 
     results = do_KDE_and_get_peaks(data)
-    peaks = results[0]  # the first component give an R matrix of the peaks
-    peaks = np.array(peaks)[0]  # get only the first peak
+    # peaks = results[0]  # the first component give an R matrix of the peaks
+    # peaks = np.array(peaks)[0]  # get only the first peak
 
     offset = np.sqrt(np.dot(peaks, peaks))
     R200C = f["Group"]["Group_R_Crit200"][clstNo]
     offsetR200 = offset / R200C
 
-    fhat = convert_fhat_to_dict(results[1])
-    fhat['domPeak'] = peaks
+    fhat = convert_fhat_to_dict(results)  # [1])
+    # fhat['domPeak'] = fhat["dompeaks
 
     return [offset, offsetR200, fhat]
 
@@ -135,6 +135,16 @@ def py_2D_arr_to_R_matrix(x):
 
 
 def gaussian_mixture_data(samp_no=int(5e2), cwt=1. / 11., set_seed=True):
+    """ thin wrapper around R function
+    :params samp_no: integer,
+        how many data points to be drawn
+    :params cwt: float,
+        weight for the central gaussian mixture out of the 3 mixtures
+    :params set_seed: bool
+        whether to set the seed or not
+
+    :returns: R matrix of coords
+    """
     return robjects.r["gaussian_mixture_data"](samp_no, cwt, set_seed=True)
 
 
@@ -188,6 +198,7 @@ def do_KDE_and_get_peaks(x, w=None, dom_peak_no=1):
     do_KDE_and_get_peaks = robjects.r["do_KDE_and_get_peaks"]
 
     x = py_2D_arr_to_R_matrix(np.array(x))
+
     if w is not None:
         w = robjects.FloatVector(w)
         res = do_KDE_and_get_peaks(x, w=w, dom_peak_no=dom_peak_no)

@@ -222,8 +222,9 @@ function(x, bw_selector=Hscv, w=rep.int(1, nrow(x)),
 
   fhat_pi1$coords_ix <- coords_ix
   fhat_pi1$domPeaks <- peaks
-  results = list(KDE_peaks=peaks, fhat=fhat_pi1) 
-  return(results)
+  return(fhat_pi1)
+  # results = list(KDE_peaks=peaks, fhat=fhat_pi1) 
+  # return(results)
   # return(peaks)
 }
 
