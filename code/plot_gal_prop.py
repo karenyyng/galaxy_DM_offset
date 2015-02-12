@@ -102,9 +102,10 @@ def plot_cf_contour(dens, x, y, lvls=[68, 95], show=False, clabel=False):
 
 def plot_KDE_peaks(fhat, lvls=range(20, 100, 20), allPeaks=False,
                    plotDataPoints=False, save=False, R200C=None,
-                   fileName="./plots/py_KDE_peak_testcase_contours.png",
+                   fileName="KDE_plot_cluster", clstNo=None,
                    clabel=False, showData=False, xlabel="x (kpc / h)",
-                   ylabel="y (kpc / h)"):
+                   ylabel="y (kpc / h)", showDomPeak=True,
+                   fileDir="../plots/"):
     """make a plot of the fhat along with other important info
     :param fhat:
     """
@@ -117,7 +118,8 @@ def plot_KDE_peaks(fhat, lvls=range(20, 100, 20), allPeaks=False,
     if "domPeaks" in fhat.keys() and showDomPeak:
         plt.plot(fhat["domPeaks"].transpose()[0],
                  fhat["domPeaks"].transpose()[1],
-                 'rx', mew=1, label='dominant KDE peak')
+                 'ro', mew=1, label='dominant KDE peak',
+                 fillstyle='none')
         plt.legend(loc='best')
 
     if plotDataPoints:
@@ -128,11 +130,11 @@ def plot_KDE_peaks(fhat, lvls=range(20, 100, 20), allPeaks=False,
         cm = plt.cm.get_cmap('winter')
         for i in range(len(fhat["peaks_dens"])):
             sc = plt.scatter(fhat["peaks_coords"][i][0],
-                        fhat["peaks_coords"][i][1],
-                        c=fhat["peaks_dens"][i],
-                        cmap=cm, vmin=0, vmax=1.0)
+                             fhat["peaks_coords"][i][1],
+                             c=fhat["peaks_dens"][i],
+                             cmap=cm, vmin=0, vmax=1.0)
         plt.colorbar(sc)
-
+    plt.title("No of peaks found = {0}".format(len(fhat["peaks_dens"])))
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.xticks(rotation=45)
@@ -147,8 +149,8 @@ def plot_KDE_peaks(fhat, lvls=range(20, 100, 20), allPeaks=False,
     if showData:
         plt.show()
 
-    if save:
-        plt.savefig(fileName, bbox_inches='tight')
+    if save and clstNo is not None:
+        plt.savefig(fileDir + fileName + str(clstNo) + ".png")  # , bbox_inches='tight')
 
     return
 
