@@ -4,7 +4,9 @@ License: BSD
 """
 from __future__ import division
 import matplotlib.pyplot as plt
+# from matplotlib.mlab import bivariate_normal
 import numpy as np
+from matplotlib.patches import Ellipse
 # import rpy2.robjects as robjects
 
 
@@ -47,7 +49,7 @@ def plot_color_mag_diag(df, bluer_band, redder_band, band_limit,
 
     if clst is not None:
         plt.title("Cluster {0}: Color-magnitude diagram for".format(clst) +
-              " {0} subhalos".format(np.sum(mask_i)))
+                  " {0} subhalos".format(np.sum(mask_i)))
 
     if save is True:
         assert clst is not None, "arg for clst missing"
@@ -57,7 +59,8 @@ def plot_color_mag_diag(df, bluer_band, redder_band, band_limit,
     return
 
 
-def plot_cf_contour(dens, x, y, lvls=[68, 95], show=False, clabel=False):
+def plot_cf_contour(dens, x, y, lvls=[68, 95], show=False, clabel=False,
+                    fill=False):
     """this sort through the density, add them up til they are
     below the required confidence level, then plot
 
@@ -82,13 +85,16 @@ def plot_cf_contour(dens, x, y, lvls=[68, 95], show=False, clabel=False):
             if sums / d_sum <= 1. - lvls[i]:
                 lvl_vals[i] = d[j]
 
-    #lvl_vals = np.percentile(d, (1 - lvls) * 100)
     colors = [(0 / 255., 70 / 255., i / len(lvls)) for i in range(len(lvls))]
 
     # the plt.contour function is weird, if you don't transpose
     # the density, the plotted density will be rotated by 180 clockwise
-    CS = plt.contour(x, y, dens.transpose(), lvl_vals, linewidths=(2, 2),
-                     colors=colors)
+    if fill is False:
+        CS = plt.contour(x, y, dens.transpose(), lvl_vals, linewidths=(1, 1),
+                         colors=colors)
+    else:
+        CS = plt.pcolor(x, y, dens.transpose(), cmap=plt.cm.Blues)
+
     if clabel:
         str_lvls = {l: "{0:.1f}".format(s * 100)
                     for l, s in zip(CS.levels, lvls)}
@@ -100,31 +106,28 @@ def plot_cf_contour(dens, x, y, lvls=[68, 95], show=False, clabel=False):
     return
 
 
-def plot_KDE_peaks(fhat, lvls=range(20, 100, 20), allPeaks=False,
+def plot_KDE_peaks(fhat, lvls=range(2, 100, 10), allPeaks=False,
                    plotDataPoints=False, save=False, R200C=None,
                    fileName="KDE_plot_cluster", clstNo=None,
                    clabel=False, showData=False, xlabel="x (kpc / h)",
                    ylabel="y (kpc / h)", showDomPeak=True,
-                   fileDir="../plots/"):
+                   fileDir="../plots/", fill=False, showContour=True):
     """make a plot of the fhat along with other important info
     :param fhat:
     """
 
     plt.axes().set_aspect('equal')
-    plot_cf_contour(fhat["estimate"],
-                    fhat["eval_points"][0], fhat["eval_points"][1],
-                    lvls=lvls, clabel=clabel)
+    if showContour:
+        plot_cf_contour(fhat["estimate"],
+                        fhat["eval_points"][0], fhat["eval_points"][1],
+                        lvls=lvls, clabel=clabel, fill=fill)
 
     if "domPeaks" in fhat.keys() and showDomPeak:
         plt.plot(fhat["domPeaks"].transpose()[0],
                  fhat["domPeaks"].transpose()[1],
                  'ro', mew=1, label='dominant KDE peak',
                  fillstyle='none')
-        plt.legend(loc='best')
 
-    if plotDataPoints:
-        plt.plot(fhat["data_x"].transpose()[0],
-                 fhat["data_x"].transpose()[1], 'k.', alpha=.4)
 
     if allPeaks:
         cm = plt.cm.get_cmap('winter')
@@ -134,6 +137,17 @@ def plot_KDE_peaks(fhat, lvls=range(20, 100, 20), allPeaks=False,
                              c=fhat["peaks_dens"][i],
                              cmap=cm, vmin=0, vmax=1.0)
         plt.colorbar(sc)
+
+    if plotDataPoints:
+        plt.plot(fhat["data_x"].transpose()[0],
+                 fhat["data_x"].transpose()[1], 'r.', alpha=1)
+
+    low_xlim, up_xlim = plt.xlim()
+    low_ylim, up_ylim = plt.ylim()
+    plot_bandwidth_matrix(fhat["bandwidth_matrix_H"],
+                          up_xlim=up_xlim, up_ylim=up_ylim,
+                          low_xlim=low_xlim, low_ylim=low_ylim)
+
     plt.title("No of peaks found = {0}".format(len(fhat["peaks_dens"])))
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
@@ -142,15 +156,18 @@ def plot_KDE_peaks(fhat, lvls=range(20, 100, 20), allPeaks=False,
     if R200C is not None:
         R200_circl = plt.Circle((0, 0), radius=R200C, color='m', lw=1,
                                 ls='solid', fill=False, label="R200C")
-        plt.plot(0, 0, 'mo', fillstyle='none', label='center of R200C circle')
+        plt.plot(0, 0, 'm.', fillstyle='none', label='center of R200C circle',
+                 mew=2)
         fig = plt.gcf()
         fig.gca().add_artist(R200_circl)
 
+    plt.legend(loc='best')
     if showData:
         plt.show()
 
     if save and clstNo is not None:
-        plt.savefig(fileDir + fileName + str(clstNo) + ".png")  # , bbox_inches='tight')
+        plt.savefig(fileDir + fileName + str(clstNo) + ".png")
+        # , bbox_inches='tight')
 
     return
 
@@ -185,3 +202,28 @@ def plot_data_and_peak(df, peaks, R200C=None, save=False, title=None,
 
     plt.legend(loc='best')
     return None
+
+
+def plot_bandwidth_matrix(mtx, up_xlim, up_ylim, low_xlim, low_ylim):
+    """
+    :params mtx: numpy array
+        represents symmteric positive definite matrix
+    """
+    eigval, eigvec = np.linalg.eig(mtx)
+    order = eigval.argsort()[::-1]
+    eigval = eigval[order]
+    eigvec = eigvec[order]
+
+    width, height = np.sqrt(eigval) * 2.
+    angle = np.arctan2(*eigvec[:, 0][::-1]) / np.pi * 180.
+    # want ellipse to be in lower right corner
+    mux = up_xlim - .7 * width
+    muy = low_ylim + .7 * width
+
+    print "width: {0}, height: {1}, angle {2}".format(width, height, angle)
+    ell = Ellipse(xy=np.array([mux, muy]), width=width, height=height,
+                  angle=angle, color="m", edgecolor='none')
+    ax = plt.gca()
+    ax.add_artist(ell)
+
+    return

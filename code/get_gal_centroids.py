@@ -30,11 +30,12 @@ def cut_reliable_galaxies(df, DM_cut=1e3, star_cut=1e2):
     return np.logical_and(mask, df["SubhaloLenType4"] > star_cut)
 
 
-def compute_KDE_peak_offsets(df, f, clstNo, cut_method, cut_kwargs,
+def compute_KDE_peak_offsets(df, f, clstNo, cut_method, cut_kwargs, w=None,
                              verbose=False):
     """
     :params df: pandas dataframe for each cluster
     :params cut_method: function
+    :params w: floats, weight
 
     :return: list of [offset, offsetR200]
         offset: offset in unit of c kpc/h
@@ -58,11 +59,15 @@ def compute_KDE_peak_offsets(df, f, clstNo, cut_method, cut_kwargs,
     # peaks = results[0]  # the first component give an R matrix of the peaks
     # peaks = np.array(peaks)[0]  # get only the first peak
 
-    offset = np.sqrt(np.dot(peaks, peaks))
+
     R200C = f["Group"]["Group_R_Crit200"][clstNo]
-    offsetR200 = offset / R200C
 
     fhat = convert_fhat_to_dict(results)  # [1])
+    get_py_peaks_and_density_weights(fhat)
+    peaks = fhat['domPeaks'][0]
+
+    offset = np.sqrt(np.dot(peaks, peaks))
+    offsetR200 = offset / R200C
     # fhat['domPeak'] = fhat["dompeaks
 
     return [offset, offsetR200, fhat]
