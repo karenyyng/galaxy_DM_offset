@@ -340,7 +340,8 @@ def find_peaks_from_py_diff(fhat, estKey="estimate", gridKey="eval_points"):
 
 def check_peak_higher_than_corner_values(fhat, rowIx, colIx,
                                          estKey="estimate",
-                                         gridKey="eval_points"):
+                                         gridKey="eval_points",
+                                         debug=False):
     """due to kludgy implementation I didn't check for corner values
     in the derivative function
 
@@ -352,8 +353,9 @@ def check_peak_higher_than_corner_values(fhat, rowIx, colIx,
     """
 
     OK_peaks = np.array([check_corners_of_one_peak(fhat, rowIx[i], colIx[i])
-                for i in range(len(rowIx))], dtype=bool)
-    print "OK_peaks = ", OK_peaks
+                         for i in range(len(rowIx))], dtype=bool)
+    if debug:
+        print "OK_peaks = ", OK_peaks
 
     return rowIx[OK_peaks], colIx[OK_peaks]
 
