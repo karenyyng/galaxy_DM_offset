@@ -128,7 +128,6 @@ def plot_KDE_peaks(fhat, lvls=range(2, 100, 10), allPeaks=False,
                  'ro', mew=1, label='dominant KDE peak',
                  fillstyle='none')
 
-
     if allPeaks:
         cm = plt.cm.get_cmap('winter')
         for i in range(len(fhat["peaks_dens"])):
@@ -148,7 +147,8 @@ def plot_KDE_peaks(fhat, lvls=range(2, 100, 10), allPeaks=False,
                           up_xlim=up_xlim, up_ylim=up_ylim,
                           low_xlim=low_xlim, low_ylim=low_ylim)
 
-    plt.title("No of peaks found = {0}".format(len(fhat["peaks_dens"])))
+    plt.title("Clst {0}: ".format(clstNo) +
+              "No of peaks found = {0}".format(len(fhat["peaks_dens"])))
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.xticks(rotation=45)

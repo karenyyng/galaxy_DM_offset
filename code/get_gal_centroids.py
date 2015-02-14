@@ -59,7 +59,6 @@ def compute_KDE_peak_offsets(df, f, clstNo, cut_method, cut_kwargs, w=None,
     # peaks = results[0]  # the first component give an R matrix of the peaks
     # peaks = np.array(peaks)[0]  # get only the first peak
 
-
     R200C = f["Group"]["Group_R_Crit200"][clstNo]
 
     fhat = convert_fhat_to_dict(results)  # [1])
@@ -73,6 +72,7 @@ def compute_KDE_peak_offsets(df, f, clstNo, cut_method, cut_kwargs, w=None,
     return [offset, offsetR200, fhat]
 
 # ------------python wrapper to ks_KDE.r code ---------------------------
+
 
 def convert_fhat_to_dict(r_fhat):
     """preserves the returned object structure with a dict
@@ -110,11 +110,11 @@ def convert_R_peak_ix_to_py_peaks(fhat, ix_key="peak_coords_ix",
     """
     py_peak_ix = fhat[ix_key] - 1  # python is zeroth indexed
     return np.array([[fhat[pt_key][0, ix[0]], fhat[pt_key][1, ix[1]]]
-                      for ix in py_peak_ix])
+                     for ix in py_peak_ix])
 
 
 def get_py_peaks_and_density_weights(fhat, ix_key="peak_coords_ix",
-                                  pt_key="eval_points"):
+                                     pt_key="eval_points"):
     """
     :note: fhat is passed by reference, fhat is modified!
     """
@@ -265,7 +265,7 @@ def rmvnorm_mixt(n, mus, Sigmas, props):
 #     :return: fhat, ks R object spat out by KDE()
 #     """
 #     assert data.shape[1] == 2, \
-#         "data array is of the wrong shape, want array with shape (# of obs, 2)"
+# "data array is of the wrong shape, want array with shape (# of obs, 2)"
 #     assert bw_selector == 'Hscv' or bw_selector == 'Hpi', \
 #         "bandwidth selector {0} not available".format(bw_selector)
 #
@@ -273,7 +273,7 @@ def rmvnorm_mixt(n, mus, Sigmas, props):
 #     doKDE = robjects.r["do_KDE"]
 #
 #     if w is not None:
-#         # needs to be tested
+# needs to be tested
 #         fhat = doKDE(data, robjects.r[bw_selector],
 #                      robjects.FloatVector(w))
 #     else:
@@ -282,7 +282,6 @@ def rmvnorm_mixt(n, mus, Sigmas, props):
 #     return fhat
 
 # -----------other centroid methods ------------------------------------
-
 
 
 def shrinking_apert(r0, x0, y0, data):
@@ -299,3 +298,104 @@ def BCG():
     return
 
 
+def find_peaks_from_py_diff(fhat, estKey="estimate", gridKey="eval_points"):
+
+    est = fhat[estKey]
+    # diff consecutive columns
+    colGrad1 = np.diff(est)
+    colGrad1 = np.column_stack((colGrad1, np.zeros(est.shape[0])))
+
+    # diff the consecutive cols in the reverse direction
+    # or actually can made use of np.diff(est), multiply by -1 then add
+    # zero column on the leftmost side of the arrays
+    colGrad2 = np.diff(est.transpose()[::-1].transpose())
+    colGrad2 = colGrad2.transpose()[::-1].transpose()
+    colGrad2 = np.column_stack((np.zeros(est.shape[0]), colGrad2))
+
+    colMask1 = np.logical_and(colGrad1 < 0, colGrad2 < 0)
+
+    # diff consecutive rows
+    rowGrad1 = np.diff(fhat[estKey], axis=0)
+    rowGrad1 = np.vstack((rowGrad1, np.zeros(est.shape[0]).transpose()))
+
+    # diff the consecutive row in the reverse direction
+    rowGrad2 = np.diff(est[::-1], axis=0)
+    rowGrad2 = np.vstack((rowGrad2, np.zeros(est.shape[0]).transpose()))
+    rowGrad2 = rowGrad2[::-1]
+
+    rowMask1 = np.logical_and(rowGrad1 < 0, rowGrad2 < 0)
+
+    mask = np.logical_and(colMask1, rowMask1)
+    rowIx, colIx = np.where(mask)
+
+    rowIx, colIx = check_peak_higher_than_corner_values(fhat, rowIx, colIx)
+
+    fhat["peaks_xcoords"] = fhat["eval_points"][0][rowIx]
+    fhat["peaks_ycoords"] = fhat["eval_points"][1][colIx]
+    fhat["peaks_rowIx"] = rowIx
+    fhat["peaks_colIx"] = colIx
+
+    return
+
+
+def check_peak_higher_than_corner_values(fhat, rowIx, colIx,
+                                         estKey="estimate",
+                                         gridKey="eval_points"):
+    """due to kludgy implementation I didn't check for corner values
+    in the derivative function
+
+    :param fhat: dictionary
+    :param rowIX: list of integer
+        row indices of the peak
+    :param colIX: list of integer
+        col indices of the peak
+    """
+
+    OK_peaks = [check_corners_of_one_peak(fhat, rowIx[i], colIx[i])
+                for i in range(len(rowIx))]
+
+    return rowIx[OK_peaks], colIx[OK_peaks]
+
+
+def check_corners_of_one_peak(fhat, peakRowIx, peakColIx):
+    check_rowIx, check_colIx = check_ix(fhat)
+    OK = np.sum([fhat["estimate"][peakRowIx, peakColIx] >
+                 fhat["estimate"][check_rowIx[i], check_colIx[i]]
+                 for i in range(len(check_rowIx))]) == len(check_rowIx)
+    return OK
+
+
+def check_ix(fhat, rowIx, colIx):
+    """ compute ix of the corner values to be checked
+    :param fhat: dictionary
+    :param rowIX: integer
+        row index of the peak
+    :param colIX: integer
+        col index of the peak
+    """
+    check_rowIx = []
+    check_colIx = []
+    upper_rowIx = fhat["eval_points"][0].shape
+    upper_colIx = fhat["eval_points"][1].shape
+
+    # upper left corner
+    if rowIx > 0 and colIx > 0:
+        check_rowIx.append(rowIx - 1)
+        check_colIx.append(colIx - 1)
+
+    # upper right corner
+    if rowIx > 0 and colIx < upper_colIx:
+        check_rowIx.append(rowIx - 1)
+        check_colIx.append(colIx + 1)
+
+    # lower left corner
+    if rowIx < upper_rowIx and colIx > 0:
+        check_rowIx.append(rowIx + 1)
+        check_colIx.append(colIx - 1)
+
+    # lower right corner
+    if rowIx < upper_rowIx and colIx < upper_colIx:
+        check_rowIx.append(rowIx + 1)
+        check_colIx.append(colIx + 1)
+
+    return check_rowIx, check_colIx

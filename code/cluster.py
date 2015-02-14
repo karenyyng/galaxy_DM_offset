@@ -7,6 +7,7 @@ import tables
 # maybe best organized as a dict first ...?
 # then use pd.concat
 class cluster(IsDescription):
+
     """processed info about a cluster
     * good for parallelization
     -[ ] think about projections
@@ -16,7 +17,7 @@ class cluster(IsDescription):
     relaxedness2 = Float32Col()
     galDomPeaks = Int32Col()
     galpeaks = Int32Col()
-    DMpeaks = # nested
+    DMpeaks =  # nested
     galPeakNo = Int32Col()
     DMPeakNo = Int32Col()
     richness = Float32Col()

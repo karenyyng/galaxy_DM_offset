@@ -5,7 +5,6 @@ from get_gal_centroids import *
 from plot_gal_prop import *
 
 
-x = gaussian_mixture_data()  # random seed is set to 8192 by default
 
 
 def test_get_py_peaks_and_density_weights():
@@ -33,9 +32,30 @@ def test_weights_of_do_KDE_and_get_peaks():
     plot_KDE_peaks(fhat, allPeaks=True, showData=True)
     return
 
+
+def test_data1():
+    fhat = {}
+    fhat["estimate"] = np.array([[1, 1, 1, 1, 1, 1, 1],
+                                 [1, 8, 3, 2, 1, 1, 1],
+                                 [1, 7, 9, 3, 1, 1, 1],
+                                 [3, 2, 4, 4, 5, 2, 1],
+                                 [1, 1, 3, 2, 1, 1, 1],
+                                 [1, 1, 1, 1, 2, 1, 1],
+                                 [1, 1, 1, 1, 1, 1, 1]])
+
+    a = np.arange(fhat["estimate"].shape[0])
+    fhat["eval_points"] = np.vstack((a, a))
+    return fhat
+
+
+def test_find_peak_from_py_deriv():
+    fhat = test_data1()
+
+
+    return
+
 if __name__ == "__main__":
+    x = gaussian_mixture_data()  # random seed is set to 8192 by default
     # test_get_py_peaks_and_density_weights()
-    test_weights_of_do_KDE_and_get_peaks()
-
-
-
+    # test_weights_of_do_KDE_and_get_peaks()
+    pass

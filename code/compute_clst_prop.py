@@ -26,7 +26,7 @@ def compute_non_relaxedness1():
     return
 
 
-#def compute_relaxedness1(df, f, clstNo):
+# def compute_relaxedness1(df, f, clstNo):
 #    """ relaxedness1 = total mass in subhalo / cluster mass * 100 < 10
 #
 #    :param df: pandas dataframe,
@@ -47,7 +47,7 @@ def compute_non_relaxedness1():
 #    R200C = f["Group"]["Group_R_Crit200"][clstNo]
 #    df["pos_dist"] = subhalo_cent_dist(df) / R200C
 #
-#    # sum all the subhalos within R200C except the most bound subhalo
+# sum all the subhalos within R200C except the most bound subhalo
 #    subhaloM200C = np.sum(df["SubhaloMass"][df["pos_dist"] < 1.][1:])
 #
 #    return subhaloM200C / groupM200C * 100.
