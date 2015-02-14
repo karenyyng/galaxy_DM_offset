@@ -36,11 +36,11 @@ fhat_list = [result_list[i][2] for i in range(allClst)]
 relaxedness_list = [cp.compute_relaxedness0(df_list[i], f, i) for i in
                     range(allClst)]
 
-f = open('offset_list_{0}_testing' + suffix + '.pkl'.format(allClst), 'w')
+f = open('offset_list_{0}' + suffix + '.pkl'.format(allClst), 'w')
 pickle.dump(offsets_list, f)
 f.close()
 
-f = open('relaxedness_{0}_testing' + suffix + '.pkl'.format(allClst), 'w')
+f = open('relaxedness_{0}' + suffix + '.pkl'.format(allClst), 'w')
 pickle.dump(relaxedness_list, f)
 f.close()
 
