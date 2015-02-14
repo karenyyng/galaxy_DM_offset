@@ -122,20 +122,20 @@ def plot_KDE_peaks(fhat, lvls=range(2, 100, 10), allPeaks=False,
                         fhat["eval_points"][0], fhat["eval_points"][1],
                         lvls=lvls, clabel=clabel, fill=fill)
 
-    if "domPeaks" in fhat.keys() and showDomPeak:
-        plt.plot(fhat["domPeaks"].transpose()[0],
-                 fhat["domPeaks"].transpose()[1],
-                 'ro', mew=1, label='dominant KDE peak',
-                 fillstyle='none')
-
     if allPeaks:
         cm = plt.cm.get_cmap('winter')
         for i in range(len(fhat["peaks_dens"])):
-            sc = plt.scatter(fhat["peaks_coords"][i][0],
-                             fhat["peaks_coords"][i][1],
+            sc = plt.scatter(fhat["peaks_xcoords"][i],
+                             fhat["peaks_ycoords"][i],
                              c=fhat["peaks_dens"][i],
                              cmap=cm, vmin=0, vmax=1.0)
         plt.colorbar(sc)
+
+    if showDomPeak:
+        plt.plot(fhat["peaks_xcoords"][0],
+                 fhat["peaks_ycoords"][0],
+                 'ro', mew=1, label='dominant KDE peak',
+                 fillstyle='none')
 
     if plotDataPoints:
         plt.plot(fhat["data_x"].transpose()[0],
