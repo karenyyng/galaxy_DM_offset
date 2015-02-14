@@ -351,17 +351,27 @@ def check_peak_higher_than_corner_values(fhat, rowIx, colIx,
         col indices of the peak
     """
 
-    OK_peaks = [check_corners_of_one_peak(fhat, rowIx[i], colIx[i])
-                for i in range(len(rowIx))]
+    OK_peaks = np.array([check_corners_of_one_peak(fhat, rowIx[i], colIx[i])
+                for i in range(len(rowIx))], dtype=bool)
+    print "OK_peaks = ", OK_peaks
 
     return rowIx[OK_peaks], colIx[OK_peaks]
 
 
-def check_corners_of_one_peak(fhat, peakRowIx, peakColIx):
-    check_rowIx, check_colIx = check_ix(fhat)
+def check_corners_of_one_peak(fhat, peakRowIx, peakColIx, debug=False):
+    check_rowIx, check_colIx = check_ix(fhat, peakRowIx, peakColIx)
+
+    if debug:
+        print "peakRowIX, peakColIx = {0}, {1}".format(peakRowIx, peakColIx)
+        print "checkRowIx = {0}".format(check_rowIx)
+        print "checkColIx = {0}".format(check_colIx)
+
     OK = np.sum([fhat["estimate"][peakRowIx, peakColIx] >
                  fhat["estimate"][check_rowIx[i], check_colIx[i]]
                  for i in range(len(check_rowIx))]) == len(check_rowIx)
+
+    if debug:
+        print "OK or not = ", OK
     return OK
 
 
