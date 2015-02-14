@@ -329,6 +329,7 @@ def find_peaks_from_py_diff(fhat, estKey="estimate", gridKey="eval_points"):
     rowIx, colIx = np.where(mask)
 
     rowIx, colIx = check_peak_higher_than_corner_values(fhat, rowIx, colIx)
+    rowIx, colIx = sort_peaks_with_decreasing_density(fhat, rowIx, colIx)
 
     fhat["peaks_xcoords"] = fhat["eval_points"][0][rowIx]
     fhat["peaks_ycoords"] = fhat["eval_points"][1][colIx]
@@ -411,3 +412,11 @@ def check_ix(fhat, rowIx, colIx):
         check_colIx.append(colIx + 1)
 
     return check_rowIx, check_colIx
+
+
+def sort_peaks_with_decreasing_density(fhat, rowIx, colIx):
+    order = np.argsort(fhat["estimate"][rowIx, colIx])[::-1]
+    sortedRowIx = np.array([rowIx[i] for i in order])
+    sortedColIx = np.array([colIx[i] for i in order])
+
+    return sortedRowIx, sortedColIx
