@@ -50,6 +50,9 @@ def test_data1():
 
 def test_find_peak_from_py_deriv():
     fhat = test_data1()
+    # ans put in descending density
+    correct_peaks_rowIx = [2, 3]
+    correct_peaks_colIx = [2, 4]
 
 
     return

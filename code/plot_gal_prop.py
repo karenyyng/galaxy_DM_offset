@@ -117,10 +117,22 @@ def plot_KDE_peaks(fhat, lvls=range(2, 100, 10), allPeaks=False,
     """
 
     plt.axes().set_aspect('equal')
+
     if showContour:
         plot_cf_contour(fhat["estimate"],
                         fhat["eval_points"][0], fhat["eval_points"][1],
                         lvls=lvls, clabel=clabel, fill=fill)
+
+
+    if plotDataPoints:
+        plt.plot(fhat["data_x"].transpose()[0],
+                 fhat["data_x"].transpose()[1], 'r.', alpha=1)
+
+    low_xlim, up_xlim = plt.xlim()
+    low_ylim, up_ylim = plt.ylim()
+    plot_bandwidth_matrix(fhat["bandwidth_matrix_H"],
+                          up_xlim=up_xlim, up_ylim=up_ylim,
+                          low_xlim=low_xlim, low_ylim=low_ylim)
 
     if allPeaks:
         cm = plt.cm.get_cmap('winter')
@@ -136,16 +148,6 @@ def plot_KDE_peaks(fhat, lvls=range(2, 100, 10), allPeaks=False,
                  fhat["peaks_ycoords"][0],
                  'ro', mew=1, label='dominant KDE peak',
                  fillstyle='none')
-
-    if plotDataPoints:
-        plt.plot(fhat["data_x"].transpose()[0],
-                 fhat["data_x"].transpose()[1], 'r.', alpha=1)
-
-    low_xlim, up_xlim = plt.xlim()
-    low_ylim, up_ylim = plt.ylim()
-    plot_bandwidth_matrix(fhat["bandwidth_matrix_H"],
-                          up_xlim=up_xlim, up_ylim=up_ylim,
-                          low_xlim=low_xlim, low_ylim=low_ylim)
 
     plt.title("Clst {0}: ".format(clstNo) +
               "No of peaks found = {0}".format(len(fhat["peaks_dens"])))
