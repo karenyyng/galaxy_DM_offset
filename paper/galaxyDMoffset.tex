@@ -56,7 +56,7 @@ Illustris simulation}
 	
 \end{abstract}
 \begin{keywords}
--- methods: statistical 
+	galaxy clusters, dark matter, something else 
 \end{keywords}
 \section{INTRODUCTION} 
 % \begin{figure}
@@ -66,25 +66,77 @@ Illustris simulation}
 % \end{figure}
 \section{DATA}
 \subsection{Test data from Gaussian mixture(s)}
+In order to examine the performance of commonly used point-estimates of the
+distribution of the galaxy data, we test them on Gaussian mixtures with
+known mean and variance.
+Fig 1. one Normal mixture \\  
+Fig 2. one big normal mixture and one smaller normal mixture \\ 
+Fig 3. bridged normal mixtures \\  
+
 \subsection{Data from the Illustris simulation} 
-\subsubsection{Properties of the galaxy clusters /
-groups}
-\subsubsection{Data proprocessing / selection}
-\subsubsection{Data with and without noise}
+\subsubsection{Properties of the galaxy clusters / groups}
+Most important properties of the galaxy clusters that we examine in this
+study include, colors, magnitude, richness and non-relaxedness. We defined
+and examined these properties one by one. 
+Fig 4. Relaxedness 
+Fig 5. 
+
+Richness characterizes the number of galaxies in a given cluster.
+We provide several definitions of non-relaxedness to characterize whether
+the clusters underwent any recent merger activities. These definitions of
+non-relaxedness 
+
+
+
 \subsubsection{Volume Selection}
+1. Rockstar halo finder 
+2. Light cone 
+3. spatial projections 
+\subsubsection{Data with and without noise}
 \subsubsection{Galaxy Selection}
 \subsubsection{Galaxy weights}
+1. Mass-richness diagram - with different cuts  
 \section{METHODS} 
 \subsection{Galaxy Centers}
+\subsubsection{Unweighted and weighted centroids}
+We follow the usual definition of spatial centroid as 
+\begin{equation}
+	\vec{x} = \frac{1}{n} \sum_i \vec{x}_i. 
+\end{equation}
+While the weighted centroids are just: 
+\begin{equation}
+	\vec{x} = \frac{\sum_i w_i \vec{x}_i}{\sum_i \vec{x}_i},
+\end{equation}
+for each spatial dimension $x$ and the weights $w_i$ for the $i-th$ galaxy
+is described in section.
+This estimator is sensitive to merging activities. 
+
 \subsubsection{Cross-validated Kernel Density Estimation (KDE) and peak finder} 
+We employed a KDE algorithm to infer a smooth density distribution of the
+galaxies while using smoothed cross-validation to obtain the optimal smoothing
+bandwidth matrices ($H$). Specifically, we made use of the statistical package 
+ks (Duong) in the R statistical computing environment (R Core Team 2014).
+Cross validation eliminates the free parameters in the KDE and minimizes
+the asymptotic mean-integrated squared error (AMISE).
+After obtaining the KDE estimate, we employed a finite differencing algorithm
+to find the local maxima. We sorted the local maxima according to the KDE
+density at the maxima locations and identified the dominant peak. 
+
 \subsubsection{Shrinking aperture}
-\subsubsection{Weighted and unweighted centroids}
 \subsubsection{Brightest Cluster Galaxies (BCG)}
 \subsection{DM Centers}
 \subsection{Finding offsets} 
+We computed the offsets between the galaxy density peaks inferred from the
+cross-validated KDE and the  
+
 \section{RESULTS} 
 \subsection{Benchmark results from Gaussian mixtures} 
+(We expect some of the existing point-estimates are quite crappy e.g. the
+shrinking aperture method, and will not
+use them for the Illustris data) 
+
 \subsection{Galaxy-DM Offset in Illustris}
+\subsubsection{Permutation tests for computing the P-value}
 \section{DISCUSSION}
 \subsection{Comparison to other simulations}
 \subsection{Comparison to other observational studies}
@@ -96,6 +148,7 @@ groups}
 
 \bibliographystyle{mn2e}
 \bibliography{galDMoffset.bib}
+\bibliography{R_package.bib}
 \appendix
 \section{KDE}
 \clearpage\bsp\label{lastpage} 

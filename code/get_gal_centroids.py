@@ -253,7 +253,7 @@ def gaussian_mixture_data(samp_no=int(5e2), cwt=1. / 11., set_seed=True):
     return robjects.r["gaussian_mixture_data"](samp_no, cwt, set_seed=True)
 
 
-def get_peaks(fhat, no_of_peaks):
+def get_peaks(fhat, no_of_peaks=1):
     """
     :param fhat: robject spat out from ks.KDE
     :param no_of_peaks: integer

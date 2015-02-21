@@ -18,7 +18,7 @@ do_KDE=
 function(data, bandwidth_selector=Hscv, w=rep.int(1, nrow(data)), 
          verbose=F, dom_peak_no=1L){
   H <- bandwidth_selector(x=data)
-  fhat_pi1 <- kde(x=data, H=H, w=w) 
+  fhat_pi1 <- kde(x=data, H=H, w=w, binned = FALSE) 
 
   return(fhat_pi1)
 }
@@ -255,9 +255,9 @@ function(bt_peaks, truth=NULL)
   title('bootstrapped peak locations')
 }
 
-# sort_peaks=
-#   # sort according to the x coordinate  
-# function(peaks)
-# {
-#  peaks <- peaks[, sort(peaks[1,], index.return=T)$ix]  
-# }
+sort_peaks=
+  # sort according to the x coordinate  
+function(peaks)
+{
+ peaks <- peaks[, sort(peaks[1,], index.return=T)$ix]  
+}

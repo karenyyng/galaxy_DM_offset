@@ -12,12 +12,13 @@ import compute_clst_prop as cp
 import pickle
 import sys
 
-suffix = "_wwts"
 h5File = "../../data/Illustris-1_fof_subhalo_myCompleteHaloCatalog_00135.hdf5"
 f = h5py.File(h5File, "r")
 
 # there are only 129 clst > 1e13 Msun
 allClst = int(sys.argv[1])
+suffix = str(sys.argv[2])
+
 print "examining {0} clusters in total".format(allClst)
 
 df_list = [ec.extract_clst(f, clstNo) for clstNo in range(allClst)]
