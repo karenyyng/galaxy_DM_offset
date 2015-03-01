@@ -73,18 +73,12 @@ Fig 1. one Normal mixture \\
 Fig 2. one big normal mixture and one smaller normal mixture \\ 
 Fig 3. bridged normal mixtures \\  
 
-\subsection{Data from the Illustris simulation} 
-\subsubsection{Properties of the galaxy clusters / groups}
-Most important properties of the galaxy clusters that we examine in this
-study include, colors, magnitude, richness and non-relaxedness. We defined
-and examined these properties one by one. 
-Fig 4. Relaxedness 
-Fig 5. 
+We provide all the code and data of these test in our Bitbucket repository
+for comparison purposes for point estimator not listed.
 
-Richness characterizes the number of galaxies in a given cluster.
-We provide several definitions of non-relaxedness to characterize whether
-the clusters underwent any recent merger activities. These definitions of
-non-relaxedness 
+\subsection{Data from the Illustris simulation} 
+We examined the 
+
 
 
 
@@ -92,9 +86,9 @@ non-relaxedness
 1. Rockstar halo finder 
 2. Light cone 
 3. spatial projections 
-\subsubsection{Data with and without noise}
 \subsubsection{Galaxy Selection}
 \subsubsection{Galaxy weights}
+\subsubsection{Data with and without noise}
 1. Mass-richness diagram - with different cuts  
 \section{METHODS} 
 \subsection{Galaxy Centers}
@@ -109,7 +103,21 @@ While the weighted centroids are just:
 \end{equation}
 for each spatial dimension $x$ and the weights $w_i$ for the $i-th$ galaxy
 is described in section.
-This estimator is sensitive to merging activities. 
+Centroids and weighted centroids can be biased by merging activities yet do
+not provide explicit evidence for ongoing merger or accretion. 
+
+\subsubsection{Properties of the galaxy clusters / groups}
+Most important properties of the galaxy clusters that we examine in this
+study include, colors, magnitude, richness and non-relaxedness. We define
+and examined these properties one by one. 
+Fig 4. Relaxedness 
+Fig 5. 
+
+Richness characterizes the number of galaxies in a given cluster.
+We provide several definitions of non-relaxedness to characterize whether
+the clusters underwent any recent merger activities. These definitions of
+non-relaxedness.
+The Shapiro-Wilk statistics characterize the 
 
 \subsubsection{Cross-validated Kernel Density Estimation (KDE) and peak finder} 
 We employed a KDE algorithm to infer a smooth density distribution of the
@@ -124,6 +132,9 @@ density at the maxima locations and identified the dominant peak.
 
 \subsubsection{Shrinking aperture}
 \subsubsection{Brightest Cluster Galaxies (BCG)}
+From the provided 
+
+
 \subsection{DM Centers}
 \subsection{Finding offsets} 
 We computed the offsets between the galaxy density peaks inferred from the
@@ -136,7 +147,8 @@ shrinking aperture method, and will not
 use them for the Illustris data) 
 
 \subsection{Galaxy-DM Offset in Illustris}
-\subsubsection{Permutation tests for computing the P-value}
+
+
 \section{DISCUSSION}
 \subsection{Comparison to other simulations}
 \subsection{Comparison to other observational studies}

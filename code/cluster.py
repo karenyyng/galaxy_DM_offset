@@ -1,13 +1,12 @@
 """cluster object that holds all the final info for comparison among
 different clusters
 """
-import tables
+from tables import Float32Col, Int32Col, IsDescription
 
 
 # maybe best organized as a dict first ...?
 # then use pd.concat
 class cluster(IsDescription):
-
     """processed info about a cluster
     * good for parallelization
     -[ ] think about projections
@@ -17,7 +16,7 @@ class cluster(IsDescription):
     relaxedness2 = Float32Col()
     galDomPeaks = Int32Col()
     galpeaks = Int32Col()
-    DMpeaks =  # nested
+    DMpeaks = Int32Col()  # nested
     galPeakNo = Int32Col()
     DMPeakNo = Int32Col()
     richness = Float32Col()

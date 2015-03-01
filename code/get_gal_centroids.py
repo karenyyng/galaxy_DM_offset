@@ -174,7 +174,7 @@ def compute_KDE_peak_offsets(df, f, clstNo, cut_method, cut_kwargs, w=None,
     data = np.array(df[col][mask])
     print "data shape is ", data.shape
 
-    results = do_KDE_and_get_peaks(data)
+    results = do_KDE_and_get_peaks(data, w=w)
     # peaks = results[0]  # the first component give an R matrix of the peaks
     # peaks = np.array(peaks)[0]  # get only the first peak
 
@@ -205,14 +205,16 @@ def convert_fhat_to_dict(r_fhat):
 
     fhat["data_x"] : np.array with shape as (obs_no, 2)
     fhat["domPeaks"] : np.array with shape as (peak_no, 2)
+
+    :to do: convert this to a h5 object instead
     """
     return {"data_x": np.array(r_fhat[0]),
             "eval_points": np.array(r_fhat[1]),
             "estimate": np.array(r_fhat[2]),
             "bandwidth_matrix_H": np.array(r_fhat[3]),
             "gridtype": tuple(r_fhat[4]),
-            "gridded": bool(r_fhat[5]),
-            "binned": bool(r_fhat[6]),
+            "gridded": bool(r_fhat[5]),  # don't really have to store this
+            "binned": bool(r_fhat[6]),  # don't really have to store this
             "names": list(r_fhat[7]),
             "weight_w": np.array(r_fhat[8])}
 
@@ -394,17 +396,28 @@ def shrinking_apert(r0, x0, y0, data):
     return
 
 
-def BCG():
+def get_BCG():
+    """ return the position information of the BCG
+    """
     return
 
 
-
 def sort_peaks_with_decreasing_density(fhat, rowIx, colIx):
+    """
+    :param fhat: dictionary
+    :param rowIx: list of integers
+    :param colIx: list of integers
+
+    :return sortedRowIx: sorted list of integers
+    :return sortedColIx: sorted list of integers
+    """
     order = np.argsort(fhat["estimate"][rowIx, colIx])[::-1]
     sortedRowIx = np.array([rowIx[i] for i in order])
     sortedColIx = np.array([colIx[i] for i in order])
 
     return sortedRowIx, sortedColIx
+
+
 
 
 # def convert_R_peak_ix_to_py_peaks(fhat, ix_key="peak_coords_ix",

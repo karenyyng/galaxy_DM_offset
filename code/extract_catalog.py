@@ -20,12 +20,18 @@ def default_keys():
             # u'SubhaloParent',
             u'SubhaloGrNr',
             u'SubhaloStellarPhotometrics',
+            u'SubhaloStellarPhotometricsMassInRad',
             u'SubhaloLenType',
             u'SubhaloMass']
 
 
 def extract_clst(f, clstNo, output=False, keys=default_keys(),
                  fix_phot_band=True, outputFolder="../../data/", verbose=True):
+    """
+    :param f: filestream object to the hdf5 file
+    :param clstNo: integer that denotes the cluster number
+    """
+
     clst_df = pd.DataFrame(fix_clst_cat(f, clstNo, keys))
 
     # checks if positions are part of the keys
@@ -46,6 +52,7 @@ def extract_clst(f, clstNo, output=False, keys=default_keys(),
             print "outputting file :" + outputFile
             print "with key name as df"
         clst_df.to_hdf(outputFile, "df")
+
 
     return clst_df
 

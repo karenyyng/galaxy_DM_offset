@@ -57,6 +57,10 @@ def test_find_peak_from_py_deriv():
 
     return
 
+
+def test_bandwidth_matrix():
+    return
+
 if __name__ == "__main__":
     x = gaussian_mixture_data()  # random seed is set to 8192 by default
     # test_get_py_peaks_and_density_weights()
