@@ -37,10 +37,10 @@
 \providecommand{\ISBN}[1]{\href{http://cosmologist.info/ISBN/#1}{ISBN: #1}} 
 %-----------------------------------------------------------------------
 \title[
-	Galaxy-dark matter offsets in galaxy clusters / groups of the
+	Galaxy-dark matter offsets in galaxy clusters and groups of the
 Illustris simulation
 ]
-{Galaxy-dark matter offsets in galaxy clusters / groups of the
+{Galaxy-dark matter offsets in galaxy clusters and groups of the
 Illustris simulation}
 \author[Karen Y. Ng et al.]{Karen Y. Ng,$^{1}$
 	Annalisa P. Pillepich,$^{2}$ 
@@ -53,12 +53,19 @@ Illustris simulation}
 \date{arXiv} \pagerange{\pageref{firstpage}--\pageref{lastpage}}
 \pubyear{2015} \maketitle\label{firstpage}
 \begin{abstract} 
-	
+	Being able to find the center of the dark matter component of a galaxy cluster or
+	group enables correct stacking and mass estimation if any parametric halo
+	profile is employed. 
 \end{abstract}
 \begin{keywords}
 	galaxy clusters, dark matter, something else 
 \end{keywords}
 \section{INTRODUCTION} 
+
+Galaxies that belongs to a galaxy cluster or group are stochastic samples
+of the underlying dark matter mass density. 
+
+We examine the density peak since lensing power is the highest.
 % \begin{figure}
 % 	\includegraphics[width=.95\linewidth]{ElGordo.png}
 % 	\caption{
@@ -99,16 +106,16 @@ We follow the usual definition of spatial centroid as
 \end{equation}
 While the weighted centroids are just: 
 \begin{equation}
-	\vec{x} = \frac{\sum_i w_i \vec{x}_i}{\sum_i \vec{x}_i},
+	\vec{x}_w = \frac{\sum_i w_i \vec{x}_i}{\sum_i \vec{w}_i},
 \end{equation}
-for each spatial dimension $x$ and the weights $w_i$ for the $i-th$ galaxy
+for each spatial dimension and the weights $w_i$ for the $i-th$ galaxy
 is described in section.
 Centroids and weighted centroids can be biased by merging activities yet do
 not provide explicit evidence for ongoing merger or accretion. 
 
 \subsubsection{Properties of the galaxy clusters / groups}
 Most important properties of the galaxy clusters that we examine in this
-study include, colors, magnitude, richness and non-relaxedness. We define
+study include, colors, magnitude, richness, concentration and non-relaxedness. We define
 and examined these properties one by one. 
 Fig 4. Relaxedness 
 Fig 5. 
@@ -117,28 +124,35 @@ Richness characterizes the number of galaxies in a given cluster.
 We provide several definitions of non-relaxedness to characterize whether
 the clusters underwent any recent merger activities. These definitions of
 non-relaxedness.
-The Shapiro-Wilk statistics characterize the 
+The Shapiro-Wilk statistic can characterize the deviation from normality
+with the highest statistical power ().
 
-\subsubsection{Cross-validated Kernel Density Estimation (KDE) and peak finder} 
+
+\subsubsection{Cross-validated Kernel Density Estimation (KDE) and the peak finder} 
 We employed a KDE algorithm to infer a smooth density distribution of the
 galaxies while using smoothed cross-validation to obtain the optimal smoothing
-bandwidth matrices ($H$). Specifically, we made use of the statistical package 
-ks (Duong) in the R statistical computing environment (R Core Team 2014).
-Cross validation eliminates the free parameters in the KDE and minimizes
-the asymptotic mean-integrated squared error (AMISE).
+bandwidth matrices ($H$). Specifically, we made use of the KDE function in
+the statistical package ks (Duong) in the R statistical computing environment (R Core Team 2014).
+Cross validation eliminates free parameters in the KDE and minimizes
+the asymptotic mean-integrated squared error (AMISE) for a best fit to the
+data.
 After obtaining the KDE estimate, we employed a finite differencing algorithm
 to find the local maxima. We sorted the local maxima according to the KDE
 density at the maxima locations and identified the dominant peak. 
 
 \subsubsection{Shrinking aperture}
+Another method that is popular among astronomers for summarizing a spatial
+distribution include what we call a shrinking aperture method.
 \subsubsection{Brightest Cluster Galaxies (BCG)}
 From the provided 
 
 
 \subsection{DM Centers}
 \subsection{Finding offsets} 
+
+
 We computed the offsets between the galaxy density peaks inferred from the
-cross-validated KDE and the  
+cross-validated KDE and the dark matter density peak. 
 
 \section{RESULTS} 
 \subsection{Benchmark results from Gaussian mixtures} 

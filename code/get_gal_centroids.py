@@ -357,6 +357,64 @@ def rmvnorm_mixt(n, mus, Sigmas, props):
     return None
 
 
+# -----------other centroid methods ------------------------------------
+def shrinking_apert(r0, x0, y0, data):
+    """
+    :param r0: float, aperture to consider in the data
+    :param x0: float, initial x coord of center
+    :param y0: float, initial y coord of center
+    :param data: 2D np.array
+
+    :note: I want to write this procedure so that it would work in both 2D and
+    3D
+    """
+
+    return
+
+
+def compute_weighted_mean(x, w):
+    """
+    :param x: numpy array
+    :param w: numpy array
+    """
+    return np.mean(x * w) / np.sum(w)
+
+
+def get_BCG():
+    """ return the position information of the BCG
+    """
+    return
+
+
+def sort_peaks_with_decreasing_density(fhat, rowIx, colIx):
+    """
+    :param fhat: dictionary
+    :param rowIx: list of integers
+    :param colIx: list of integers
+
+    :return sortedRowIx: sorted list of integers
+    :return sortedColIx: sorted list of integers
+    """
+    order = np.argsort(fhat["estimate"][rowIx, colIx])[::-1]
+    sortedRowIx = np.array([rowIx[i] for i in order])
+    sortedColIx = np.array([colIx[i] for i in order])
+
+    return sortedRowIx, sortedColIx
+
+
+# def convert_R_peak_ix_to_py_peaks(fhat, ix_key="peak_coords_ix",
+#                                   pt_key="eval_points"):
+#     """
+#     :param fhat: python dictionary
+#     :returns coords: numpy array
+#         shape=(n_peak, 2)
+#
+#     :stability: this should be tested!
+#     """
+#     py_peak_ix = fhat[ix_key] - 1  # python is zeroth indexed
+#     return np.array([[fhat[pt_key][0, ix[0]], fhat[pt_key][1, ix[1]]]
+#                      for ix in py_peak_ix])
+#
 # def do_KDE(data, bw_selector="Hscv", w=None, verbose=False):
 #     """
 #     :param data: np.array, with shape (dataNo, 2)
@@ -382,53 +440,3 @@ def rmvnorm_mixt(n, mus, Sigmas, props):
 #         fhat = doKDE(data, robjects.r[bw_selector])
 #
 #     return fhat
-
-# -----------other centroid methods ------------------------------------
-
-
-def shrinking_apert(r0, x0, y0, data):
-    """
-    :param r0: float, aperture to consider in the data
-    :param x0: float, initial x coord of center
-    :param y0: float, initial y coord of center
-    :param data: 2D np.array
-    """
-    return
-
-
-def get_BCG():
-    """ return the position information of the BCG
-    """
-    return
-
-
-def sort_peaks_with_decreasing_density(fhat, rowIx, colIx):
-    """
-    :param fhat: dictionary
-    :param rowIx: list of integers
-    :param colIx: list of integers
-
-    :return sortedRowIx: sorted list of integers
-    :return sortedColIx: sorted list of integers
-    """
-    order = np.argsort(fhat["estimate"][rowIx, colIx])[::-1]
-    sortedRowIx = np.array([rowIx[i] for i in order])
-    sortedColIx = np.array([colIx[i] for i in order])
-
-    return sortedRowIx, sortedColIx
-
-
-
-
-# def convert_R_peak_ix_to_py_peaks(fhat, ix_key="peak_coords_ix",
-#                                   pt_key="eval_points"):
-#     """
-#     :param fhat: python dictionary
-#     :returns coords: numpy array
-#         shape=(n_peak, 2)
-#
-#     :stability: this should be tested!
-#     """
-#     py_peak_ix = fhat[ix_key] - 1  # python is zeroth indexed
-#     return np.array([[fhat[pt_key][0, ix[0]], fhat[pt_key][1, ix[1]]]
-#                      for ix in py_peak_ix])
