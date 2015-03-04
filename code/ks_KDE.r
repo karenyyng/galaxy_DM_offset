@@ -148,6 +148,13 @@ function(samp_no = 5e2, cwt = 1 / 11, set_seed = F)
   x <- rmvnorm.mixt(n=samp_no, mus=mu_s, Sigmas=Sigma_s, props=weights)
 }
 
+gaussian_mixture_data3D=
+function()
+{
+}
+
+
+
 TwoDtestCase1 = 
 function(samp_no = 5e2, cwt = 1 / 11)
   # test case with 3 normal mixtures 
@@ -260,4 +267,12 @@ sort_peaks=
 function(peaks)
 {
  peaks <- peaks[, sort(peaks[1,], index.return=T)$ix]  
+}
+
+
+3D_gaussian_mixture=
+  # testing the 3D performance of the KDE algorithm
+function()
+{
+
 }

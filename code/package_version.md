@@ -1,5 +1,3 @@
-python version 2.7.8
-
 Cython==0.21.1
 easydev==0.7.4
 h5py==2.3.1
@@ -17,4 +15,4 @@ tables==3.1.1
 wsgiref==0.1.2
 
 R version 3.1.2
-
+python version 2.7.8

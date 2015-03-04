@@ -206,7 +206,8 @@ def plot_data_and_peak(df, peaks, R200C=None, save=False, title=None,
     return None
 
 
-def plot_bandwidth_matrix(mtx, up_xlim, up_ylim, low_xlim, low_ylim):
+def plot_bandwidth_matrix(mtx, up_xlim, up_ylim, low_xlim, low_ylim,
+                          debug=False):
     """
     :params mtx: numpy array
         represents symmteric positive definite matrix
@@ -222,7 +223,10 @@ def plot_bandwidth_matrix(mtx, up_xlim, up_ylim, low_xlim, low_ylim):
     mux = up_xlim - .7 * width
     muy = low_ylim + .7 * width
 
-    print "width: {0}, height: {1}, angle {2}".format(width, height, angle)
+    if debug:
+        print "eigval {0} and eigvec are {1}".format(eigval, eigvec)
+        print "matrix is {0}".format(mtx)
+        print "width: {0}, height: {1}, angle {2}".format(width, height, angle)
     ell = Ellipse(xy=np.array([mux, muy]), width=width, height=height,
                   angle=angle, color="m", edgecolor='none')
     ax = plt.gca()

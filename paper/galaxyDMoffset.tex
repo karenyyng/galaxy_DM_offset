@@ -18,7 +18,7 @@
 \usepackage{tabularx}
 \usepackage{booktabs}
 \usepackage{microtype}
-\graphicspath{{graphics/}}
+\graphicspath{{figures/}}
 \newcommand{\mc}[1]{\multicolumn{1}{c}{#1}} % handy shortcut macro
 %-----------------------------------------------------------------------
 \def\apjl{ApJL }
@@ -65,17 +65,17 @@ Illustris simulation}
 Galaxies that belongs to a galaxy cluster or group are stochastic samples
 of the underlying dark matter mass density. 
 
-We examine the density peak since lensing power is the highest.
-% \begin{figure}
-% 	\includegraphics[width=.95\linewidth]{ElGordo.png}
-% 	\caption{
-% 		\label{fig:config}}
-% \end{figure}
+We look for summary statistic that would have the least biased estimate of
+the dark matter density peak. For stacking the different sets of data, 
+find a good proxy for the dark matter density peak is important for the
+peak not to be smoothed out. 
+
+
 \section{DATA}
 \subsection{Test data from Gaussian mixture(s)}
 In order to examine the performance of commonly used point-estimates of the
 distribution of the galaxy data, we test them on Gaussian mixtures with
-known mean and variance.
+known mean and variance. \\
 Fig 1. one Normal mixture \\  
 Fig 2. one big normal mixture and one smaller normal mixture \\ 
 Fig 3. bridged normal mixtures \\  
@@ -84,7 +84,11 @@ We provide all the code and data of these test in our Bitbucket repository
 for comparison purposes for point estimator not listed.
 
 \subsection{Data from the Illustris simulation} 
-We examined the 
+\begin{figure}
+	\includegraphics[width=.95\linewidth]{clusterMassDist.eps}
+	\caption{
+		\label{fig:config}}
+\end{figure}
 
 
 
@@ -143,6 +147,9 @@ density at the maxima locations and identified the dominant peak.
 \subsubsection{Shrinking aperture}
 Another method that is popular among astronomers for summarizing a spatial
 distribution include what we call a shrinking aperture method.
+This method is dependent on the initial location of the aperture.
+
+
 \subsubsection{Brightest Cluster Galaxies (BCG)}
 From the provided 
 
