@@ -1,6 +1,7 @@
 from __future__ import division
 import matplotlib.pyplot as plt
 import numpy as np
+from mpl_toolkits.mplot3d import Axes3D
 
 
 def plot_cluster_mass_distribution(ticks, y_data,
@@ -33,7 +34,6 @@ def plot_cluster_mass_distribution(ticks, y_data,
         print "saving figure {0}".format(filename)
         plt.savefig(filename, bbox_inches="tight")
 
-
     return
 
 
@@ -56,3 +56,28 @@ def compute_clst_no_above_mass_threshold(mass,
     noCount = [np.sum(mass > t) for t in ticks]
 
     return ticks, noCount
+
+
+def visualize_3D_clst(df, position_keys):
+    """
+    :param df: pandas data frame with the position keys
+    :param position_keys: tuple of strings that correspond to the keys in df
+        for the position columns
+    """
+    fig = plt.figure()
+    ax = Axes3D(fig)
+    ax.set_xlabel('x (Mpc/h)')
+    ax.set_ylabel('y (Mpc/h)')
+    ax.set_zlabel('z (Mpc/h)')
+
+    ax.plot(df[position_keys[0]], df[position_keys[1]], df[position_keys[2]],
+            'o', alpha=0.05, label='subhalo location')
+
+    ax.legend(loc='best')
+
+    # code that I will eventually use to check my projections
+    # for ii in xrange(0,360,1):
+    #     ax.view_init(elev=10., azim=ii)
+    #     savefig("movie"%ii+".png")
+    plt.show()
+

@@ -367,6 +367,11 @@ def sort_peaks_with_decreasing_density(fhat, rowIx, colIx):
     return sortedRowIx, sortedColIx
 
 
+def find_3D_peaks():
+    # find
+    # needs to check 27 - 7 points from the cube
+    return
+
 # def convert_R_peak_ix_to_py_peaks(fhat, ix_key="peak_coords_ix",
 #                                   pt_key="eval_points"):
 #     """
