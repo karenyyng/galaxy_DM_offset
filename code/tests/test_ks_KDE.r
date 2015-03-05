@@ -44,5 +44,4 @@ function()
 
 }
 
-
-test_find_peaks_from_2nd_deriv() 
+test_do_KDE_with_weights()
