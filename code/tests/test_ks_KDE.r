@@ -43,3 +43,6 @@ function()
   plot(fhat)
 
 }
+
+
+test_find_peaks_from_2nd_deriv() 

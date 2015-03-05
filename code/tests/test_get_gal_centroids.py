@@ -7,7 +7,7 @@ from plot_gal_prop import *
 
 
 
-def test_get_py_peaks_and_density_weights():
+def test_get_py_peaks_and_density_weights(x):
     res = do_KDE_and_get_peaks(x)
     fhat = convert_fhat_to_dict(res)
 
@@ -45,7 +45,7 @@ def test_data1():
 
     a = np.arange(fhat["estimate"].shape[0])
     fhat["eval_points"] = np.vstack((a, a))
-    return fhat
+    return fhat["estimate"]
 
 
 def test_find_peak_from_py_deriv():
@@ -62,7 +62,6 @@ def test_bandwidth_matrix():
     return
 
 if __name__ == "__main__":
-    x = gaussian_mixture_data()  # random seed is set to 8192 by default
-    # test_get_py_peaks_and_density_weights()
-    # test_weights_of_do_KDE_and_get_peaks()
-    pass
+    x = test_data1()  # random seed is set to 8192 by default
+    test_get_py_peaks_and_density_weights(x)
+    # test_weights_of_do_KDE_and_get_peaks(x)

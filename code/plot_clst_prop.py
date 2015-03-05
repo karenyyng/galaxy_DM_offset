@@ -24,8 +24,8 @@ def plot_cluster_mass_distribution(ticks, y_data,
         plt.loglog(ticks, y, lw=2, label=y_legend[i])
 
     plt.title("Illustris clusters at z=0")
-    plt.xlabel(x_ticks)
-    plt.ylabel(y_ticks)
+    plt.xlabel(x_ticks, fontsize=15)
+    plt.ylabel(y_ticks, fontsize=15)
     plt.legend(loc='best')
 
     if save:

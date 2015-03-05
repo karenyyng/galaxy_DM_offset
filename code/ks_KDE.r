@@ -270,9 +270,3 @@ function(peaks)
 }
 
 
-3D_gaussian_mixture=
-  # testing the 3D performance of the KDE algorithm
-function()
-{
-
-}
