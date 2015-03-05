@@ -255,41 +255,6 @@ def gaussian_mixture_data(samp_no=int(5e2), cwt=1. / 11., set_seed=True):
     return robjects.r["gaussian_mixture_data"](samp_no, cwt, set_seed=True)
 
 
-def get_peaks(fhat, no_of_peaks=1):
-    """
-    :param fhat: robject spat out from ks.KDE
-    :param no_of_peaks: integer
-
-    :returns: list of peaks,
-        each row correspond to one peak [[x1, y1], [x2, y2], ...]
-    """
-    findPeaks = robjects.r["find_peaks_from_2nd_deriv"]
-    findDomPeaks = robjects.r["find_dominant_peaks"]
-
-    peaks_ix = findPeaks(fhat)  # fhat[2] = fhat$estimate
-    dom_peaks = np.array(findDomPeaks(fhat, peaks_ix, no_of_peaks))
-
-    fhat = convert_fhat_to_dict(fhat)
-    # subtracting 1 from the peak_coords since python is zeroth index,
-    # R has 1 as the first index
-    fhat["peaks_py_ix"] = np.array(peaks_ix) - 1
-
-    # need to double check how the coordinates are put into vectors
-    # something might have been transposed ...
-    fhat["domPeaks"] = dom_peaks
-
-    return fhat
-
-
-# def find_peaks_from_2nd_deriv(fhat, verbose=False):
-#     """not tested but works without errors
-#     fhat = robject returned by ks.KDE
-#     """
-#     func = robjects.r["find_peaks_from_2nd_deriv"]
-#
-#     return func(fhat, verbose)
-
-
 def do_KDE_and_get_peaks(x, w=None, dom_peak_no=1):
     """ don't want to write this for a general bandwidth selector yet
     :params x: np.array, each row should be one observation / subhalo
@@ -338,7 +303,7 @@ def TwoDtestCase1(samp_no=5e2, cwt=1. / 11., w=None, H=None):
     else:
         fhat = func(samp_no, cwt)
 
-    return get_peaks(fhat)
+    return do_KDE_and_get_peaks(fhat)
 
 
 def rmvnorm_mixt(n, mus, Sigmas, props):
@@ -440,3 +405,37 @@ def sort_peaks_with_decreasing_density(fhat, rowIx, colIx):
 #         fhat = doKDE(data, robjects.r[bw_selector])
 #
 #     return fhat
+#
+# def get_peaks(fhat, no_of_peaks=1):
+#     """
+#     :param fhat: robject spat out from ks.KDE
+#     :param no_of_peaks: integer
+#
+#     :returns: list of peaks,
+#         each row correspond to one peak [[x1, y1], [x2, y2], ...]
+#     """
+#     findPeaks = robjects.r["find_peaks_from_2nd_deriv"]
+#     findDomPeaks = robjects.r["find_dominant_peaks"]
+#
+#     peaks_ix = findPeaks(fhat)  # fhat[2] = fhat$estimate
+#     dom_peaks = np.array(findDomPeaks(fhat, peaks_ix, no_of_peaks))
+#
+#     fhat = convert_fhat_to_dict(fhat)
+#     # subtracting 1 from the peak_coords since python is zeroth index,
+#     # R has 1 as the first index
+#     fhat["peaks_py_ix"] = np.array(peaks_ix) - 1
+#
+#     # need to double check how the coordinates are put into vectors
+#     # something might have been transposed ...
+#     fhat["domPeaks"] = dom_peaks
+#
+#     return fhat
+
+
+# def find_peaks_from_2nd_deriv(fhat, verbose=False):
+#     """not tested but works without errors
+#     fhat = robject returned by ks.KDE
+#     """
+#     func = robjects.r["find_peaks_from_2nd_deriv"]
+#
+#     return func(fhat, verbose)
