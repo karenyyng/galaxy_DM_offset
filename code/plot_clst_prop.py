@@ -24,9 +24,11 @@ def plot_cluster_mass_distribution(ticks, y_data,
         y = np.vstack((y, y)).transpose().ravel()
         plt.loglog(ticks, y, lw=2, label=y_legend[i])
 
-    plt.title("Illustris clusters at z=0")
-    plt.xlabel(x_ticks, fontsize=15)
-    plt.ylabel(y_ticks, fontsize=15)
+    plt.title("Illustris clusters at z=0", fontsize=20)
+    plt.xlabel(x_ticks, fontsize=20)
+    plt.ylabel(y_ticks, fontsize=20)
+    plt.tick_params(width=2, length=8, which='major', labelsize=14)
+    plt.tick_params(width=1.5, length=6, which='minor', labelsize=10)
     plt.legend(loc='best')
 
     if save:

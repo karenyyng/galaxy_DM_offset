@@ -21,7 +21,7 @@ ticks, countGroupMcrit200 = compute_clst_no_above_mass_threshold(groupMcrit200)
 ticks, countGroupMcrit500 = compute_clst_no_above_mass_threshold(groupMcrit500)
 
 y_data = [countGroupMass, countGroupMcrit200, countGroupMcrit500]
-y_legend = [r"$M_{\rm haloFinder}$", r"$M_{200c}$", r"$M_{500c}$"]
+y_legend = [r"$M_{\rm FoF}$", r"$M_{200c}$", r"$M_{500c}$"]
 x_ticks = r"$M_{Cluster}(10^{10} M_{\odot})$"
 y_ticks = r"$N(> M_{Cluster})$"
 
