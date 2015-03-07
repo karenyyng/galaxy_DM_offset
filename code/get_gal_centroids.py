@@ -323,7 +323,7 @@ def rmvnorm_mixt(n, mus, Sigmas, props):
 
 
 # -----------other centroid methods ------------------------------------
-def shrinking_apert(center_coord, data, r0=None):
+def shrinking_apert(center_coord, data, r0=None, debug=False):
     """
     :param center_coord: list of floats or array of floats
     :param data: np.array
@@ -334,33 +334,48 @@ def shrinking_apert(center_coord, data, r0=None):
     :note: I want to write this procedure so that it would work in both 2D and
     3D
     """
-    c1 = np.array(center_coord)
-    assert c1.shape[0] == data.shape[1], "dimension mismatch"
-    assert r0 > 0, "initial aperture has to be greater than 0"
 
+    c1 = np.array(center_coord)
     # we don't want to worry about different scales of the data
     data, normalization = normalize_data(data)
     c1 = c1 / normalization
 
     dist = compute_euclidean_dist(data - center_coord)
 
+    assert c1.shape[0] == data.shape[1], "dimension mismatch"
+
     if r0 is None:
         r0 = np.percentile(dist, 90)
         print "no r0 was given, setting r0 to {0}".format(
             r0 * compute_euclidean_dist(normalization))
+    else:
+        assert r0 > 0, "initial aperture has to be greater than 0"
 
     mdist = np.mean(dist)
     c0 = c1 + 10 * np.mean(dist)
     mask = dist < r0
-    while(compute_euclidean_dist(c1 - c0) > 0.01 * mdist and
-          np.sum(mask) > 10):
+    it = 0
+
+    while(np.abs(compute_euclidean_dist(c1 - c0) - mdist) / mdist > 2e-2
+          and np.sum(mask) > 10):
+        # compute new convergence criteria
+        mdist = compute_euclidean_dist(c1 - c0)
+        if debug:
+            it += 1
+            print "iter {0} : c1 = {1}, data no = {2}".format(it, c1,
+                                                              np.sum(mask))
+            print "mdist = {0}".format(mdist)
         c0 = c1
         c1 = np.mean(data[mask], axis=0)  # compute new centroid
-        dist = compute_euclidean_dist(data - c1, data - c1)  # compute new dist
-        r0 *= 0.9  # shrink the aperture
+        dist = compute_euclidean_dist(data - c1)  # compute new dist
+        r0 *= 0.95  # shrink the aperture
         mask = dist < r0
+        if debug:
+            print "(new mdist - old mdist) / old mdist = {0}\n".format(
+                np.abs(compute_euclidean_dist(c1 - c0) - mdist) / mdist)
 
-    return c1
+
+    return c1 * normalization
 
 
 def normalize_data(data):

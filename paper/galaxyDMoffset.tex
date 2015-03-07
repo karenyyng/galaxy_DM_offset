@@ -18,6 +18,8 @@
 \usepackage{tabularx}
 \usepackage{booktabs}
 \usepackage{microtype}
+\usepackage{algpseudocode}
+\usepackage[]{algorithm2e}
 \graphicspath{{figures/}}
 \newcommand{\mc}[1]{\multicolumn{1}{c}{#1}} % handy shortcut macro
 %-----------------------------------------------------------------------
@@ -148,6 +150,19 @@ density at the maxima locations and identified the dominant peak.
 Another method that is popular among astronomers for summarizing a spatial
 distribution include what we call a shrinking aperture method.
 This method is dependent on the initial location of the aperture.
+\begin{algorithm}
+	\caption{Shrinking aperture algorithm}
+	\KwData{subhalo that satisfy cuts as a galaxy}
+	 \hrulefill
+
+	initial_center = mean(data\_array)\\
+ 	dist\_array = euclidean_dist(initial_center, data_array)\\
+ 	apert = get\_90th\_percentile(dist\_array)\\ 
+	\While{ (newCenterDist - oldCenterDist) / oldCenterDist $\geq$ 2e-2}{
+ 		new data array = old data array within apert\\
+ 		newCenter = mean value of new data along each spatial dimension 
+	}   \hrulefill
+ \end{algorithm}
 
 
 \subsubsection{Brightest Cluster Galaxies (BCG)}
