@@ -22,7 +22,8 @@ def default_keys():
             u'SubhaloStellarPhotometrics',
             u'SubhaloStellarPhotometricsMassInRad',
             u'SubhaloLenType',
-            u'SubhaloMass']
+            u'SubhaloMass',
+            u'SubhaloMassType']
 
 
 def extract_clst(f, clstNo, output=False, keys=default_keys(),

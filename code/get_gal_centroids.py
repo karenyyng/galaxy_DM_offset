@@ -160,7 +160,7 @@ def compute_KDE_peak_offsets(df, f, clstNo, cut_method, cut_kwargs, w=None,
         offset: offset in unit of c kpc/h
         offset: offset in terms of the R200C of the cluster
     :to do:
-        want to make col a param
+        needs major revamp to restructure the outputs
     :note:
         can think of making this function even more general
         by having the peak inference function passed in
@@ -323,18 +323,48 @@ def rmvnorm_mixt(n, mus, Sigmas, props):
 
 
 # -----------other centroid methods ------------------------------------
-def shrinking_apert(r0, x0, y0, data):
+def shrinking_apert(center_coord, data, r0=None):
     """
+    :param center_coord: list of floats or array of floats
+    :param data: np.array
+        with shape[1] == center_coord.shape[0]
     :param r0: float, aperture to consider in the data
-    :param x0: float, initial x coord of center
-    :param y0: float, initial y coord of center
-    :param data: 2D np.array
 
     :note: I want to write this procedure so that it would work in both 2D and
     3D
     """
+    c1 = np.array(center_coord)
+    assert center_coord.shape[0] == data.shape[1], "dimension mismatch"
+    assert r0 > 0, "initial aperture has to be greater than 0"
+
+    # we don't want to worry about different scales of the data
+    data = normalize_data(data)
+
+    dist = compute_euclidean_dist(data - center_coord)
+
+    if r0 is None:
+        r0 = np.percentile(dist, 90)
+
+    while(compute_euclidean_dist(c1 - c0) > 1):
+       break
 
     return
+
+
+def normalize_data(data):
+    """
+    :param data: numpy array
+    """
+    pass
+
+
+def compute_euclidean_dist(data):
+    """
+    :param data: numpy array
+    :return: numpy array
+    """
+    return np.array([np.sqrt(np.dot(data[i], data[i])) for i in
+                     range(data.shape[0])])
 
 
 def compute_weighted_mean(x, w):
