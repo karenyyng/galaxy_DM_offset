@@ -328,34 +328,56 @@ def shrinking_apert(center_coord, data, r0=None):
     :param center_coord: list of floats or array of floats
     :param data: np.array
         with shape[1] == center_coord.shape[0]
+        shape[0] = number of observations
     :param r0: float, aperture to consider in the data
 
     :note: I want to write this procedure so that it would work in both 2D and
     3D
     """
     c1 = np.array(center_coord)
-    assert center_coord.shape[0] == data.shape[1], "dimension mismatch"
+    assert c1.shape[0] == data.shape[1], "dimension mismatch"
     assert r0 > 0, "initial aperture has to be greater than 0"
 
     # we don't want to worry about different scales of the data
-    data = normalize_data(data)
+    data, normalization = normalize_data(data)
+    c1 = c1 / normalization
 
     dist = compute_euclidean_dist(data - center_coord)
 
     if r0 is None:
         r0 = np.percentile(dist, 90)
+        print "no r0 was given, setting r0 to {0}".format(
+            r0 * compute_euclidean_dist(normalization))
 
-    while(compute_euclidean_dist(c1 - c0) > 1):
-       break
+    mdist = np.mean(dist)
+    c0 = c1 + 10 * np.mean(dist)
+    mask = dist < r0
+    while(compute_euclidean_dist(c1 - c0) > 0.01 * mdist and
+          np.sum(mask) > 10):
+        c0 = c1
+        c1 = np.mean(data[mask], axis=0)  # compute new centroid
+        dist = compute_euclidean_dist(data - c1, data - c1)  # compute new dist
+        r0 *= 0.9  # shrink the aperture
+        mask = dist < r0
 
-    return
+    return c1
 
 
 def normalize_data(data):
     """
-    :param data: numpy array
+    :param data: numpy array,
+        first dim should be the observation number
     """
-    pass
+    if type(data) is not np.ndarray:
+        data = np.array(data)
+
+    if data.ndim > 1:
+        normalization = np.array([data[:, i].max() - data[:, i].min() for i in
+                                 range(data.shape[1])])
+    else:
+        normalization = data.max() - data.min()
+
+    return data / normalization, normalization
 
 
 def compute_euclidean_dist(data):
@@ -363,8 +385,14 @@ def compute_euclidean_dist(data):
     :param data: numpy array
     :return: numpy array
     """
-    return np.array([np.sqrt(np.dot(data[i], data[i])) for i in
-                     range(data.shape[0])])
+    if type(data) is not np.ndarray:
+        data = np.array(data)
+
+    if data.ndim > 1:
+        return np.array([np.sqrt(np.dot(data[i], data[i])) for i in
+                        range(data.shape[0])])
+    else:
+        return np.sqrt(np.dot(data, data))
 
 
 def compute_weighted_mean(x, w):
