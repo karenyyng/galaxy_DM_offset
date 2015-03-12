@@ -11,7 +11,7 @@ def test_get_py_peaks_and_density_weights(x):
     res = do_KDE_and_get_peaks(x)
     fhat = convert_fhat_to_dict(res)
 
-    # get_peaks(fhat)
+    get_peaks(fhat)
     # plot_KDE_peaks(fhat, allPeaks=True, showData=True)
     print "Test results: python wrapper code ok"
 
@@ -54,7 +54,6 @@ def test_find_peak_from_py_deriv():
     # ans put in descending density
     correct_peaks_rowIx = [2, 3]
     correct_peaks_colIx = [2, 4]
-
 
     return
 

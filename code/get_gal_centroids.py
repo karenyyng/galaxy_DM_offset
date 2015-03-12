@@ -141,12 +141,14 @@ def cut_reliable_galaxies(df, DM_cut=1e3, star_cut=1e2):
     :params star_cut: integer, how many stellar particles needed for us to
         consider subhalos to be reliable
 
+    :usage:
+        >>> cut_reliable_galaxies(df, **cut_kwargs)
+
     :notes:
     http://illustris-project.org/w/index.php/Data_Details#Snapshot_Contents
     """
-    # DM cut
-    mask = df["SubhaloLenType1"] > DM_cut
-    return np.logical_and(mask, df["SubhaloLenType4"] > star_cut)
+    return np.logical_and(df["SubhaloLenType1"] > DM_cut,
+                          df["SubhaloLenType4"] > star_cut)
 
 
 def compute_KDE_peak_offsets(df, f, clstNo, cut_method, cut_kwargs, w=None,
@@ -323,7 +325,7 @@ def rmvnorm_mixt(n, mus, Sigmas, props):
 
 
 # -----------other centroid methods ------------------------------------
-def shrinking_apert(center_coord, data, r0=None, debug=False):
+def shrinking_apert(data, center_coord=None, r0=None, debug=False):
     """
     :param center_coord: list of floats or array of floats
     :param data: np.array
@@ -335,14 +337,21 @@ def shrinking_apert(center_coord, data, r0=None, debug=False):
     3D
     """
 
-    c1 = np.array(center_coord)
-    # we don't want to worry about different scales of the data
     data, normalization = normalize_data(data)
-    c1 = c1 / normalization
+
+    if center_coord is not None:
+        c1 = np.array(center_coord)
+        # We don't want to worry about different scales of the data
+        c1 = c1 / normalization
+    else:
+        # Start with mean of the data.
+        # Should not start with the origin because that is cheating.
+        c1 = np.mean(data, axis=0)
 
     dist = compute_euclidean_dist(data - center_coord)
 
-    assert c1.shape[0] == data.shape[1], "dimension mismatch"
+    assert c1.shape[0] == data.shape[1], "dimension mismatch between " + \
+        "center and data"
 
     if r0 is None:
         r0 = np.percentile(dist, 90)
@@ -374,7 +383,6 @@ def shrinking_apert(center_coord, data, r0=None, debug=False):
             print "(new mdist - old mdist) / old mdist = {0}\n".format(
                 np.abs(compute_euclidean_dist(c1 - c0) - mdist) / mdist)
 
-
     return c1 * normalization
 
 
@@ -391,6 +399,8 @@ def normalize_data(data):
                                  range(data.shape[1])])
     else:
         normalization = data.max() - data.min()
+
+    assert normalization != 0, "range of data is zero, please check your data"
 
     return data / normalization, normalization
 
@@ -418,9 +428,11 @@ def compute_weighted_mean(x, w):
     return np.mean(x * w) / np.sum(w)
 
 
-def get_BCG():
+def get_BCG(df, DM_cut=1e3, star_cut=1e2):
     """ return the position information of the BCG
+    :param df: pandas dataframe containing all subhalos of each cluster
     """
+
     return
 
 

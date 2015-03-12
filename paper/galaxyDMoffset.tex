@@ -112,7 +112,7 @@ We follow the usual definition of spatial centroid as
 \end{equation}
 While the weighted centroids are just: 
 \begin{equation}
-	\vec{x}_w = \frac{\sum_i w_i \vec{x}_i}{\sum_i \vec{w}_i},
+	\vec{x}_w = \frac{\sum_i w_i \vec{x}_i}{\sum_i w_i},
 \end{equation}
 for each spatial dimension and the weights $w_i$ for the $i-th$ galaxy
 is described in section.
@@ -177,18 +177,20 @@ cross-validated KDE and the dark matter density peak. (TBD)
 The viewing angles of the projections are defined by an elevation angle
 $\xi$ and an azimuthal angle $\phi$. 
 We sample at 5 evenly spaced values of $\xi$ where $0 \leq \xi \leq \pi / 2$ and 
-10 evenly spaced values of $\phi$ where $0 \leq \phi \leq \pi$, 
+10 evenly spaced values of $\phi$ where $0 \leq \phi \leq \pi$, to give 50
+samples for each cluster with mass $> 10^{14} M_\sun$. 
 
 This method gives us samples of the joint distribution: 
 \begin{equation}
-	P(\Delta \eta, \phi, \xi, h_{mer}, \psi_g, \psi_D, I_g, I_D). 
+	P(\Delta \eta, \phi, \xi, h_{mer}, \psi_g, \psi_D, I_g, I_D | \theta,
+	\sigma_{CDM}). 
 \end{equation}
 
 
-Binning the samples based on $\Delta \eta$ and $h_{mer}$ gives us the
+Binning the samples based on $\Delta \eta$ and $h_{mer}$ only gives us the
 marginal distribution:
 \begin{equation}
-	P(\Delta \eta, h_{mer}),
+	P(\Delta \eta, h_{mer} | \theta, \sigma_{CDM}),
 \end{equation}
 that we have far too few samples of \dots
 
