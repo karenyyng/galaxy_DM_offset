@@ -400,7 +400,7 @@ def normalize_data(data):
     else:
         normalization = data.max() - data.min()
 
-    assert normalization != 0, "range of data is zero, please check your data"
+    assert normalization != 0, "Range of data is zero, please check your data"
 
     return data / normalization, normalization
 
@@ -432,6 +432,8 @@ def get_BCG(df, DM_cut=1e3, star_cut=1e2):
     """ return the position information of the BCG
     :param df: pandas dataframe containing all subhalos of each cluster
     """
+    # sort by U, B, V, K, g, r, i, z bands
+    # magnitude : brighter = smaller magnitude
 
     return
 
