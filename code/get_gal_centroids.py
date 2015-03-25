@@ -362,8 +362,9 @@ def shrinking_apert(data, center_coord=None, r0=None, debug=False):
 
     if r0 is None:
         r0 = np.percentile(dist, 90)
-        print "no r0 was given, setting r0 to {0}".format(
-            r0 * compute_euclidean_dist(normalization))
+        if debug:
+            print "no r0 was given, setting r0 to {0}".format(
+                r0 * compute_euclidean_dist(normalization))
     else:
         assert r0 > 0, "initial aperture has to be greater than 0"
 
@@ -437,11 +438,18 @@ def compute_euclidean_dist(data):
         return np.sqrt(np.dot(data, data))
 
 
-def compute_weighted_mean(x, w):
+def compute_weighted_centroids(data, w=None):
+    return np.array([compute_weighted_mean(data[:, i], w=w)
+                     for i in range(data.shape[1])])
+
+
+def compute_weighted_mean(x, w=None):
     """
     :param x: numpy array
     :param w: numpy array
     """
+    if w is None:
+        return np.mean(x)
     return np.mean(x * w) / np.sum(w)
 
 
@@ -475,6 +483,7 @@ def find_3D_peaks():
     # find
     # needs to check 27 - 7 points from the cube
     return
+
 
 # def convert_R_peak_ix_to_py_peaks(fhat, ix_key="peak_coords_ix",
 #                                   pt_key="eval_points"):

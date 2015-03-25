@@ -60,7 +60,7 @@ def plot_color_mag_diag(df, bluer_band, redder_band, band_limit,
 
 
 def plot_cf_contour(dens, x, y, lvls=[68, 95], show=False, clabel=False,
-                    fill=False):
+                    fill=False, colors=None):
     """this sort through the density, add them up til they are
     below the required confidence level, then plot
 
@@ -85,7 +85,9 @@ def plot_cf_contour(dens, x, y, lvls=[68, 95], show=False, clabel=False,
             if sums / d_sum <= 1. - lvls[i]:
                 lvl_vals[i] = d[j]
 
-    colors = [(0 / 255., 70 / 255., i / len(lvls)) for i in range(len(lvls))]
+    if colors is None:
+        colors = \
+            [(0 / 255., 70 / 255., i / len(lvls)) for i in range(len(lvls))]
 
     # the plt.contour function is weird, if you don't transpose
     # the density, the plotted density will be rotated by 180 clockwise
