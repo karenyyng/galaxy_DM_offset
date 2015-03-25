@@ -203,25 +203,25 @@ function(fhat_pi1, cf_lvl=c(1:4 * 20.), plot_name="./plots/R_KDE_plot.png",
 }
 
 
-do_KDE_and_get_peaks=
-  # perform KDE then get peaks 
-  # @param x: matrix, 2D matrix for holding data values   
-  # @param bw_selector: ks object called bandwidth_selector 
-  # @param w: vector of floats 
-  # 
-  # @return results: list of peaks and fhat
-  # @stability : seems ok - a little ad hoc  
-function(x, bw_selector=Hscv, w=rep.int(1, nrow(x)), 
-         dom_peak_no=1L) 
-{
-  fhat_pi1 <- do_KDE(x, bandwidth_selector=bw_selector, w=w)
-  # coords_ix <- find_peaks_from_2nd_deriv(fhat_pi1) 
-  # peaks <- find_dominant_peaks(fhat_pi1, coords_ix, dom_peak_no=dom_peak_no)
-
-  # fhat_pi1$coords_ix <- coords_ix
-  # fhat_pi1$domPeaks <- peaks
-  return(fhat_pi1)
-}
+# do_KDE_and_get_peaks=
+#   # perform KDE then get peaks 
+#   # @param x: matrix, 2D matrix for holding data values   
+#   # @param bw_selector: ks object called bandwidth_selector 
+#   # @param w: vector of floats 
+#   # 
+#   # @return results: list of peaks and fhat
+#   # @stability : seems ok - a little ad hoc  
+# function(x, bw_selector=Hscv, w=rep.int(1, nrow(x)), 
+#          dom_peak_no=1L) 
+# {
+#   fhat_pi1 <- do_KDE(x, bandwidth_selector=bw_selector, w=w)
+#   # coords_ix <- find_peaks_from_2nd_deriv(fhat_pi1) 
+#   # peaks <- find_dominant_peaks(fhat_pi1, coords_ix, dom_peak_no=dom_peak_no)
+# 
+#   # fhat_pi1$coords_ix <- coords_ix
+#   # fhat_pi1$domPeaks <- peaks
+#   return(fhat_pi1)
+# }
 
 
 bootstrap_KDE=

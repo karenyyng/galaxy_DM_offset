@@ -257,7 +257,7 @@ def gaussian_mixture_data(samp_no=int(5e2), cwt=1. / 11., set_seed=True):
     return robjects.r["gaussian_mixture_data"](samp_no, cwt, set_seed=True)
 
 
-def do_KDE_and_get_peaks(x, w=None, dom_peak_no=1):
+def do_KDE(x, w=None, dom_peak_no=1):
     """ don't want to write this for a general bandwidth selector yet
     :params x: np.array, each row should be one observation / subhalo
     :params w: np.float, weight of each row of data
@@ -269,17 +269,24 @@ def do_KDE_and_get_peaks(x, w=None, dom_peak_no=1):
 
     :stability: untested
     """
-    do_KDE_and_get_peaks = robjects.r["do_KDE_and_get_peaks"]
+    do_KDE = robjects.r["do_KDE"]
 
     x = py_2D_arr_to_R_matrix(np.array(x))
 
     if w is not None:
         w = robjects.FloatVector(w)
-        res = do_KDE_and_get_peaks(x, w=w, dom_peak_no=dom_peak_no)
+        res = do_KDE(x, w=w, dom_peak_no=dom_peak_no)
     else:
-        res = do_KDE_and_get_peaks(x, dom_peak_no=dom_peak_no)
+        res = do_KDE(x, dom_peak_no=dom_peak_no)
 
     return res
+
+
+def do_KDE_and_get_peaks(x, w=None, dom_peak_no=1):
+    res = do_KDE(x, w=w, dom_peak_no=dom_peak_no)
+    fhat = convert_fhat_to_dict(res)
+    find_peaks_from_py_diff(fhat, estKey="estimate", gridKey="eval_points")
+    return fhat
 
 
 def bootstrap_KDE(data, bootNo=4, ncpus=2):
@@ -348,7 +355,7 @@ def shrinking_apert(data, center_coord=None, r0=None, debug=False):
         # Should not start with the origin because that is cheating.
         c1 = np.mean(data, axis=0)
 
-    dist = compute_euclidean_dist(data - center_coord)
+    dist = compute_euclidean_dist(data - c1)
 
     assert c1.shape[0] == data.shape[1], "dimension mismatch between " + \
         "center and data"
@@ -365,6 +372,8 @@ def shrinking_apert(data, center_coord=None, r0=None, debug=False):
     mask = dist < r0
     it = 0
 
+    conseq_c1_diff = []
+    conseq_c1 = []
     while(np.abs(compute_euclidean_dist(c1 - c0) - mdist) / mdist > 2e-2
           and np.sum(mask) > 10):
         # compute new convergence criteria
@@ -382,8 +391,14 @@ def shrinking_apert(data, center_coord=None, r0=None, debug=False):
         if debug:
             print "(new mdist - old mdist) / old mdist = {0}\n".format(
                 np.abs(compute_euclidean_dist(c1 - c0) - mdist) / mdist)
+            conseq_c1_diff.append(np.abs(
+                compute_euclidean_dist(c1 - c0) - mdist) / mdist)
+            conseq_c1.append(c1)
 
-    return c1 * normalization
+    if debug:
+        return c1 * normalization, conseq_c1 * normalization, conseq_c1_diff
+    else:
+        return c1 * normalization
 
 
 def normalize_data(data):
@@ -400,7 +415,9 @@ def normalize_data(data):
     else:
         normalization = data.max() - data.min()
 
-    assert normalization != 0, "Range of data is zero, please check your data"
+    assert np.any(normalization != 0), \
+        "Range of data in at least one dimension is zero, \
+        please check your data"
 
     return data / normalization, normalization
 
