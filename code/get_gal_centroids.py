@@ -177,8 +177,6 @@ def compute_KDE_peak_offsets(df, f, clstNo, cut_method, cut_kwargs, w=None,
     print "data shape is ", data.shape
 
     fhat = do_KDE_and_get_peaks(data, w=w)
-    # peaks = results[0]  # the first component give an R matrix of the peaks
-    # peaks = np.array(peaks)[0]  # get only the first peak
 
     R200C = f["Group"]["Group_R_Crit200"][clstNo]
 
