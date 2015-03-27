@@ -235,3 +235,5 @@ def plot_bandwidth_matrix(mtx, up_xlim, up_ylim, low_xlim, low_ylim,
     ax.add_artist(ell)
 
     return
+
+

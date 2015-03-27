@@ -176,14 +176,12 @@ def compute_KDE_peak_offsets(df, f, clstNo, cut_method, cut_kwargs, w=None,
     data = np.array(df[col][mask])
     print "data shape is ", data.shape
 
-    results = do_KDE_and_get_peaks(data, w=w)
+    fhat = do_KDE_and_get_peaks(data, w=w)
     # peaks = results[0]  # the first component give an R matrix of the peaks
     # peaks = np.array(peaks)[0]  # get only the first peak
 
     R200C = f["Group"]["Group_R_Crit200"][clstNo]
 
-    fhat = convert_fhat_to_dict(results)  # [1])
-    find_peaks_from_py_diff(fhat, estKey="estimate", gridKey="eval_points")
     fhat["peaks_dens"] = get_density_weights(fhat)
 
     # we have sorted the density so that the highest density peak is the first
@@ -275,11 +273,9 @@ def do_KDE(x, w=None, dom_peak_no=1):
 
     if w is not None:
         w = robjects.FloatVector(w)
-        res = do_KDE(x, w=w, dom_peak_no=dom_peak_no)
+        return do_KDE(x, w=w, dom_peak_no=dom_peak_no)
     else:
-        res = do_KDE(x, dom_peak_no=dom_peak_no)
-
-    return res
+        return do_KDE(x, dom_peak_no=dom_peak_no)
 
 
 def do_KDE_and_get_peaks(x, w=None, dom_peak_no=1):
@@ -389,6 +385,9 @@ def shrinking_apert(data, center_coord=None, r0=None, debug=False):
         dist = compute_euclidean_dist(data - c1)  # compute new dist
         r0 *= 0.95  # shrink the aperture
         mask = dist < r0
+        if mdist == 0:
+            break
+
         if debug:
             print "(new mdist - old mdist) / old mdist = {0}\n".format(
                 np.abs(compute_euclidean_dist(c1 - c0) - mdist) / mdist)
@@ -400,6 +399,10 @@ def shrinking_apert(data, center_coord=None, r0=None, debug=False):
         return c1 * normalization, conseq_c1 * normalization, conseq_c1_diff
     else:
         return c1 * normalization
+
+
+def shrink_apert_CR(shrink_peaks):
+    return
 
 
 def normalize_data(data):
@@ -483,6 +486,7 @@ def find_3D_peaks():
     # find
     # needs to check 27 - 7 points from the cube
     return
+
 
 
 # def convert_R_peak_ix_to_py_peaks(fhat, ix_key="peak_coords_ix",
