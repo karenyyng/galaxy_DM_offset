@@ -3,3 +3,12 @@
 *.h5
 *.RData
 *.Rhistory
+*.eps-converted-to.pdf
+*.log
+*.aux
+*.bbl
+*.html
+*.fls
+*.fdb_latexmk
+*.out
+
