@@ -16,7 +16,7 @@ robjects.r('source("ks_KDE.r")')
 # --------- methods for computing gal-DM offsets-------------------------
 def find_peaks_from_py_diff(fhat, estKey="estimate", gridKey="eval_points"):
     """
-    :note: side effects
+    :note: side effects for fhat
     """
 
     est = fhat[estKey]
@@ -446,9 +446,11 @@ def compute_weighted_centroids(data, w=None):
 
 def compute_weighted_mean(x, w=None):
     """
-    :param x: numpy array
-    :param w: numpy array
+    :param x: numpy array, the data
+    :param w: numpy array, the weights
     """
+    assert len(x) == len(w), "shape of data and weights have to be the same"
+
     if w is None:
         return np.mean(x)
     return np.mean(x * w) / np.sum(w)
@@ -460,6 +462,7 @@ def get_BCG(df, DM_cut=1e3, star_cut=1e2):
     """
     # sort by U, B, V, K, g, r, i, z bands
     # magnitude : brighter = smaller magnitude
+    raise NotImplemented
 
     return
 
@@ -486,8 +489,84 @@ def find_3D_peaks():
     return
 
 
+# ---------- weights --------------------------------------------------
+
 def mag_to_lum(mag):
     return np.exp(-mag + 23.)
+
+
+# --------- compute confidence region for each method ------------------
+
+def get_shrinking_apert_conf_reg(data_realizations):
+    """
+    :param data_realizations: list of data_realizations
+
+    :return fhat: dictionary of properties
+        of shrinking aperture peaks
+        from the data realizations and the peaks
+    """
+    # find shrinking aperture peak of each realization
+    shrink_peaks2 = np.array([shrinking_apert(bi_data)
+                             for bi_data in data_realizations])
+
+    # use KDE to find the distribution of the shrinking aperture peaks
+    shrink_peak_dens2 = do_KDE(shrink_peaks2)
+    shrink_peak_dens2 = convert_fhat_to_dict(shrink_peak_dens2)
+    find_peaks_from_py_diff(shrink_peak_dens2)
+
+    return shrink_peak_dens2
+
+
+def get_KDE_conf_reg(data_realizations, second_peak=False):
+    """
+    :param data_realizations: list of data_realizations
+    :param 2nd_peak: boolean, whether we want the result from the
+        2nd peak
+
+    :return fhat: dictionary of properties
+        of KDE peaks
+        from the data realizations and the peaks
+    """
+    KDE_fhat2 = [do_KDE_and_get_peaks(g_data)
+                 for g_data in data_realizations]
+    KDE_peaks2 = np.array([np.array([fhat2["peaks_xcoords"][0],
+                                     fhat2["peaks_ycoords"][0]])
+                           for fhat2 in KDE_fhat2])
+    KDE_peak_dens2 = do_KDE(KDE_peaks2)
+    KDE_peak_dens2 = convert_fhat_to_dict(KDE_peak_dens2)
+    find_peaks_from_py_diff(KDE_peak_dens2)
+
+    # get second KDE peak
+    if second_peak:
+        KDE_peaks2b = np.array([np.array([fhat2["peaks_xcoords"][1],
+                                         fhat2["peaks_ycoords"][1]])
+                                for fhat2 in KDE_fhat2
+                                if len(fhat2["peaks_xcoords"]) > 1])
+        KDE_peak_dens2b = do_KDE(KDE_peaks2b)
+        KDE_peak_dens2b = convert_fhat_to_dict(KDE_peak_dens2b)
+        find_peaks_from_py_diff(KDE_peak_dens2b)
+
+        return KDE_peak_dens2, KDE_peak_dens2b
+
+    return KDE_peak_dens2
+
+
+def get_centroid_conf_reg(data_realizations):
+    """
+    :param data_realizations: list of data_realizations
+
+    :return fhat: dictionary of properties
+        of KDE peaks from the data realizations and the peaks
+    """
+    cent_fhat2 = [compute_weighted_centroids(g_data)
+                  for g_data in data_realizations]
+    cent_peak_dens2 = do_KDE(cent_fhat2)
+    cent_peak_dens2 = convert_fhat_to_dict(cent_peak_dens2)
+    find_peaks_from_py_diff(cent_peak_dens2)
+
+    return cent_peak_dens2
+
+
 
 # def convert_R_peak_ix_to_py_peaks(fhat, ix_key="peak_coords_ix",
 #                                   pt_key="eval_points"):

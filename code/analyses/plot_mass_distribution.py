@@ -27,4 +27,4 @@ y_ticks = r"$N(> M_{Cluster})$"
 
 plot_cluster_mass_distribution(ticks, y_data,
                                y_legend, x_ticks, y_ticks,
-                               save=True, path="../../paper/figures/")
+                               save=True, path="../../paper/figures/drafts/")
