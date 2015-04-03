@@ -18,7 +18,7 @@
 \usepackage{tabularx}
 \usepackage{booktabs}
 \usepackage{microtype}
-\graphicspath{{figures/}}
+\graphicspath{{figures/drafts/}{figures/finalized}}
 \newcommand{\mc}[1]{\multicolumn{1}{c}{#1}} % handy shortcut macro
 %-----------------------------------------------------------------------
 \def\apjl{ApJL }
@@ -57,10 +57,24 @@ Illustris simulation}
 \begin{keywords}
 	galaxy clusters, dark matter, something else 
 \end{keywords}
-\begin{figure}
+\begin{figure*}
 	\includegraphics[width=.95\linewidth]{clusterMassDist.eps}
 	\caption{
 		\label{fig:config}}
-\end{figure}
+\end{figure*}
+\begin{figure*}
+	\includegraphics[width=.95\linewidth]{confidence_regions_dumbbell_500.eps}
+	\caption{Comparison of the estimates given by different peak finding methods.
+		{\bf Leftmost plot:} One realization of drawing data from 3 Gaussian
+		mixtures. Grey data points (500 in total) were drawn from three
+		Gaussian mixtures with the mean locations of the Gaussians indicated by the
+		black markers. In total 200 realizations of the Gaussian data were drawn.
+		{\bf Middle plot:} Each set of colored contours represents the
+		68\% (inner contour) and the 95\% confidence region of the best estimates
+		of the peak location. The contours are computed from 200 realizations of the Gaussian
+		mixtures data respectively. {\bf Rightmost plot:} Zoomed-in view of the
+		contours and best estimates (best est) from each method near the dominant peak.  
+		\label{fig:dumbbell500}}
+\end{figure*}
 \clearpage\bsp\label{lastpage} 
 \end{document}
