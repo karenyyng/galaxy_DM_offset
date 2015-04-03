@@ -486,6 +486,8 @@ def find_3D_peaks():
     return
 
 
+def mag_to_lum(mag):
+    return np.exp(-mag + 23.)
 
 # def convert_R_peak_ix_to_py_peaks(fhat, ix_key="peak_coords_ix",
 #                                   pt_key="eval_points"):

@@ -165,13 +165,14 @@ def plot_KDE_peaks(fhat, lvls=range(2, 100, 10), allPeaks=False,
         fig = plt.gcf()
         fig.gca().add_artist(R200_circl)
 
-    plt.legend(loc='best')
-    if showData:
-        plt.show()
+    plt.legend(loc='best', frameon=False)
 
     if save and clstNo is not None:
-        plt.savefig(fileDir + fileName + str(clstNo) + ".png")
-        # , bbox_inches='tight')
+        plt.savefig(fileDir + fileName + str(clstNo) + ".png",
+                    bbox_inches='tight')
+
+    if showData:
+        plt.show()
 
     return
 

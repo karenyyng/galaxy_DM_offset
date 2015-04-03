@@ -72,18 +72,12 @@ the dark matter density peak. For stacking the different sets of data,
 find a good proxy for the dark matter density peak is important for the
 peak not to be smoothed out. 
 
+As we try to utilize our knowledge of galaxy clusters for precision cosmology,
+we need to quantify and propagate our uncertainties carefully.
+
+
 
 \section{DATA}
-\subsection{Test data from Gaussian mixture(s)}
-In order to examine the performance of commonly used point-estimates of the
-distribution of the galaxy data, we test them on Gaussian mixtures with
-known mean and variance. \\
-Fig 1. one Normal mixture \\  
-Fig 2. one big normal mixture and one smaller normal mixture \\ 
-Fig 3. bridged normal mixtures \\  
-
-We provide all the code and data of these test in our Bitbucket repository
-for comparison purposes for point estimator not listed.
 
 \subsection{Data from the Illustris simulation} 
 \begin{figure}
@@ -114,24 +108,27 @@ with the highest statistical power ().
 3. spatial projections 
 \subsubsection{Galaxy Selection}
 \subsubsection{Galaxy weights}
+One of the most common weighting scheme employed for cluster galaxy data is to weight
+by the luminosity in a particular band.
+
 \subsubsection{Data with and without noise}
 1. Mass-richness diagram - with different cuts  
 \section{METHODS} 
+
 \subsection{Galaxy Centers}
 \subsubsection{Unweighted and weighted centroids}
 We follow the usual definition of spatial centroid as 
 \begin{equation}
-	\vec{x} = \frac{1}{n} \sum_i \vec{x}_i. 
+	\bar{\bf x} = \frac{1}{n} \sum_i \vec{x}_i. 
 \end{equation}
 While the weighted centroids are just: 
 \begin{equation}
-	\vec{x}_w = \frac{\sum_i w_i \vec{x}_i}{\sum_i w_i},
+	\bar{\bf x}_w = \frac{\sum_i w_i \vec{x}_i}{\sum_i w_i},
 \end{equation}
 for each spatial dimension and the weights $w_i$ for the $i-th$ galaxy
 is described in section.
 Centroids and weighted centroids can be biased by merging activities yet do
 not provide explicit evidence for ongoing merger or accretion. 
-
 
 
 \subsubsection{Cross-validated Kernel Density Estimation (KDE) and the peak finder} 
@@ -146,12 +143,17 @@ After obtaining the KDE estimate, we employed a finite differencing algorithm
 to find the local maxima. We sorted the local maxima according to the KDE
 density at the maxima locations and identified the dominant peak. 
 
+Spatial location and the density of the subdominant peaks are also stored.
+The subdominant 
+
 \subsubsection{Shrinking aperture}
-Another method that is popular among astronomers for summarizing a spatial
+Another popular method among astronomers for finding the peak of a spatial
 distribution include what we call a shrinking aperture method.
 We test if the shrinking aperture method is able to recover the highest peak reliably.
-This method is dependent on the initial location of the aperture.
-Furthermore, the convergence criteria is not set objectively.
+This method is dependent on the initial diameter and the center location of the aperture.
+Furthermore, the convergence criteria is not set objectively. We present the
+convergence criteria for reference. We note that different implementation may result in
+different performances.
 \begin{algorithm}
 	\caption{Shrinking aperture algorithm}
 	\KwData{subhalo that satisfy cuts as a galaxy}
@@ -167,8 +169,32 @@ Furthermore, the convergence criteria is not set objectively.
  \end{algorithm}
 
 
+
+
 \subsubsection{Brightest Cluster Galaxies (BCG)}
-From the provided 
+
+\subsubsection{Comparison of the methods from test data}
+In order to examine the performance of commonly used point-estimates of the
+distribution of the galaxy data, we test them on data drawn from Gaussian mixtures with
+known mean and variance. \\
+Fig 1. one Normal mixture \\  
+Fig 2. one big normal mixture and one smaller normal mixture \\ 
+Fig 3. three bridged normal mixtures \\  
+We compare the properties and performance of each of the
+methods for finding the peaks of the galaxy and dark matter, 
+except the BCG since it does not rely on the cluster member population. 
+The main factors that affect the performance of the methods depend heavily on
+statistical fluctuations of the drawn data. Namely, the performance of each
+method depends on: 1) the
+number of Gaussian mixture used, 2) the number of data points in each mixture
+
+Due to the statistical nature of this exercise, it is not enough to just
+compare the performance from one realization of each method. We also provide
+the 68\% and the 95\% confidence regions from 
+
+
+The details and implementation can be found in our Bitbucket git repository.
+
 
 
 \subsection{DM Centers}
@@ -198,10 +224,6 @@ that we have far too few samples of \dots
 
 
 \section{RESULTS} 
-\subsection{Benchmark results from Gaussian mixtures} 
-(We expect some of the existing point-estimates are quite crappy e.g. the
-shrinking aperture method, and will not
-use them for the Illustris data) 
 
 \subsection{Galaxy-DM Offset in Illustris}
 \subsubsection{Projected offsets}
@@ -210,6 +232,17 @@ use them for the Illustris data)
 \subsection{Comparison to other simulations}
 \subsection{Comparison to other observational studies}
 \subsection{Galaxy-DM Offset in Merging Galaxy Clusters}
+\subsection{Summary}
+We showed that 
+\begin{itemize}
+		\item  the peak finding method To-be-finalized for the density of cluster
+			galaxies is the least biased due to substructures from our test data. 
+		\item  all existing peak finding methods have non-negligible uncertainty 
+			due to the small number of data points. When dealing with small number of
+			cluster samples, the uncertainties of the peak locations should not be
+			ignored.
+\end{itemize}
+
 \section{ACKNOWLEDGEMENTS}
 % K. Ng would like to thank D. Hogg for useful discussion on 
 % alternative ways of characterizing differences between DM and galaxy
