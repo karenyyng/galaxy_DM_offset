@@ -449,10 +449,10 @@ def compute_weighted_mean(x, w=None):
     :param x: numpy array, the data
     :param w: numpy array, the weights
     """
-    assert len(x) == len(w), "shape of data and weights have to be the same"
-
     if w is None:
         return np.mean(x)
+
+    assert len(x) == len(w), "row no of data and weights have to be the same"
     return np.mean(x * w) / np.sum(w)
 
 

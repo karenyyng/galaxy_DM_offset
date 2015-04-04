@@ -13,6 +13,17 @@ import get_gal_centroids as get_gal
 from plot_gal_prop import plot_cf_contour
 
 
+# plot styles
+lvls = [68, 95]
+g_colors = [(0 / 255., i / (len(lvls) + 1.), 0 / 255.)
+            for i in range(1, len(lvls) + 1)]
+
+b_colors = [(0 / 255., 0 / 255., i / (len(lvls) + 1.))
+            for i in range(1, len(lvls) + 1)]
+
+r_colors = [(i / (len(lvls) + 1.), 0 / 255., 0 / 255.)
+            for i in range(1, len(lvls) + 1)]
+
 def draw_gaussian(mean=np.ones(2),
                   cov=np.eye(2),
                   data_size=300):
@@ -37,6 +48,101 @@ def call_gaussian_and_prepare_data(data_size=500, bootNo=100):
     cent_peak_dens = get_gal.get_centroid_conf_reg(gauss_data)
 
     return gauss_data, shrink_peak_dens, KDE_peak_dens, cent_peak_dens
+
+
+def plot_gauss_500_comparison(gauss_data, shrink_peak_dens, KDE_peak_dens,
+                              cent_peak_dens,
+                              fig_path="../../paper/figures/drafts/",
+                              fig_name="gauss500.pdf",
+                              figsize=7):
+
+    plt.figure(figsize=(figsize * 3, figsize))
+    plt.subplot(131)
+    plt.plot(gauss_data[0][:, 0], gauss_data[0][:, 1], 'k.', alpha=0.3)
+    plt.plot(1, 1, 'kx', mew=2, ms=10, label='Mean of Gaussian')
+    plt.legend(loc='best', frameon=False)
+
+    xlim = plt.xlim(-2, 4)
+    ylim = plt.ylim(-2, 4)
+
+    plt.subplot(132)
+
+    plot_cf_contour(KDE_peak_dens["estimate"],
+                    KDE_peak_dens["eval_points"][0],
+                    KDE_peak_dens["eval_points"][1],
+                    colors=g_colors)
+    plt.annotate('KDE peak C.R.', (0.1, 0.27), textcoords='axes fraction',
+                 color='g')
+
+    plot_cf_contour(shrink_peak_dens["estimate"],
+                    shrink_peak_dens["eval_points"][0],
+                    shrink_peak_dens["eval_points"][1],
+                    colors=b_colors)
+    plt.annotate('shrink apert peak C.R.', (0.1, 0.85),
+                 textcoords='axes fraction',
+                 color='b')
+
+    plot_cf_contour(cent_peak_dens["estimate"],
+                    cent_peak_dens["eval_points"][0],
+                    cent_peak_dens["eval_points"][1],
+                    colors=r_colors)
+    plt.annotate('centroid C.R.', (0.38, 0.6),
+                 textcoords='axes fraction',
+                 color='r')
+    plt.plot(1, 1, "kx", mew=2, label="True center", markersize=5)
+    plt.xlim(0, 2.0)
+    plt.legend(loc='best', frameon=False)
+    # plt.title('Confidence region from one Gaussian at (1, 1)',
+    #           fontsize=15)
+    plt.xlim(xlim)
+    plt.ylim(ylim)
+
+    plt.subplot(133)
+    markersize = 10
+    # plot KDE dominant peak contour
+    plot_cf_contour(KDE_peak_dens["estimate"],
+                    KDE_peak_dens["eval_points"][0],
+                    KDE_peak_dens["eval_points"][1],
+                    colors=b_colors)
+
+    plt.plot(KDE_peak_dens["peaks_xcoords"][0],
+             KDE_peak_dens["peaks_ycoords"][0],
+             'bx', mew=2, markersize=markersize,
+             label="KDE peak best est")
+
+    # plot shrinking aperture contour
+    plot_cf_contour(shrink_peak_dens["estimate"],
+                    shrink_peak_dens["eval_points"][0],
+                    shrink_peak_dens["eval_points"][1],
+                    colors=g_colors)
+
+    plt.plot(shrink_peak_dens["peaks_xcoords"][0],
+             shrink_peak_dens["peaks_ycoords"][0],
+             'gx', mew=2, markersize=markersize,
+             label="Shrink peak best est")
+
+    # plot centroid contour
+    plot_cf_contour(cent_peak_dens["estimate"],
+                    cent_peak_dens["eval_points"][0],
+                    cent_peak_dens["eval_points"][1],
+                    colors=r_colors)
+
+    plt.plot(cent_peak_dens["peaks_xcoords"][0],
+             cent_peak_dens["peaks_ycoords"][0],
+             'rx', mew=2, markersize=markersize,
+             label="Centroid peak best est")
+
+    plt.plot(1, 1, "kx", mew=2, label="Mean of dominant Gaussian",
+             markersize=markersize)
+
+    plt.legend(loc='lower right', frameon=False)
+    plt.title("Zoomed-in view near the dominant peak",
+              fontsize=15)
+
+    print("saving figure to" + fig_path + fig_name)
+    plt.savefig(fig_path + fig_name, bbox_inches='tight')
+
+    return
 
 
 def one_big_gaussian_one_small_gaussian(data_size=500,
@@ -104,18 +210,7 @@ def plot_dumbbell_500_comparison(
         cent_peak_dens2,
         figsidesize=7,
         plot_path="../../paper/figures/drafts/",
-        plot_fig_name="confidence_regions_dumbbell_500.eps"):
-
-    # plot styles
-    lvls = [68, 95]
-    g_colors = [(0 / 255., i / (len(lvls) + 1.), 0 / 255.)
-                for i in range(1, len(lvls) + 1)]
-
-    b_colors = [(0 / 255., 0 / 255., i / (len(lvls) + 1.))
-                for i in range(1, len(lvls) + 1)]
-
-    r_colors = [(i / (len(lvls) + 1.), 0 / 255., 0 / 255.)
-                for i in range(1, len(lvls) + 1)]
+        plot_fig_name="confidence_regions_dumbbell_500.pdf"):
 
     plt.figure(figsize=(figsidesize * 3, figsidesize))
 
@@ -206,7 +301,8 @@ def plot_dumbbell_500_comparison(
 
     # first plot for the data
     plt.subplot(131)
-    plt.plot(dumb_data[0][:, 0], dumb_data[0][:, 1], '.', color='grey')
+    plt.plot(dumb_data[0][:, 0], dumb_data[0][:, 1], '.', color='k',
+             alpha=0.3)
     plt.plot(2, 2, "ko", mew=2,
              label="Mean of dominant Gaussian", fillstyle='none',
              markersize=markersize)
@@ -230,18 +326,7 @@ def plot_dumbbell_50_comparison(
         cent_peak_dens2,
         figsidesize=7,
         plot_path="../../paper/figures/drafts/",
-        plot_fig_name="confidence_regions_dumbbell_50.eps"):
-
-    # plot styles
-    lvls = [68, 95]
-    g_colors = [(0 / 255., i / (len(lvls) + 1.), 0 / 255.)
-                for i in range(1, len(lvls) + 1)]
-
-    b_colors = [(0 / 255., 0 / 255., i / (len(lvls) + 1.))
-                for i in range(1, len(lvls) + 1)]
-
-    r_colors = [(i / (len(lvls) + 1.), 0 / 255., 0 / 255.)
-                for i in range(1, len(lvls) + 1)]
+        plot_fig_name="confidence_regions_dumbbell_50.pdf"):
 
     plt.figure(figsize=(figsidesize * 3, figsidesize))
 
