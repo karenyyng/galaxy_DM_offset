@@ -73,7 +73,7 @@ def check_peak_higher_than_corner_values(fhat, rowIx, colIx,
     """
 
     OK_peaks = np.array([check_corners_of_one_peak(fhat, rowIx[i], colIx[i])
-                         for i in range(len(rowIx))], dtype=bool)
+                         for i in xrange(len(rowIx))], dtype=bool)
     if debug:
         print "OK_peaks = ", OK_peaks
 
@@ -90,7 +90,7 @@ def check_corners_of_one_peak(fhat, peakRowIx, peakColIx, debug=False):
 
     OK = np.sum([fhat["estimate"][peakRowIx, peakColIx] >
                  fhat["estimate"][check_rowIx[i], check_colIx[i]]
-                 for i in range(len(check_rowIx))]) == len(check_rowIx)
+                 for i in xrange(len(check_rowIx))]) == len(check_rowIx)
 
     if debug:
         print "OK or not = ", OK
@@ -399,10 +399,6 @@ def shrinking_apert(data, center_coord=None, r0=None, debug=False):
         return c1 * normalization
 
 
-def shrink_apert_CR(shrink_peaks):
-    return
-
-
 def normalize_data(data):
     """
     :param data: numpy array,
@@ -413,7 +409,7 @@ def normalize_data(data):
 
     if data.ndim > 1:
         normalization = np.array([data[:, i].max() - data[:, i].min() for i in
-                                 range(data.shape[1])])
+                                 xrange(data.shape[1])])
     else:
         normalization = data.max() - data.min()
 
@@ -434,14 +430,14 @@ def compute_euclidean_dist(data):
 
     if data.ndim > 1:
         return np.array([np.sqrt(np.dot(data[i], data[i])) for i in
-                        range(data.shape[0])])
+                        xrange(data.shape[0])])
     else:
         return np.sqrt(np.dot(data, data))
 
 
 def compute_weighted_centroids(data, w=None):
     return np.array([compute_weighted_mean(data[:, i], w=w)
-                     for i in range(data.shape[1])])
+                     for i in xrange(data.shape[1])])
 
 
 def compute_weighted_mean(x, w=None):
