@@ -362,7 +362,7 @@ def shrinking_apert(data, center_coord=None, r0=None, debug=False, w=None):
     else:
         # Start with mean of the data.
         # Should not start with the origin because that is cheating.
-        c1 = compute_weighted_mean(data, axis=0, w=w)
+        c1 = compute_weighted_centroids(data, w=w)
 
     dist = compute_euclidean_dist(data - c1)
 
@@ -394,7 +394,7 @@ def shrinking_apert(data, center_coord=None, r0=None, debug=False, w=None):
                                                               np.sum(mask))
             print "mdist = {0}".format(mdist)
         c0 = c1
-        c1 = np.mean(data[mask], axis=0)  # compute new centroid
+        c1 = compute_weighted_mean(data[mask], w=w)  # compute new centroid
         dist = compute_euclidean_dist(data - c1)  # compute new dist
         r0 *= 0.95  # shrink the aperture
         mask = dist < r0
@@ -454,12 +454,7 @@ def compute_euclidean_dist(data):
         return np.sqrt(np.dot(data, data))
 
 
-def compute_weighted_centroids(data, w=None):
-    return np.array([compute_weighted_mean(data[:, i], w=w)
-                     for i in range(data.shape[1])])
-
-
-def compute_weighted_mean(x, w=None):
+def compute_weighted_centroids(x, w=None):
     """
     :param x: numpy array, the data,
     :param w: numpy array, the weights
