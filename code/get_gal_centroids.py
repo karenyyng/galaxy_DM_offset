@@ -189,6 +189,21 @@ def compute_KDE_peak_offsets(df, f, clstNo, cut_method, cut_kwargs, w=None,
 
     return [offset, offsetR200, fhat]
 
+
+def compute_shrinking_aperture_offset(df, f, clstNo, cut_method, cut_kwargs,
+                                      w=None, verbose=False):
+    mask = cut_method(df, **cut_kwargs)
+    if verbose:
+        print "# of subhalos after the cut = {0}".format(np.sum(mask))
+
+    col = ["SubhaloPos0", "SubhaloPos1"]
+    data = np.array(df[col][mask])
+    shrink_cent = [shrinking_apert(d) for d in data]
+
+
+
+    return
+
 # ------------python wrapper to ks_KDE.r code ---------------------------
 
 
@@ -326,7 +341,7 @@ def rmvnorm_mixt(n, mus, Sigmas, props):
 
 
 # -----------other centroid methods ------------------------------------
-def shrinking_apert(data, center_coord=None, r0=None, debug=False):
+def shrinking_apert(data, center_coord=None, r0=None, debug=False, w=None):
     """
     :param center_coord: list of floats or array of floats
     :param data: np.array
@@ -347,7 +362,7 @@ def shrinking_apert(data, center_coord=None, r0=None, debug=False):
     else:
         # Start with mean of the data.
         # Should not start with the origin because that is cheating.
-        c1 = np.mean(data, axis=0)
+        c1 = compute_weighted_mean(data, axis=0, w=w)
 
     dist = compute_euclidean_dist(data - c1)
 
@@ -446,14 +461,16 @@ def compute_weighted_centroids(data, w=None):
 
 def compute_weighted_mean(x, w=None):
     """
-    :param x: numpy array, the data
+    :param x: numpy array, the data,
     :param w: numpy array, the weights
     """
     if w is None:
         return np.mean(x)
+    elif w.ndim == 1:
+        w.reshape(w.shape[0], 1)
 
     assert len(x) == len(w), "row no of data and weights have to be the same"
-    return np.mean(x * w) / np.sum(w)
+    return np.sum(x * w, axis=0) / np.sum(w)
 
 
 def get_BCG(df, DM_cut=1e3, star_cut=1e2):

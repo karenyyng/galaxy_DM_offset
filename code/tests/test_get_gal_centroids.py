@@ -1,37 +1,36 @@
 """unit tests for get gal centroids.py"""
+from __future__ import division
 import sys
 sys.path.append("../")
 from get_gal_centroids import *
 from plot_gal_prop import *
 
 
+# def test_get_py_peaks_and_density_weights():
+#     """ Regression test """
+#     res = do_KDE_and_get_peaks(x)
+#     fhat = convert_fhat_to_dict(res)
+#
+#     get_peaks(fhat)
+#     # plot_KDE_peaks(fhat, allPeaks=True, showData=True)
+#
+#     return
 
 
-def test_get_py_peaks_and_density_weights(x):
-    res = do_KDE_and_get_peaks(x)
-    fhat = convert_fhat_to_dict(res)
-
-    get_peaks(fhat)
-    # plot_KDE_peaks(fhat, allPeaks=True, showData=True)
-    print "Test results: python wrapper code ok"
-
-    return
-
-
-def test_weights_of_do_KDE_and_get_peaks():
-    py_x = np.array(x)
-    orig = np.array([-2, 2])
-    dist_x = np.array([np.sqrt(np.dot(x_row - orig, x_row - orig))
-                       for x_row in py_x])
-    w = np.ones(len(np.array(x)))
-    mask = dist_x < 0.3
-    w[mask] = 50.  # weight points near the (-2, 2) peak more
-
-    res = do_KDE_and_get_peaks(x, w=w)
-    fhat = convert_fhat_to_dict(res)
-    get_py_peaks_and_density_weights(fhat)
-    plot_KDE_peaks(fhat, allPeaks=True, showData=True)
-    return
+# def test_weights_of_do_KDE_and_get_peaks():
+#     py_x = np.array(x)
+#     orig = np.array([-2, 2])
+#     dist_x = np.array([np.sqrt(np.dot(x_row - orig, x_row - orig))
+#                        for x_row in py_x])
+#     w = np.ones(len(np.array(x)))
+#     mask = dist_x < 0.3
+#     w[mask] = 50.  # weight points near the (-2, 2) peak more
+#
+#     res = do_KDE_and_get_peaks(x, w=w)
+#     fhat = convert_fhat_to_dict(res)
+#     get_py_peaks_and_density_weights(fhat)
+#     plot_KDE_peaks(fhat, allPeaks=True, showData=True)
+#     return
 
 
 def test_data1():
@@ -49,16 +48,30 @@ def test_data1():
     return fhat["estimate"]
 
 
-def test_find_peak_from_py_deriv():
-    fhat = test_data1()
-    # ans put in descending density
-    correct_peaks_rowIx = [2, 3]
-    correct_peaks_colIx = [2, 4]
-
-    return
+# def test_find_peak_from_py_deriv():
+#     fhat = test_data1()
+#     # ans put in descending density
+#     correct_peaks_rowIx = [2, 3]
+#     correct_peaks_colIx = [2, 4]
+#
+#     assert fhat["peak_x"] == correct_peaks_rowIx
+#     assert fhat["peak_y"] == correct_peaks_rowIx
+#
+#     return
 
 
 def test_bandwidth_matrix():
+    return
+
+
+def test_compute_weighted_mean():
+    data = np.array([[1, i] for i in range(4)])
+    w = np.arange(4)
+    w = w.reshape(w.shape[0], 1)
+
+    assert np.array_equal(compute_weighted_mean(data, w),
+        np.array([1., ((1 + 4 + 9) / 6.)]))
+
     return
 
 if __name__ == "__main__":
