@@ -394,7 +394,7 @@ def shrinking_apert(data, center_coord=None, r0=None, debug=False, w=None):
                                                               np.sum(mask))
             print "mdist = {0}".format(mdist)
         c0 = c1
-        c1 = compute_weighted_mean(data[mask], w=w)  # compute new centroid
+        c1 = compute_weighted_centroids(data[mask], w=w)  # compute new centroid
         dist = compute_euclidean_dist(data - c1)  # compute new dist
         r0 *= 0.95  # shrink the aperture
         mask = dist < r0
@@ -460,7 +460,7 @@ def compute_weighted_centroids(x, w=None):
     :param w: numpy array, the weights
     """
     if w is None:
-        return np.mean(x)
+        return np.mean(x, axis=0)
     elif w.ndim == 1:
         w.reshape(w.shape[0], 1)
 
