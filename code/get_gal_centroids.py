@@ -73,7 +73,7 @@ def check_peak_higher_than_corner_values(fhat, rowIx, colIx,
     """
 
     OK_peaks = np.array([check_corners_of_one_peak(fhat, rowIx[i], colIx[i])
-                         for i in xrange(len(rowIx))], dtype=bool)
+                         for i in range(len(rowIx))], dtype=bool)
     if debug:
         print "OK_peaks = ", OK_peaks
 
@@ -90,7 +90,7 @@ def check_corners_of_one_peak(fhat, peakRowIx, peakColIx, debug=False):
 
     OK = np.sum([fhat["estimate"][peakRowIx, peakColIx] >
                  fhat["estimate"][check_rowIx[i], check_colIx[i]]
-                 for i in xrange(len(check_rowIx))]) == len(check_rowIx)
+                 for i in range(len(check_rowIx))]) == len(check_rowIx)
 
     if debug:
         print "OK or not = ", OK
@@ -188,6 +188,21 @@ def compute_KDE_peak_offsets(df, f, clstNo, cut_method, cut_kwargs, w=None,
     offsetR200 = offset / R200C
 
     return [offset, offsetR200, fhat]
+
+
+def compute_shrinking_aperture_offset(df, f, clstNo, cut_method, cut_kwargs,
+                                      w=None, verbose=False):
+    mask = cut_method(df, **cut_kwargs)
+    if verbose:
+        print "# of subhalos after the cut = {0}".format(np.sum(mask))
+
+    col = ["SubhaloPos0", "SubhaloPos1"]
+    data = np.array(df[col][mask])
+    shrink_cent = [shrinking_apert(d) for d in data]
+
+
+
+    return
 
 # ------------python wrapper to ks_KDE.r code ---------------------------
 
@@ -326,7 +341,7 @@ def rmvnorm_mixt(n, mus, Sigmas, props):
 
 
 # -----------other centroid methods ------------------------------------
-def shrinking_apert(data, center_coord=None, r0=None, debug=False):
+def shrinking_apert(data, center_coord=None, r0=None, debug=False, w=None):
     """
     :param center_coord: list of floats or array of floats
     :param data: np.array
@@ -347,7 +362,7 @@ def shrinking_apert(data, center_coord=None, r0=None, debug=False):
     else:
         # Start with mean of the data.
         # Should not start with the origin because that is cheating.
-        c1 = np.mean(data, axis=0)
+        c1 = compute_weighted_centroids(data, w=w)
 
     dist = compute_euclidean_dist(data - c1)
 
@@ -379,7 +394,7 @@ def shrinking_apert(data, center_coord=None, r0=None, debug=False):
                                                               np.sum(mask))
             print "mdist = {0}".format(mdist)
         c0 = c1
-        c1 = np.mean(data[mask], axis=0)  # compute new centroid
+        c1 = compute_weighted_centroids(data[mask], w=w)  # compute new centroid
         dist = compute_euclidean_dist(data - c1)  # compute new dist
         r0 *= 0.95  # shrink the aperture
         mask = dist < r0
@@ -399,6 +414,10 @@ def shrinking_apert(data, center_coord=None, r0=None, debug=False):
         return c1 * normalization
 
 
+def shrink_apert_CR(shrink_peaks):
+    return
+
+
 def normalize_data(data):
     """
     :param data: numpy array,
@@ -409,7 +428,7 @@ def normalize_data(data):
 
     if data.ndim > 1:
         normalization = np.array([data[:, i].max() - data[:, i].min() for i in
-                                 xrange(data.shape[1])])
+                                 range(data.shape[1])])
     else:
         normalization = data.max() - data.min()
 
@@ -430,26 +449,23 @@ def compute_euclidean_dist(data):
 
     if data.ndim > 1:
         return np.array([np.sqrt(np.dot(data[i], data[i])) for i in
-                        xrange(data.shape[0])])
+                        range(data.shape[0])])
     else:
         return np.sqrt(np.dot(data, data))
 
 
-def compute_weighted_centroids(data, w=None):
-    return np.array([compute_weighted_mean(data[:, i], w=w)
-                     for i in xrange(data.shape[1])])
-
-
-def compute_weighted_mean(x, w=None):
+def compute_weighted_centroids(x, w=None):
     """
-    :param x: numpy array, the data
+    :param x: numpy array, the data,
     :param w: numpy array, the weights
     """
     if w is None:
-        return np.mean(x)
+        return np.mean(x, axis=0)
+    elif w.ndim == 1:
+        w.reshape(w.shape[0], 1)
 
     assert len(x) == len(w), "row no of data and weights have to be the same"
-    return np.mean(x * w) / np.sum(w)
+    return np.sum(x * w, axis=0) / np.sum(w)
 
 
 def get_BCG(df, DM_cut=1e3, star_cut=1e2):

@@ -1,7 +1,7 @@
 import h5py
 import numpy as np
 import sys
-import time
+# import time
 
 sys.path.append("../")
 
@@ -27,9 +27,7 @@ compute_relaxedness0 = False
 wts_key = ["i_lum"]
 wt_suffix = ["I_lum"]  # ["tot_mass", "stel_mass", "I_band_lum"]
 
-
 file_suffix = '_{0}'.format(allClst) + '.h5'
-
 print "examining {0} clusters in total".format(allClst)
 
 df_list = [ec.extract_clst(f, clstNo) for clstNo in range(allClst)]
@@ -70,6 +68,8 @@ if compute_relaxedness0:
     df["relaxedness1"] = [cp.compute_relaxedness0(df_list[i], f, i) for i in
                           range(allClst)]
 
+f.close()
+#---- Example code for appending to existing dataframe----------
 # old_df = pd.read_hdf("../../data/offset_stat_129.h5", "w")
 # pd.concat([old_df, df], axis=1)
 
@@ -80,4 +80,3 @@ if compute_relaxedness0:
 ##
 ## f = open('relaxedness' + file_suffix, 'w')
 ## pickle.dump(relaxedness_list, f)
-f.close()
