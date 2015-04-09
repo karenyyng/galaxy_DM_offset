@@ -748,6 +748,7 @@ def plot_dumbbell_comparison(
     plt.ylim(-6, 6)
 
     if save:
+        print("saving figure to" + plot_path + plot_fig_name)
         plt.savefig(plot_path + plot_fig_name, bbox_inches='tight')
 
     return
