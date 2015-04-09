@@ -191,22 +191,19 @@ def compute_KDE_peak_offsets(df, f, clstNo, cut_method, cut_kwargs, w=None,
 
 
 def compute_shrinking_aperture_offset(df, f, clstNo, cut_method, cut_kwargs,
-                                      w=None, verbose=False):
+                                      w=None, verbose=True):
     mask = cut_method(df, **cut_kwargs)
     if verbose:
         print "# of subhalos after the cut = {0}".format(np.sum(mask))
 
     col = ["SubhaloPos0", "SubhaloPos1"]
     data = np.array(df[col][mask])
-    shrink_cent = [shrinking_apert(d) for d in data]
+    shrink_cent = np.array([shrinking_apert(d, w) for d in data])
 
+    return compute_euclidean_dist(shrink_cent)
 
-
-    return
 
 # ------------python wrapper to ks_KDE.r code ---------------------------
-
-
 def convert_fhat_to_dict(r_fhat):
     """preserves the returned object structure with a dict
     :param r_fhat: robject of the output evaluated from ks.KDE
