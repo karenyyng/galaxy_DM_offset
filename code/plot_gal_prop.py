@@ -77,17 +77,18 @@ def plot_cf_contour(dens, x, y, lvls=[68, 95], show=False, clabel=False,
     sums = 0
 
     d = np.sort(d)  # in ascending order
-    d_sum = np.sum(d)
+    d_sum = np.sum(d)  # compute normalization
 
     for j in xrange(d.size):
         sums += d[j]
+        # compute the different confidence levels
         for i in range(len(lvls)):
             if sums / d_sum <= 1. - lvls[i]:
                 lvl_vals[i] = d[j]
 
     if colors is None:
         colors = \
-            [(0 / 255., 70 / 255., i / len(lvls)) for i in range(len(lvls))]
+            [(i / len(lvls), 0 / 255., 70 / 255.) for i in range(len(lvls))]
 
     # the plt.contour function is weird, if you don't transpose
     # the density, the plotted density will be rotated by 180 clockwise
@@ -95,9 +96,10 @@ def plot_cf_contour(dens, x, y, lvls=[68, 95], show=False, clabel=False,
         CS = plt.contour(x, y, dens.transpose(), lvl_vals, linewidths=(1, 1),
                          colors=colors)
     else:
-        CS = plt.pcolor(x, y, dens.transpose(), cmap=plt.cm.Blues)
+        CS = plt.pcolor(x, y, dens.transpose(), cmap=plt.cm.RdBu)
 
     if clabel:
+        # labels for the confidence levels
         str_lvls = {l: "{0:.1f}".format(s * 100)
                     for l, s in zip(CS.levels, lvls)}
         plt.clabel(CS, CS.levels, fmt=str_lvls, inline=1, fontsize=6.5)
@@ -105,7 +107,7 @@ def plot_cf_contour(dens, x, y, lvls=[68, 95], show=False, clabel=False,
     if show:
         plt.show()
 
-    return
+    return lvl_vals
 
 
 def plot_KDE_peaks(fhat, lvls=range(2, 100, 10), allPeaks=False,
