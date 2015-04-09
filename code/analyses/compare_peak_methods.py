@@ -24,6 +24,7 @@ b_colors = [(0 / 255., 0 / 255., i / (len(lvls) + 1.))
 r_colors = [(i / (len(lvls) + 1.), 0 / 255., 0 / 255.)
             for i in range(1, len(lvls) + 1)]
 
+
 def draw_gaussian(mean=np.ones(2),
                   cov=np.eye(2),
                   data_size=300):
@@ -522,6 +523,7 @@ def plot_dumbbell_500_comparison(
         figsidesize=7,
         plot_path="../../paper/figures/drafts/",
         plot_fig_name="confidence_regions_dumbbell_500.pdf"):
+    """ for plot in appendix, tweaked labels to look best on fig"""
 
     plt.figure(figsize=(figsidesize * 3, figsidesize))
 
@@ -629,15 +631,16 @@ def plot_dumbbell_500_comparison(
     return
 
 
-def plot_dumbbell_50_comparison(
+def plot_dumbbell_comparison(
         dumb_data,
         shrink_peak_dens2,
         KDE_peak_dens2,
         KDE_peak_dens2b,
         cent_peak_dens2,
         figsidesize=7,
+        save=False,
         plot_path="../../paper/figures/drafts/",
-        plot_fig_name="confidence_regions_dumbbell_50.pdf"):
+        plot_fig_name="confidence_regions_dumbbell.pdf"):
 
     plt.figure(figsize=(figsidesize * 3, figsidesize))
 
@@ -744,12 +747,7 @@ def plot_dumbbell_50_comparison(
     plt.xlim(-6, 6)
     plt.ylim(-6, 6)
 
-    plt.savefig(plot_path + plot_fig_name, bbox_inches='tight')
+    if save:
+        plt.savefig(plot_path + plot_fig_name, bbox_inches='tight')
 
     return
-
-
-if __name__ == "__main__":
-    # g1 = draw_gaussian()
-    # plt.plot()
-    pass
