@@ -6,7 +6,7 @@ Author: Karen Ng
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 from collections import OrderedDict
-import matplotlib.pyplot as ax
+import matplotlib.pyplot as plt
 import cPickle
 import numpy as np
 import sys
@@ -143,8 +143,6 @@ def call_dumbbell_example_and_prepare_data(data_size=500, bootNo=100,
 
     return d
 
-# -----------------plotting functions ----------------------
-
 
 def save_data(d, path="../../data/"):
     dataDetail = d.keys()[0]
@@ -157,25 +155,72 @@ def save_data(d, path="../../data/"):
         cPickle.dump(v, open(filename, "w"))
     return
 
+# -----------------plotting functions ----------------------
+
+def grid_spec_plot(gaussData, biData, dumbData, figsize=(13, 13)):
+    import matplotlib.gridspec as gridspec
+    from matplotlib.ticker import MaxNLocator
+
+    plt.figure(figsize=figsize)
+    rowNo = 3
+    colNo = 2
+    hspace = 0.01
+
+    # plot the left two columns
+    gs1 = gridspec.GridSpec(rowNo, colNo)
+    gs1.update(left=0.05, right=0.44, wspace=0.01, hspace=hspace)
+    axArr1 = [[plt.subplot(gs1[i, j], aspect='equal')
+               for j in range(colNo)] for i in range(rowNo)]
+
+    # plot the right two columns
+    gs2 = gridspec.GridSpec(rowNo, colNo)
+    gs2.update(left=0.51, right=0.98, wspace=0.4, hspace=hspace)
+    axArr2 = [[plt.subplot(gs2[i, j], aspect='equal')
+               for j in range(colNo)] for i in range(rowNo)]
+
+    _ = plt.setp([axArr1[j][1].get_yticklabels()
+                for j in range(rowNo)], visible=False)
+
+    for j in range(rowNo):
+        axArr1[j][1].xaxis.set_major_locator(
+            MaxNLocator(nbins=5, prune="lower"))
+
+    plot_gauss(axArr1)
+
+    return
+
 
 def plot_one_big_one_small_gaussian_500(
-        ax, bimodal_data, shrink_peak_dens1, KDE_peak_dens1, cent_peak_dens1,
-        figsize=7, fig_path="../../paper/figures/drafts/",
-        fig_name="confidence_regions_bimodal_500.pdf"):
+        bimodal_data, shrink_peak_dens1, KDE_peak_dens1, cent_peak_dens1,
+        figsize=7, ax=None, fig_path="../../paper/figures/drafts/",
+        fig_name="confidence_regions_bimodal_500.pdf", save=False):
 
-    ax.figure(figsize=(figsize * 3, figsize))
-    ax.subplot(131)
+    if ax is None:
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+
+    # ax.figure(figsize=(figsize * 3, figsize))
+    # ax.subplot(131)
     ax.plot(bimodal_data[0][:, 0], bimodal_data[0][:, 1], 'k.', alpha=0.3)
     ax.plot(2, 2, 'kx', mew=2, ms=10, label='Mean of dominant Gaussian')
     ax.plot(0, 0, 'x', color='grey',
             mew=2, ms=10, label='Mean of subdominant Gaussian')
     ax.legend(loc='best', frameon=False)
 
+    if save:
+        ax.savefig(figname, bbox_inches='tight')
+
     return
 
 
 def peak_est_contours_one_big_one_small_gaussian(
-        ax, KDE_peak_dens1, shrink_peak_dens1, cent_peak_dens1, xlim, ylim):
+        KDE_peak_dens1, shrink_peak_dens1, cent_peak_dens1, xlim, ylim,
+        ax=None, save=False, figname="bimodal_CR_contour.pdf"):
+
+    if ax is None:
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+
     plot_cf_contour(KDE_peak_dens1["estimate"],
                     KDE_peak_dens1["eval_points"][0],
                     KDE_peak_dens1["eval_points"][1],
@@ -202,15 +247,20 @@ def peak_est_contours_one_big_one_small_gaussian(
 
     ax.plot(2, 2, "kx", mew=2, label="True center", markersize=5)
     ax.legend(loc='best', frameon=False)
-    # ax.title('Confidence region from one Gaussian at (1, 1)',
-    #           fontsize=15)
     ax.xlim(xlim)
     ax.ylim(ylim)
+
+    if save:
+        ax.savefig(figname, bbox_inches='tight')
     return
 
 
-def zoomed_in_view(ax, KDE_peak_dens, shrink_peak_dens1, cent_peak_dens1,
-                   xlim, ylim, markersize):
+def zoomed_in_view(KDE_peak_dens, shrink_peak_dens1, cent_peak_dens1,
+                   xlim, ylim, markersize, ax=None):
+    if ax is None:
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+
     markersize = 10
     # plot KDE dominant peak contour
     plot_cf_contour(KDE_peak_dens1["estimate"],
@@ -254,8 +304,9 @@ def zoomed_in_view(ax, KDE_peak_dens, shrink_peak_dens1, cent_peak_dens1,
     ax.title("Zoomed-in view near the dominant peak",
              fontsize=15)
 
-    print("saving figure to" + fig_path + fig_name)
-    ax.savefig(fig_path + fig_name, bbox_inches='tight')
+    if save:
+        print("saving figure to" + fig_path + fig_name)
+        ax.savefig(fig_path + fig_name, bbox_inches='tight')
 
     return
 
