@@ -75,7 +75,13 @@ peak not to be smoothed out.
 As we try to utilize our knowledge of galaxy clusters for precision cosmology,
 we need to quantify and propagate our uncertainties carefully.
 
-
+The main goals of this paper include:
+\begin{itemize}
+		\item identifying the peak finding methods that would minimize the
+			projected galaxy-dark matter offset, which we call $\Delta s$ 
+		\item finding variables that characterize the physical state of the
+			clusters that show highest correlation with $\Delta s$ 
+\end{itemize}
 
 \section{DATA}
 
@@ -96,16 +102,53 @@ Fig 5.
 
 Richness characterizes the number of galaxies in a given cluster.
 We provide several definitions of non-relaxedness to characterize whether
-the clusters underwent any recent merger activities. These definitions of
-non-relaxedness.
+the clusters underwent any recent merger activities. 
+1) These definitions of non-relaxedness.
+2) 
 The Shapiro-Wilk statistic can characterize the deviation from normality
 with the highest statistical power ().
 
 
 \subsubsection{Volume Selection}
-1. Rockstar halo finder 
+As a default output from the Illustris simulation, subhalos and particles of
+each galaxy cluster and group is identified by the Rockstar halo finder
+(CITATION). We make use of the member particle / subhalo identification as our
+default volume selection scheme for each cluster / group.
+We understand that this choice of volume selection can be more ideal than
+observational conditions. However, we make use of this volume selection scheme
+for baseline comparisons. 
+
 2. Light cone 
+
+
+
+
+
+
+
 3. spatial projections 
+
+For each cluster, we sample at 5 evenly spaced values of $\xi$ where $0 \leq \xi \leq \pi / 2$ and 
+10 evenly spaced values of $\phi$ where $0 \leq \phi \leq \pi$, to give 50
+samples for each cluster with mass $> 10^{14} M_\sun$. 
+
+This method gives us samples of the joint distribution: 
+\begin{equation}
+	P(\Delta \eta, \phi, \xi, h_{mer}, \psi_g, \psi_D, I_g, I_D | \theta,
+	\sigma_{CDM}). 
+\end{equation}
+
+
+Binning the samples based on $\Delta \eta$ and $h_{mer}$ only gives us the
+marginal distribution:
+\begin{equation}
+	P(\Delta \eta, h_{mer} | \theta, \sigma_{CDM}),
+\end{equation}
+that we have far too few samples of \dots
+
+
+
+
 \subsubsection{Galaxy Selection}
 \subsubsection{Galaxy weights}
 One of the most common weighting scheme employed for cluster galaxy data is to weight
@@ -144,7 +187,8 @@ to find the local maxima. We sorted the local maxima according to the KDE
 density at the maxima locations and identified the dominant peak. 
 
 Spatial location and the density of the subdominant peaks are also stored.
-The subdominant 
+We investigated if the presence of subdominant peaks are correlated with
+$\Delta s$. 
 
 \subsubsection{Shrinking aperture}
 Another popular method among astronomers for finding the peak of a spatial
@@ -188,9 +232,9 @@ statistical fluctuations of the drawn data. Namely, the performance of each
 method depends on: 1) the
 number of Gaussian mixture used, 2) the number of data points in each mixture
 
-Due to the statistical nature of this exercise, it is not enough to just
-compare the performance from one realization of each method. We also provide
-the 68\% and the 95\% confidence regions from 
+Due to the statistical nature of the data, it is not enough to just
+compare the performance from applying each method for one realization of the
+data. We also provide the 68\% and the 95\% confidence regions from the different methods.
 
 
 The details and implementation can be found in our Bitbucket git repository.
@@ -204,23 +248,6 @@ We computed the projected offsets between the galaxy density peaks inferred from
 cross-validated KDE and the dark matter density peak. (TBD) 
 The viewing angles of the projections are defined by an elevation angle
 $\xi$ and an azimuthal angle $\phi$. 
-We sample at 5 evenly spaced values of $\xi$ where $0 \leq \xi \leq \pi / 2$ and 
-10 evenly spaced values of $\phi$ where $0 \leq \phi \leq \pi$, to give 50
-samples for each cluster with mass $> 10^{14} M_\sun$. 
-
-This method gives us samples of the joint distribution: 
-\begin{equation}
-	P(\Delta \eta, \phi, \xi, h_{mer}, \psi_g, \psi_D, I_g, I_D | \theta,
-	\sigma_{CDM}). 
-\end{equation}
-
-
-Binning the samples based on $\Delta \eta$ and $h_{mer}$ only gives us the
-marginal distribution:
-\begin{equation}
-	P(\Delta \eta, h_{mer} | \theta, \sigma_{CDM}),
-\end{equation}
-that we have far too few samples of \dots
 
 
 \section{RESULTS} 

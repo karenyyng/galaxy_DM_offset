@@ -157,7 +157,13 @@ def save_data(d, path="../../data/"):
 
 # -----------------plotting functions ----------------------
 
-def grid_spec_plot(gaussData, biData, dumbData, figsize=(13, 13)):
+def read_in_data(folder_path="../../data/"):
+    """handle the data to be plotted"""
+
+    return gauss_data, bi_data, dumb_data
+
+
+def grid_spec_plot(gauss_data, bi_data, dumb_data, figsize=(13, 13)):
     import matplotlib.gridspec as gridspec
     from matplotlib.ticker import MaxNLocator
 
@@ -185,30 +191,8 @@ def grid_spec_plot(gaussData, biData, dumbData, figsize=(13, 13)):
         axArr1[j][1].xaxis.set_major_locator(
             MaxNLocator(nbins=5, prune="lower"))
 
-    plot_gauss(axArr1)
-
-    return
-
-
-def plot_one_big_one_small_gaussian_500(
-        bimodal_data, shrink_peak_dens1, KDE_peak_dens1, cent_peak_dens1,
-        figsize=7, ax=None, fig_path="../../paper/figures/drafts/",
-        fig_name="confidence_regions_bimodal_500.pdf", save=False):
-
-    if ax is None:
-        fig = plt.figure()
-        ax = fig.add_subplot(111)
-
-    # ax.figure(figsize=(figsize * 3, figsize))
-    # ax.subplot(131)
-    ax.plot(bimodal_data[0][:, 0], bimodal_data[0][:, 1], 'k.', alpha=0.3)
-    ax.plot(2, 2, 'kx', mew=2, ms=10, label='Mean of dominant Gaussian')
-    ax.plot(0, 0, 'x', color='grey',
-            mew=2, ms=10, label='Mean of subdominant Gaussian')
-    ax.legend(loc='best', frameon=False)
-
-    if save:
-        ax.savefig(figname, bbox_inches='tight')
+    plot_gauss(ax = axArr1[0][0])
+    plot_one_big_one_small_gaussian(ax=axArr2[0][0])
 
     return
 
@@ -311,10 +295,33 @@ def zoomed_in_view(KDE_peak_dens, shrink_peak_dens1, cent_peak_dens1,
     return
 
 
+def plot_one_big_one_small_gaussian_500(
+        bimodal_data, shrink_peak_dens1, KDE_peak_dens1, cent_peak_dens1,
+        figsize=7, ax=None, fig_path="../../paper/figures/drafts/",
+        fig_name="confidence_regions_bimodal_500.pdf", save=False):
+
+    if ax is None:
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+
+    # ax.figure(figsize=(figsize * 3, figsize))
+    # ax.subplot(131)
+    ax.plot(bimodal_data[0][:, 0], bimodal_data[0][:, 1], 'k.', alpha=0.3)
+    ax.plot(2, 2, 'kx', mew=2, ms=10, label='Mean of dominant Gaussian')
+    ax.plot(0, 0, 'x', color='grey',
+            mew=2, ms=10, label='Mean of subdominant Gaussian')
+    ax.legend(loc='best', frameon=False)
+
+    if save:
+        ax.savefig(figname, bbox_inches='tight')
+
+    return
+
+
 def plot_one_big_one_small_gaussian(
         bimodal_data, shrink_peak_dens1, KDE_peak_dens1, cent_peak_dens1,
         figsize=7, fig_path="../../paper/figures/drafts/",
-        fig_name="confidence_regions_bimodal.pdf", save=False):
+        fig_name="confidence_regions_bimodal.pdf", save=False, ax=None):
 
     ax.figure(figsize=(figsize * 3, figsize))
     ax.subplot(131)
