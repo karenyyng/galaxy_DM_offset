@@ -411,10 +411,6 @@ def shrinking_apert(data, center_coord=None, r0=None, debug=False, w=None):
         return c1 * normalization
 
 
-def shrink_apert_CR(shrink_peaks):
-    return
-
-
 def normalize_data(data):
     """
     :param data: numpy array,
@@ -575,6 +571,11 @@ def get_centroid_conf_reg(data_realizations):
 
     return cent_peak_dens2
 
+
+# ---------- Utilities for converting
+
+def dict_to_h5objs(fhat):
+    return
 
 
 # def convert_R_peak_ix_to_py_peaks(fhat, ix_key="peak_coords_ix",

@@ -88,7 +88,8 @@ def plot_cf_contour(dens, x, y, lvls=[68, 95], show=False, clabel=False,
 
     if colors is None:
         colors = \
-            [(i / len(lvls), 0 / 255., 70 / 255.) for i in range(len(lvls))]
+            [((len(lvls) - i) / len(lvls), 0 / 255., 100 / 255.)
+             for i in range(len(lvls))]
 
     # the plt.contour function is weird, if you don't transpose
     # the density, the plotted density will be rotated by 180 clockwise
@@ -96,7 +97,7 @@ def plot_cf_contour(dens, x, y, lvls=[68, 95], show=False, clabel=False,
         CS = plt.contour(x, y, dens.transpose(), lvl_vals, linewidths=(1, 1),
                          colors=colors)
     else:
-        CS = plt.pcolor(x, y, dens.transpose(), cmap=plt.cm.RdBu)
+        CS = plt.pcolor(x, y, dens.transpose(), cmap=plt.cm.winter)
 
     if clabel:
         # labels for the confidence levels
@@ -127,7 +128,6 @@ def plot_KDE_peaks(fhat, lvls=range(2, 100, 10), allPeaks=False,
                         fhat["eval_points"][0], fhat["eval_points"][1],
                         lvls=lvls, clabel=clabel, fill=fill)
 
-
     if plotDataPoints:
         plt.plot(fhat["data_x"].transpose()[0],
                  fhat["data_x"].transpose()[1], 'r.', alpha=1)
@@ -139,31 +139,33 @@ def plot_KDE_peaks(fhat, lvls=range(2, 100, 10), allPeaks=False,
                           low_xlim=low_xlim, low_ylim=low_ylim)
 
     if allPeaks:
-        cm = plt.cm.get_cmap('winter')
+        cm = plt.cm.get_cmap('bwr')
         for i in range(len(fhat["peaks_dens"])):
             sc = plt.scatter(fhat["peaks_xcoords"][i],
                              fhat["peaks_ycoords"][i],
                              c=fhat["peaks_dens"][i],
-                             cmap=cm, vmin=0, vmax=1.0)
+                             cmap=cm, vmin=0, vmax=1.0, edgecolor='k',
+                             s=35, marker='s')
         plt.colorbar(sc)
 
     if showDomPeak:
         plt.plot(fhat["peaks_xcoords"][0],
                  fhat["peaks_ycoords"][0],
-                 'ro', mew=1, label='dominant KDE peak',
-                 fillstyle='none')
+                 's', mew=1.5, markersize=9, label='dominant KDE peak',
+                 fillstyle='none', color='orange')
 
     plt.title("Clst {0}: ".format(clstNo) +
-              "No of peaks found = {0}".format(len(fhat["peaks_dens"])))
+              "No of peaks found = {0}\n".format(len(fhat["peaks_dens"])) +
+              "Total peak dens = {0:.3g}".format(np.sum(fhat["peaks_dens"])))
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.xticks(rotation=45)
 
     if R200C is not None:
-        R200_circl = plt.Circle((0, 0), radius=R200C, color='m', lw=1,
+        R200_circl = plt.Circle((0, 0), radius=R200C, color='g', lw=2,
                                 ls='solid', fill=False, label="R200C")
-        plt.plot(0, 0, 'm.', fillstyle='none', label='center of R200C circle',
-                 mew=2)
+        plt.plot(0, 0, 'go', fillstyle='none', label='center of R200C circle',
+                 mew=1.5)
         fig = plt.gcf()
         fig.gca().add_artist(R200_circl)
 
