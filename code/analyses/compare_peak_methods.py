@@ -149,7 +149,9 @@ def call_dumbbell_example_and_prepare_data(data_size=500, bootNo=100,
 def save_data(d, path="../../data/"):
     dataDetail = d.keys()[0]
     for k, v in d.iteritems():
-        cPickle.dump(v, path + k + "_" + dataDetail + ".pkl")
+        filename = path + k + "_" + dataDetail + ".pkl"
+        print(filename)
+        cPickle.dump(v, open(filename))
     return
 
 def plot_one_big_one_small_gaussian_500(
