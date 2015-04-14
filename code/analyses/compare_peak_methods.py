@@ -157,8 +157,34 @@ def save_data(d, path="../../data/"):
 
 # -----------------plotting functions ----------------------
 
-def read_in_data(folder_path="../../data/"):
+
+def read_in_data_for_left_3_cols(folder_path="../../data/fig2_data/",
+                                 data_size=50):
     """handle the data to be plotted"""
+    import os
+    pkl_lists = os.listdir(folder_path)
+    gauss_data = OrderedDict()
+    bi_data = OrderedDict()
+    dumb_data = OrderedDict()
+
+    methods = ["KDE", "shrink", "cent"]
+
+    # pick out file names for suitable sets of data
+    gauss_pkls = \
+        [p for p in pkl_lists if "_gauss" + str(data_size) + ".pkl" in p]
+    bimodal_pkls = \
+        [p for p in pkl_lists if "_bimodal" + str(data_size) + ".pkl" in p]
+    dumb_pkls = \
+        [p for p in pkl_lists if "_dumb" + str(data_size) + ".pkl" in p]
+
+    # load the suitable files based on the paths, preserving order of the
+    # methods in the methods list
+    gauss_data = {m: cPickle.load(open(folder_path + p)) for p in gauss_pkls
+                  for m in methods if m in p}
+    bi_data = {m: cPickle.load(open(folder_path + p)) for p in bimodal_pkls
+               for m in methods if m in p}
+    dumb_data = {m: cPickle.load(open(folder_path + p)) for p in dumb_pkls
+                 for m in methods if m in p}
 
     return gauss_data, bi_data, dumb_data
 
