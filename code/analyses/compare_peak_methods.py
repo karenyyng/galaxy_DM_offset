@@ -165,6 +165,7 @@ def read_in_data_for_left_3_cols(folder_path="../../data/fig2_data/",
     pkl_lists = os.listdir(folder_path)
 
     methods = ["KDE", "shrink", "cent"]
+    dumb_methods = ["KDE1", "KDE2", "shrink", "cent"]
 
     # pick out file names for suitable sets of data
     gauss_pkls = \
@@ -173,6 +174,7 @@ def read_in_data_for_left_3_cols(folder_path="../../data/fig2_data/",
         [p for p in pkl_lists if "_bimodal" + str(data_size) + ".pkl" in p]
     dumb_pkls = \
         [p for p in pkl_lists if "_dumb" + str(data_size) + ".pkl" in p]
+    print(dumb_pkls)
 
     # load the suitable files based on the paths, preserving order of the
     # methods in the methods list
@@ -185,8 +187,8 @@ def read_in_data_for_left_3_cols(folder_path="../../data/fig2_data/",
          for m in methods if m in p})
 
     dumb_data = OrderedDict(
-        {m: cPickle.load(open(folder_path + p)) for p in dumb_pkls
-         for m in methods if m in p})
+        {m: cPickle.load(open(folder_path + p))
+         for m in dumb_methods for p in dumb_pkls if m in p})
 
     # only want the first set of the sampled data
     gauss_data["data"] = cPickle.load(open(folder_path +
@@ -245,8 +247,9 @@ def grid_spec_plot(gauss_data, bimodal_data, dumb_data, figsize=(13, 13)):
     plot_one_big_one_small_gaussian_zoomed_contour(*bimodal_data.values(),
                                                    ax=axArr2[1][0])
 
-
     # third row of plots
+    xlim, ylim = plot_dumbbell_data(dumb_data["data"], ax=axArr1[2][0])
+
     return
 
 
@@ -484,8 +487,50 @@ def plot_one_big_one_small_gaussian_zoomed_contour(
         ax.set_xlim(xlim)
 
     ax.legend(loc='lower right', frameon=False, fontsize='small')
-    # ax.title("Zoomed-in view near the dominant peak",
-    #          fontsize=15)
+    return
+
+
+def plot_dumbbell_data(
+        dumb_data, xlim=None, ylim=None, save=False,
+        plot_path="../../paper/figures/drafts/", markersize=10,
+        plot_fig_name="confidence_regions_dumbbell.pdf", ax=None):
+
+    if ax is None:
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+
+    ax.plot(dumb_data[:, 0], dumb_data[:, 1], '.', color='grey')
+    ax.plot(2, 2, "ko", mew=2,
+            label="Mean of dominant Gaussian", fillstyle='none',
+            markersize=markersize)
+    ax.plot(-2, -2, "x", color="k", mew=3,
+            label="Mean of subdominant Gaussian",
+            markersize=markersize)
+    ax.plot(0, 0, "x", color="k", mew=3,
+            label="Mean of subdominant Gaussian",
+            markersize=markersize)
+    ax.legend(loc='best', frameon=False)
+    # ax.title("Dumbbell data with 3 mixtures of Gaussians", size=15)
+
+    if xlim is not None:
+        ax.set_xlim(xlim)
+    if ylim is not None:
+        ax.set_ylim(ylim)
+
+    return ax.get_xlim(), ax.get_ylim()
+
+
+def plot_dumbbell_contour(
+        KDE_peak_dens2b,
+        KDE_peak_dens2,
+        shrink_peak_dens2,
+        cent_peak_dens2,
+        xlim=None, ylim=None,
+        save=False,
+        plot_path="../../paper/figures/drafts/",
+        plot_fig_name="confidence_regions_dumbbell.pdf", ax=None):
+
+
     return
 
 
