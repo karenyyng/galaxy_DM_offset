@@ -186,6 +186,17 @@ def read_in_data_for_left_3_cols(folder_path="../../data/fig2_data/",
     dumb_data = {m: cPickle.load(open(folder_path + p)) for p in dumb_pkls
                  for m in methods if m in p}
 
+    # only want the first set of the sampled data
+    gauss_data["data"] = cPickle.load(open(folder_path +
+                                           "gauss" + str(data_size) +
+                                           ".pkl"))[0]
+    bi_data["data"] = cPickle.load(open(folder_path +
+                                   "bimodal" + str(data_size) +
+                                   ".pkl"))[0]
+    dumb_data["data"] = cPickle.load(open(folder_path +
+                                   "dumb" + str(data_size) +
+                                   ".pkl"))[0]
+
     return gauss_data, bi_data, dumb_data
 
 
@@ -217,8 +228,20 @@ def grid_spec_plot(gauss_data, bi_data, dumb_data, figsize=(13, 13)):
         axArr1[j][1].xaxis.set_major_locator(
             MaxNLocator(nbins=5, prune="lower"))
 
-    plot_gauss(ax = axArr1[0][0])
-    plot_one_big_one_small_gaussian(ax=axArr2[0][0])
+    plot_gauss_data(ax = axArr1[0][0])
+    # plot_one_big_one_small_gaussian(ax=axArr2[0][0])
+
+    return
+
+
+def plot_gauss_data(gauss_data, KDE_peak_dens, shrink_peak_dens, cent_peak_dens,
+                    ax=None):
+    if ax is None:
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+    ax.plot(gauss_data[:, 0], gauss_data[0][:, 1], 'k.', alpha=0.3)
+    ax.plot(1, 1, 'kx', mew=2, ms=10, label='Mean of Gaussian')
+    ax.legend(loc='best', frameon=False)
 
     return
 
@@ -345,10 +368,11 @@ def plot_one_big_one_small_gaussian_500(
 
 
 def plot_one_big_one_small_gaussian(
-        bimodal_data, shrink_peak_dens1, KDE_peak_dens1, cent_peak_dens1,
+        KDE_peak_dens1, shrink_peak_dens1, cent_peak_dens1,
         figsize=7, fig_path="../../paper/figures/drafts/",
         fig_name="confidence_regions_bimodal.pdf", save=False, ax=None):
 
+    if ax is None:
     ax.figure(figsize=(figsize * 3, figsize))
     ax.subplot(131)
     ax.plot(bimodal_data[0][:, 0], bimodal_data[0][:, 1], 'k.', alpha=0.3)
