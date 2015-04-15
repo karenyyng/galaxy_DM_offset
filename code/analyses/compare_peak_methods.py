@@ -230,38 +230,38 @@ def grid_spec_plot(gauss_data, bi_data, dumb_data, figsize=(13, 13)):
         axArr1[j][1].xaxis.set_major_locator(
             MaxNLocator(nbins=5, prune="lower"))
 
-    plot_gauss_data(ax = axArr1[0][0])
+    xlim, ylim = plot_gauss_data(gauss_data["data"], ax=axArr1[0][0])
+    plot_gauss_contour(*gauss_data.values(), ax=axArr1[0][1], xlim=xlim,
+                       ylim=ylim)
     # plot_one_big_one_small_gaussian(ax=axArr2[0][0])
 
     return
 
 
-def plot_gauss_data(KDE_peak_dens, shrink_peak_dens,
-                    cent_peak_dens, gauss_data, ax=None, xlim=None,
+def plot_gauss_data(gauss_data, ax=None, xlim=None,
                     ylim=None):
     if ax is None:
         fig = plt.figure()
         ax = fig.add_subplot(111)
-    ax.plot(gauss_data[:, 0], gauss_data[0][:, 1], 'k.', alpha=0.3)
+    ax.plot(gauss_data[:, 0], gauss_data[:, 1], 'k.', alpha=0.3)
     ax.plot(1, 1, 'kx', mew=2, ms=10, label='Mean of Gaussian')
     ax.legend(loc='best', frameon=False)
 
     if xlim is not None:
-        ax.xlim(xlim)
+        ax.set_xlim(xlim)
     if ylim is not None:
-        ax.ylim(ylim)
+        ax.set_ylim(ylim)
 
-    return
+    return ax.get_xlim(), ax.get_ylim()
 
 
 def plot_gauss_contour(KDE_peak_dens, shrink_peak_dens,
                        cent_peak_dens, gauss_data, ax=None, xlim=None,
                        ylim=None):
-
     plot_cf_contour(KDE_peak_dens["estimate"],
                     KDE_peak_dens["eval_points"][0],
                     KDE_peak_dens["eval_points"][1],
-                    colors=b_colors)
+                    colors=b_colors, ax=ax)
     ax.annotate('KDE peak\nconfidence region', (0.3, 0.62),
                 textcoords='axes fraction',
                 color='b')
@@ -269,7 +269,7 @@ def plot_gauss_contour(KDE_peak_dens, shrink_peak_dens,
     plot_cf_contour(shrink_peak_dens["estimate"],
                     shrink_peak_dens["eval_points"][0],
                     shrink_peak_dens["eval_points"][1],
-                    colors=g_colors)
+                    colors=g_colors, ax=ax)
     ax.annotate('Shrink. apert. peak\nconfidence region', (0.3, 0.25),
                 textcoords='axes fraction',
                 color='g')
@@ -277,19 +277,18 @@ def plot_gauss_contour(KDE_peak_dens, shrink_peak_dens,
     plot_cf_contour(cent_peak_dens["estimate"],
                     cent_peak_dens["eval_points"][0],
                     cent_peak_dens["eval_points"][1],
-                    colors=r_colors)
+                    colors=r_colors, ax=ax)
     ax.annotate('Centroid\nconfidence region', (0.6, 0.5),
                 textcoords='axes fraction',
                 color='r')
     ax.plot(1, 1, "kx", mew=2, label="True center", markersize=5)
-    ax.xlim(0, 2.0)
     ax.legend(loc='best', frameon=False)
     # ax.title('Confidence region from one Gaussian at (1, 1)',
     #           fontsize=15)
     if xlim is not None:
-        ax.xlim(xlim)
+        ax.set_xlim(xlim)
     if ylim is not None:
-        ax.ylim(ylim)
+        ax.set_ylim(ylim)
 
     return
 
@@ -857,11 +856,11 @@ def plot_gauss_comparison(gauss_data, shrink_peak_dens, KDE_peak_dens,
                           cent_peak_dens,
                           fig_path="../../paper/figures/drafts/",
                           fig_name="gauss.pdf",
-                          figsize=7, save=False):
+                          figsize=7, save=False, ax=None):
 
     ax.figure(figsize=(figsize * 3, figsize))
     ax.subplot(131)
-    ax.plot(d["gauss"][0][:, 0], gauss_data[0][:, 1], 'k.', alpha=0.3)
+    ax.plot(gauss_data[0][:, 0], gauss_data[0][:, 1], 'k.', alpha=0.3)
     ax.plot(1, 1, 'kx', mew=2, ms=10, label='Mean of Gaussian')
     ax.legend(loc='best', frameon=False)
 
