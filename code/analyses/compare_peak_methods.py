@@ -163,9 +163,6 @@ def read_in_data_for_left_3_cols(folder_path="../../data/fig2_data/",
     """handle the data to be plotted"""
     import os
     pkl_lists = os.listdir(folder_path)
-    gauss_data = OrderedDict()
-    bi_data = OrderedDict()
-    dumb_data = OrderedDict()
 
     methods = ["KDE", "shrink", "cent"]
 
@@ -179,12 +176,17 @@ def read_in_data_for_left_3_cols(folder_path="../../data/fig2_data/",
 
     # load the suitable files based on the paths, preserving order of the
     # methods in the methods list
-    gauss_data = {m: cPickle.load(open(folder_path + p)) for p in gauss_pkls
-                  for m in methods if m in p}
-    bi_data = {m: cPickle.load(open(folder_path + p)) for p in bimodal_pkls
-               for m in methods if m in p}
-    dumb_data = {m: cPickle.load(open(folder_path + p)) for p in dumb_pkls
-                 for m in methods if m in p}
+    gauss_data = OrderedDict(
+        {m: cPickle.load(open(folder_path + p)) for p in gauss_pkls
+        for m in methods if m in p})
+
+    bi_data = OrderedDict(
+        {m: cPickle.load(open(folder_path + p)) for p in bimodal_pkls
+         for m in methods if m in p})
+
+    dumb_data = OrderedDict(
+        {m: cPickle.load(open(folder_path + p)) for p in dumb_pkls
+         for m in methods if m in p})
 
     # only want the first set of the sampled data
     gauss_data["data"] = cPickle.load(open(folder_path +
@@ -194,8 +196,8 @@ def read_in_data_for_left_3_cols(folder_path="../../data/fig2_data/",
                                    "bimodal" + str(data_size) +
                                    ".pkl"))[0]
     dumb_data["data"] = cPickle.load(open(folder_path +
-                                   "dumb" + str(data_size) +
-                                   ".pkl"))[0]
+                                     "dumb" + str(data_size) +
+                                     ".pkl"))[0]
 
     return gauss_data, bi_data, dumb_data
 
@@ -234,14 +236,60 @@ def grid_spec_plot(gauss_data, bi_data, dumb_data, figsize=(13, 13)):
     return
 
 
-def plot_gauss_data(gauss_data, KDE_peak_dens, shrink_peak_dens, cent_peak_dens,
-                    ax=None):
+def plot_gauss_data(KDE_peak_dens, shrink_peak_dens,
+                    cent_peak_dens, gauss_data, ax=None, xlim=None,
+                    ylim=None):
     if ax is None:
         fig = plt.figure()
         ax = fig.add_subplot(111)
     ax.plot(gauss_data[:, 0], gauss_data[0][:, 1], 'k.', alpha=0.3)
     ax.plot(1, 1, 'kx', mew=2, ms=10, label='Mean of Gaussian')
     ax.legend(loc='best', frameon=False)
+
+    if xlim is not None:
+        ax.xlim(xlim)
+    if ylim is not None:
+        ax.ylim(ylim)
+
+    return
+
+
+def plot_gauss_contour(KDE_peak_dens, shrink_peak_dens,
+                       cent_peak_dens, gauss_data, ax=None, xlim=None,
+                       ylim=None):
+
+    plot_cf_contour(KDE_peak_dens["estimate"],
+                    KDE_peak_dens["eval_points"][0],
+                    KDE_peak_dens["eval_points"][1],
+                    colors=b_colors)
+    ax.annotate('KDE peak\nconfidence region', (0.3, 0.62),
+                textcoords='axes fraction',
+                color='b')
+
+    plot_cf_contour(shrink_peak_dens["estimate"],
+                    shrink_peak_dens["eval_points"][0],
+                    shrink_peak_dens["eval_points"][1],
+                    colors=g_colors)
+    ax.annotate('Shrink. apert. peak\nconfidence region', (0.3, 0.25),
+                textcoords='axes fraction',
+                color='g')
+
+    plot_cf_contour(cent_peak_dens["estimate"],
+                    cent_peak_dens["eval_points"][0],
+                    cent_peak_dens["eval_points"][1],
+                    colors=r_colors)
+    ax.annotate('Centroid\nconfidence region', (0.6, 0.5),
+                textcoords='axes fraction',
+                color='r')
+    ax.plot(1, 1, "kx", mew=2, label="True center", markersize=5)
+    ax.xlim(0, 2.0)
+    ax.legend(loc='best', frameon=False)
+    # ax.title('Confidence region from one Gaussian at (1, 1)',
+    #           fontsize=15)
+    if xlim is not None:
+        ax.xlim(xlim)
+    if ylim is not None:
+        ax.ylim(ylim)
 
     return
 
@@ -370,14 +418,13 @@ def plot_one_big_one_small_gaussian_500(
 def plot_one_big_one_small_gaussian(
         KDE_peak_dens1, shrink_peak_dens1, cent_peak_dens1,
         figsize=7, fig_path="../../paper/figures/drafts/",
-        fig_name="confidence_regions_bimodal.pdf", save=False, ax=None):
+        fig_name="confidence_regions_bimodal.pdf", save=False):
 
-    if ax is None:
-    ax.figure(figsize=(figsize * 3, figsize))
-    ax.subplot(131)
-    ax.plot(bimodal_data[0][:, 0], bimodal_data[0][:, 1], 'k.', alpha=0.3)
-    ax.plot(2, 2, 'kx', mew=2, ms=10, label='Mean of dominant Gaussian')
-    ax.plot(0, 0, 'x', color='grey',
+    plt.figure(figsize=(figsize * 3, figsize))
+    plt.subplot(131)
+    plt.plot(bimodal_data[0][:, 0], bimodal_data[0][:, 1], 'k.', alpha=0.3)
+    plt.plot(2, 2, 'kx', mew=2, ms=10, label='Mean of dominant Gaussian')
+    plt.plot(0, 0, 'x', color='grey',
             mew=2, ms=10, label='Mean of subdominant Gaussian')
     ax.legend(loc='best', frameon=False)
 

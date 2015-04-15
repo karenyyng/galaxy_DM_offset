@@ -60,7 +60,7 @@ def plot_color_mag_diag(df, bluer_band, redder_band, band_limit,
 
 
 def plot_cf_contour(dens, x, y, lvls=[68, 95], show=False, clabel=False,
-                    fill=False, colors=None):
+                    fill=False, colors=None, ax=None):
     """this sort through the density, add them up til they are
     below the required confidence level, then plot
 
@@ -71,6 +71,10 @@ def plot_cf_contour(dens, x, y, lvls=[68, 95], show=False, clabel=False,
 
     :returns: None
     """
+    if ax is None:
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+
     d = dens.ravel()
     lvls = np.array(lvls) / 100.
     lvl_vals = np.zeros(len(lvls))
@@ -94,19 +98,19 @@ def plot_cf_contour(dens, x, y, lvls=[68, 95], show=False, clabel=False,
     # the plt.contour function is weird, if you don't transpose
     # the density, the plotted density will be rotated by 180 clockwise
     if fill is False:
-        CS = plt.contour(x, y, dens.transpose(), lvl_vals, linewidths=(1, 1),
-                         colors=colors)
+        CS = ax.contour(x, y, dens.transpose(), lvl_vals, linewidths=(1, 1),
+                        colors=colors)
     else:
-        CS = plt.pcolor(x, y, dens.transpose(), cmap=plt.cm.winter)
+        CS = ax.pcolor(x, y, dens.transpose(), cmap=plt.cm.winter)
 
     if clabel:
         # labels for the confidence levels
         str_lvls = {l: "{0:.1f}".format(s * 100)
                     for l, s in zip(CS.levels, lvls)}
-        plt.clabel(CS, CS.levels, fmt=str_lvls, inline=1, fontsize=6.5)
+        ax.clabel(CS, CS.levels, fmt=str_lvls, inline=1, fontsize=6.5)
 
     if show:
-        plt.show()
+        ax.show()
 
     return lvl_vals
 
