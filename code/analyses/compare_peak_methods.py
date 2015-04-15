@@ -230,11 +230,17 @@ def grid_spec_plot(gauss_data, bi_data, dumb_data, figsize=(13, 13)):
         axArr1[j][1].xaxis.set_major_locator(
             MaxNLocator(nbins=5, prune="lower"))
 
+    # first row of plots
     xlim, ylim = plot_gauss_data(gauss_data["data"], ax=axArr1[0][0])
     plot_gauss_contour(*gauss_data.values(), ax=axArr1[0][1], xlim=xlim,
                        ylim=ylim)
+    plot_gauss_zoomed_contours(*gauss_data.values()[:-1], ax=axArr2[0][0])
+
+    # second row of plots
     # plot_one_big_one_small_gaussian(ax=axArr2[0][0])
 
+
+    # third row of plots
     return
 
 
@@ -335,18 +341,19 @@ def peak_est_contours_one_big_one_small_gaussian(
     return
 
 
-def zoomed_in_view(KDE_peak_dens, shrink_peak_dens1, cent_peak_dens1,
-                   xlim, ylim, markersize, ax=None):
+def plot_gauss_zoomed_contours(KDE_peak_dens1, shrink_peak_dens1,
+                               cent_peak_dens1, xlim=None, ylim=None,
+                               markersize=10,
+                               ax=None):
     if ax is None:
         fig = plt.figure()
         ax = fig.add_subplot(111)
 
-    markersize = 10
     # plot KDE dominant peak contour
     plot_cf_contour(KDE_peak_dens1["estimate"],
                     KDE_peak_dens1["eval_points"][0],
                     KDE_peak_dens1["eval_points"][1],
-                    colors=b_colors)
+                    colors=b_colors, ax=ax)
 
     ax.plot(KDE_peak_dens1["peaks_xcoords"][0],
             KDE_peak_dens1["peaks_ycoords"][0],
@@ -357,7 +364,7 @@ def zoomed_in_view(KDE_peak_dens, shrink_peak_dens1, cent_peak_dens1,
     plot_cf_contour(shrink_peak_dens1["estimate"],
                     shrink_peak_dens1["eval_points"][0],
                     shrink_peak_dens1["eval_points"][1],
-                    colors=g_colors)
+                    colors=g_colors, ax=ax)
 
     ax.plot(shrink_peak_dens1["peaks_xcoords"][0],
             shrink_peak_dens1["peaks_ycoords"][0],
@@ -368,25 +375,29 @@ def zoomed_in_view(KDE_peak_dens, shrink_peak_dens1, cent_peak_dens1,
     plot_cf_contour(cent_peak_dens1["estimate"],
                     cent_peak_dens1["eval_points"][0],
                     cent_peak_dens1["eval_points"][1],
-                    colors=r_colors)
+                    colors=r_colors, ax=ax)
 
     ax.plot(cent_peak_dens1["peaks_xcoords"][0],
             cent_peak_dens1["peaks_ycoords"][0],
             'rx', mew=2, markersize=markersize,
             label="Centroid peak best est")
 
-    ax.plot(2, 2, "kx", mew=2, label="Mean of dominant Gaussian",
+    ax.plot(1, 1, "kx", mew=2, label="Mean of dominant Gaussian",
             markersize=markersize)
 
-    ax.ylim(0, 3)
+    if ylim is not None:
+        ax.set_ylim(ylim)
 
-    ax.legend(loc='lower right', frameon=False)
-    ax.title("Zoomed-in view near the dominant peak",
-             fontsize=15)
+    if xlim is not None:
+        ax.set_xlim(xlim)
 
-    if save:
-        print("saving figure to" + fig_path + fig_name)
-        ax.savefig(fig_path + fig_name, bbox_inches='tight')
+    ax.legend(loc='lower right', frameon=False, fontsize='small')
+    # ax.title("Zoomed-in view near the dominant peak",
+    #          fontsize=15)
+
+    # if save:
+    #     print("saving figure to" + fig_path + fig_name)
+    #     ax.savefig(fig_path + fig_name, bbox_inches='tight')
 
     return
 
