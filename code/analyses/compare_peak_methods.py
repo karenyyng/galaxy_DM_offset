@@ -202,7 +202,7 @@ def read_in_data_for_left_3_cols(folder_path="../../data/fig2_data/",
     return gauss_data, bi_data, dumb_data
 
 
-def grid_spec_plot(gauss_data, bi_data, dumb_data, figsize=(13, 13)):
+def grid_spec_plot(gauss_data, bimodal_data, dumb_data, figsize=(13, 13)):
     import matplotlib.gridspec as gridspec
     from matplotlib.ticker import MaxNLocator
 
@@ -223,8 +223,8 @@ def grid_spec_plot(gauss_data, bi_data, dumb_data, figsize=(13, 13)):
     axArr2 = [[plt.subplot(gs2[i, j], aspect='equal')
                for j in range(colNo)] for i in range(rowNo)]
 
-    _ = plt.setp([axArr1[j][1].get_yticklabels()
-                for j in range(rowNo)], visible=False)
+    plt.setp([axArr1[j][1].get_yticklabels()
+              for j in range(rowNo)], visible=False)
 
     for j in range(rowNo):
         axArr1[j][1].xaxis.set_major_locator(
@@ -237,7 +237,13 @@ def grid_spec_plot(gauss_data, bi_data, dumb_data, figsize=(13, 13)):
     plot_gauss_zoomed_contours(*gauss_data.values()[:-1], ax=axArr2[0][0])
 
     # second row of plots
-    # plot_one_big_one_small_gaussian(ax=axArr2[0][0])
+    xlim, ylim = plot_one_big_one_small_gaussian(bimodal_data["data"],
+                                                 ax=axArr1[1][0])
+    plot_one_big_one_small_gaussian_contour(*bimodal_data.values(),
+                                            xlim=xlim, ylim=ylim,
+                                            ax=axArr1[1][1])
+    plot_one_big_one_small_gaussian_zoomed_contour(*bimodal_data.values(),
+                                                   ax=axArr2[1][0])
 
 
     # third row of plots
@@ -296,48 +302,6 @@ def plot_gauss_contour(KDE_peak_dens, shrink_peak_dens,
     if ylim is not None:
         ax.set_ylim(ylim)
 
-    return
-
-
-def peak_est_contours_one_big_one_small_gaussian(
-        KDE_peak_dens1, shrink_peak_dens1, cent_peak_dens1, xlim, ylim,
-        ax=None, save=False, figname="bimodal_CR_contour.pdf"):
-
-    if ax is None:
-        fig = plt.figure()
-        ax = fig.add_subplot(111)
-
-    plot_cf_contour(KDE_peak_dens1["estimate"],
-                    KDE_peak_dens1["eval_points"][0],
-                    KDE_peak_dens1["eval_points"][1],
-                    colors=b_colors)
-    ax.annotate('KDE peak\nconfidence region', (0.12, 0.52),
-                textcoords='axes fraction',
-                color='b')
-
-    plot_cf_contour(shrink_peak_dens1["estimate"],
-                    shrink_peak_dens1["eval_points"][0],
-                    shrink_peak_dens1["eval_points"][1],
-                    colors=g_colors)
-    ax.annotate('Shrink. apert. peak\nconfidence region', (0.3, 0.7),
-                textcoords='axes fraction',
-                color='g')
-
-    plot_cf_contour(cent_peak_dens1["estimate"],
-                    cent_peak_dens1["eval_points"][0],
-                    cent_peak_dens1["eval_points"][1],
-                    colors=r_colors)
-    ax.annotate('Centroid\nconfidence region', (0.3, 0.42),
-                textcoords='axes fraction',
-                color='r')
-
-    ax.plot(2, 2, "kx", mew=2, label="True center", markersize=5)
-    ax.legend(loc='best', frameon=False)
-    ax.xlim(xlim)
-    ax.ylim(ylim)
-
-    if save:
-        ax.savefig(figname, bbox_inches='tight')
     return
 
 
@@ -402,46 +366,142 @@ def plot_gauss_zoomed_contours(KDE_peak_dens1, shrink_peak_dens1,
     return
 
 
-def plot_one_big_one_small_gaussian_500(
-        bimodal_data, shrink_peak_dens1, KDE_peak_dens1, cent_peak_dens1,
-        figsize=7, ax=None, fig_path="../../paper/figures/drafts/",
-        fig_name="confidence_regions_bimodal_500.pdf", save=False):
+def plot_one_big_one_small_gaussian(
+        bimodal_data, figsize=7, fig_path="../../paper/figures/drafts/",
+        fig_name="confidence_regions_bimodal.pdf", save=False, ax=None,
+        xlim=None, ylim=None):
+    if ax is None:
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+
+    ax.plot(bimodal_data[:, 0], bimodal_data[:, 1], 'k.', alpha=0.3)
+    ax.plot(2, 2, 'kx', mew=2, ms=10, label='Mean of dominant Gaussian')
+    ax.plot(0, 0, 'x', color='grey',
+            mew=2, ms=10, label='Mean of subdominant Gaussian')
+    ax.legend(loc='best', frameon=False, fontsize='small')
+
+    ax.set_xlim(xlim)
+    ax.set_ylim(ylim)
+
+    return ax.get_xlim(), ax.get_ylim()
+
+
+def plot_one_big_one_small_gaussian_contour(
+        KDE_peak_dens1, shrink_peak_dens1, cent_peak_dens1,
+        figsize=7, xlim=None, ylim=None,
+        fig_path="../../paper/figures/drafts/",
+        fig_name="confidence_regions_bimodal.pdf", save=False, ax=None):
 
     if ax is None:
         fig = plt.figure()
         ax = fig.add_subplot(111)
 
-    # ax.figure(figsize=(figsize * 3, figsize))
-    # ax.subplot(131)
+    plot_cf_contour(KDE_peak_dens1["estimate"],
+                    KDE_peak_dens1["eval_points"][0],
+                    KDE_peak_dens1["eval_points"][1],
+                    colors=b_colors, ax=ax)
+    ax.annotate('KDE peak\nconfidence region', (0.12, 0.52),
+                textcoords='axes fraction',
+                color='b')
+
+    plot_cf_contour(shrink_peak_dens1["estimate"],
+                    shrink_peak_dens1["eval_points"][0],
+                    shrink_peak_dens1["eval_points"][1],
+                    colors=g_colors, ax=ax)
+    ax.annotate('Shrink. apert. peak\nconfidence region', (0.3, 0.7),
+                textcoords='axes fraction',
+                color='g')
+
+    plot_cf_contour(cent_peak_dens1["estimate"],
+                    cent_peak_dens1["eval_points"][0],
+                    cent_peak_dens1["eval_points"][1],
+                    colors=r_colors, ax=ax)
+    ax.annotate('Centroid\nconfidence region', (0.3, 0.42),
+                textcoords='axes fraction',
+                color='r')
+
+    ax.plot(2, 2, "kx", mew=2, label="True center", markersize=5)
+    ax.legend(loc='best', frameon=False)
+    # ax.title('Confidence region from one Gaussian at (1, 1)',
+    #           fontsize=15)
+    if xlim is not None:
+        ax.set_xlim(xlim)
+    if ylim is not None:
+        ax.set_ylim(ylim)
+
+    return
+
+
+def plot_one_big_one_small_gaussian_zoomed_contour(
+        KDE_peak_dens1, shrink_peak_dens1, cent_peak_dens1,
+        figsize=7, fig_path="../../paper/figures/drafts/", markersize=10,
+        fig_name="confidence_regions_bimodal.pdf", save=False, ax=None,
+        xlim=None, ylim=None):
+
+    if ax is None:
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+
+    # plot KDE dominant peak contour
+    plot_cf_contour(KDE_peak_dens1["estimate"],
+                    KDE_peak_dens1["eval_points"][0],
+                    KDE_peak_dens1["eval_points"][1],
+                    colors=b_colors, ax=ax)
+
+    ax.plot(KDE_peak_dens1["peaks_xcoords"][0],
+            KDE_peak_dens1["peaks_ycoords"][0],
+            'bx', mew=2, markersize=markersize,
+            label="KDE peak best est")
+
+    # plot shrinking aperture contour
+    plot_cf_contour(shrink_peak_dens1["estimate"],
+                    shrink_peak_dens1["eval_points"][0],
+                    shrink_peak_dens1["eval_points"][1],
+                    colors=g_colors, ax=ax)
+
+    ax.plot(shrink_peak_dens1["peaks_xcoords"][0],
+            shrink_peak_dens1["peaks_ycoords"][0],
+            'gx', mew=2, markersize=markersize,
+            label="Shrink peak best est")
+
+    # plot centroid contour
+    plot_cf_contour(cent_peak_dens1["estimate"],
+                    cent_peak_dens1["eval_points"][0],
+                    cent_peak_dens1["eval_points"][1],
+                    colors=r_colors, ax=ax)
+
+    ax.plot(cent_peak_dens1["peaks_xcoords"][0],
+            cent_peak_dens1["peaks_ycoords"][0],
+            'rx', mew=2, markersize=markersize,
+            label="Centroid peak best est")
+
+    ax.plot(2, 2, "kx", mew=2, label="Mean of dominant Gaussian",
+            markersize=markersize)
+
+    if ylim is not None:
+        ax.set_ylim(ylim)
+    if xlim is not None:
+        ax.set_xlim(xlim)
+
+    ax.legend(loc='lower right', frameon=False, fontsize='small')
+    # ax.title("Zoomed-in view near the dominant peak",
+    #          fontsize=15)
+    return
+
+
+def plot_compare_one_big_one_small_gaussian(
+        KDE_peak_dens1, shrink_peak_dens1, cent_peak_dens1,
+        figsize=7, fig_path="../../paper/figures/drafts/",
+        fig_name="confidence_regions_bimodal.pdf", save=False, ax=None):
+
     ax.plot(bimodal_data[0][:, 0], bimodal_data[0][:, 1], 'k.', alpha=0.3)
     ax.plot(2, 2, 'kx', mew=2, ms=10, label='Mean of dominant Gaussian')
     ax.plot(0, 0, 'x', color='grey',
             mew=2, ms=10, label='Mean of subdominant Gaussian')
     ax.legend(loc='best', frameon=False)
 
-    if save:
-        ax.savefig(figname, bbox_inches='tight')
-
-    return
-
-
-def plot_one_big_one_small_gaussian(
-        KDE_peak_dens1, shrink_peak_dens1, cent_peak_dens1,
-        figsize=7, fig_path="../../paper/figures/drafts/",
-        fig_name="confidence_regions_bimodal.pdf", save=False):
-
-    plt.figure(figsize=(figsize * 3, figsize))
-    plt.subplot(131)
-    plt.plot(bimodal_data[0][:, 0], bimodal_data[0][:, 1], 'k.', alpha=0.3)
-    plt.plot(2, 2, 'kx', mew=2, ms=10, label='Mean of dominant Gaussian')
-    plt.plot(0, 0, 'x', color='grey',
-            mew=2, ms=10, label='Mean of subdominant Gaussian')
-    ax.legend(loc='best', frameon=False)
-
     xlim = ax.xlim(-2, 5)
     ylim = ax.ylim(-2, 5)
-
-    ax.subplot(132)
 
     plot_cf_contour(KDE_peak_dens1["estimate"],
                     KDE_peak_dens1["eval_points"][0],
@@ -521,6 +581,71 @@ def plot_one_big_one_small_gaussian(
     if save:
         print("saving figure to" + fig_path + fig_name)
         ax.savefig(fig_path + fig_name, bbox_inches='tight')
+
+    return
+
+
+def peak_est_contours_one_big_one_small_gaussian(
+        KDE_peak_dens1, shrink_peak_dens1, cent_peak_dens1, xlim, ylim,
+        ax=None, save=False, figname="bimodal_CR_contour.pdf"):
+
+    if ax is None:
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+
+    plot_cf_contour(KDE_peak_dens1["estimate"],
+                    KDE_peak_dens1["eval_points"][0],
+                    KDE_peak_dens1["eval_points"][1],
+                    colors=b_colors)
+    ax.annotate('KDE peak\nconfidence region', (0.12, 0.52),
+                textcoords='axes fraction',
+                color='b')
+
+    plot_cf_contour(shrink_peak_dens1["estimate"],
+                    shrink_peak_dens1["eval_points"][0],
+                    shrink_peak_dens1["eval_points"][1],
+                    colors=g_colors)
+    ax.annotate('Shrink. apert. peak\nconfidence region', (0.3, 0.7),
+                textcoords='axes fraction',
+                color='g')
+
+    plot_cf_contour(cent_peak_dens1["estimate"],
+                    cent_peak_dens1["eval_points"][0],
+                    cent_peak_dens1["eval_points"][1],
+                    colors=r_colors)
+    ax.annotate('Centroid\nconfidence region', (0.3, 0.42),
+                textcoords='axes fraction',
+                color='r')
+
+    ax.plot(2, 2, "kx", mew=2, label="True center", markersize=5)
+    ax.legend(loc='best', frameon=False)
+    ax.xlim(xlim)
+    ax.ylim(ylim)
+
+    if save:
+        ax.savefig(figname, bbox_inches='tight')
+    return
+
+
+def plot_one_big_one_small_gaussian_500(
+        bimodal_data, shrink_peak_dens1, KDE_peak_dens1, cent_peak_dens1,
+        figsize=7, ax=None, fig_path="../../paper/figures/drafts/",
+        fig_name="confidence_regions_bimodal_500.pdf", save=False):
+
+    if ax is None:
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+
+    # ax.figure(figsize=(figsize * 3, figsize))
+    # ax.subplot(131)
+    ax.plot(bimodal_data[0][:, 0], bimodal_data[0][:, 1], 'k.', alpha=0.3)
+    ax.plot(2, 2, 'kx', mew=2, ms=10, label='Mean of dominant Gaussian')
+    ax.plot(0, 0, 'x', color='grey',
+            mew=2, ms=10, label='Mean of subdominant Gaussian')
+    ax.legend(loc='best', frameon=False)
+
+    if save:
+        ax.savefig(figname, bbox_inches='tight')
 
     return
 
