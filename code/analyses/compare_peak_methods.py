@@ -604,7 +604,7 @@ def plot_dumbbell_zoomed_contour(
         KDE_peak_dens2,
         shrink_peak_dens2,
         cent_peak_dens2, markersize=10,
-        xlim=None, ylim=None,
+        xlim=(0.25, 4), ylim=(-0.6, 4),
         save=False,
         plot_path="../../paper/figures/drafts/",
         plot_fig_name="confidence_regions_dumbbell.pdf", ax=None):
