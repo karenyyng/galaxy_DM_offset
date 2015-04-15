@@ -251,6 +251,7 @@ def grid_spec_plot(gauss_data, bimodal_data, dumb_data, figsize=(13, 13)):
     xlim, ylim = plot_dumbbell_data(dumb_data["data"], ax=axArr1[2][0])
     plot_dumbbell_contour(*dumb_data.values()[:-1], ax=axArr1[2][1],
                           xlim=xlim, ylim=ylim)
+    plot_dumbbell_zoomed_contour(*dumb_data.values()[:-1], ax=axArr2[2][0])
 
     return
 
@@ -597,6 +598,59 @@ def plot_dumbbell_contour(
 
     return
 
+
+def plot_dumbbell_zoomed_contour(
+        KDE_peak_dens2b,
+        KDE_peak_dens2,
+        shrink_peak_dens2,
+        cent_peak_dens2, markersize=10,
+        xlim=None, ylim=None,
+        save=False,
+        plot_path="../../paper/figures/drafts/",
+        plot_fig_name="confidence_regions_dumbbell.pdf", ax=None):
+
+    if ax is None:
+        fig = plt.figure()
+        ax = fig.add_subplot()
+
+    if xlim is not None:
+        ax.set_xlim(xlim)
+    if ylim is not None:
+        ax.set_ylim(ylim)
+
+    markersize = 10
+    # plot KDE dominant peak contour
+    plot_cf_contour(KDE_peak_dens2["estimate"],
+                    KDE_peak_dens2["eval_points"][0],
+                    KDE_peak_dens2["eval_points"][1],
+                    colors=b_colors, ax=ax)
+
+    # plot KDE subdominant peak contour
+    ax.plot(KDE_peak_dens2["peaks_xcoords"][0],
+            KDE_peak_dens2["peaks_ycoords"][0],
+            'bx', mew=2, markersize=markersize, fillstyle='none',
+            label="KDE peak best est")
+
+    # plot shrinking aperture contour
+    plot_cf_contour(shrink_peak_dens2["estimate"],
+                    shrink_peak_dens2["eval_points"][0],
+                    shrink_peak_dens2["eval_points"][1],
+                    colors=g_colors, ax=ax)
+
+    ax.plot(shrink_peak_dens2["peaks_xcoords"][0],
+            shrink_peak_dens2["peaks_ycoords"][0],
+            'gx', mew=2, markersize=markersize,
+            label="Shrink peak best est")
+
+    ax.plot(2, 2, "kx", mew=2, label="Mean of dominant Gaussian",
+            markersize=markersize)
+
+    ax.legend(loc='lower right', frameon=False, fontsize='small')
+    # ax.title("Zoomed-in view near the dominant peak",
+    #          fontsize=15)
+
+    return
+# ------------previous drafts --------------
 
 def plot_compare_one_big_one_small_gaussian(
         KDE_peak_dens1, shrink_peak_dens1, cent_peak_dens1,
