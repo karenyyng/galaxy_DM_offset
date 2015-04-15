@@ -244,11 +244,13 @@ def grid_spec_plot(gauss_data, bimodal_data, dumb_data, figsize=(13, 13)):
     plot_one_big_one_small_gaussian_contour(*bimodal_data.values(),
                                             xlim=xlim, ylim=ylim,
                                             ax=axArr1[1][1])
-    plot_one_big_one_small_gaussian_zoomed_contour(*bimodal_data.values(),
+    plot_one_big_one_small_gaussian_zoomed_contour(*bimodal_data.values()[:-1],
                                                    ax=axArr2[1][0])
 
     # third row of plots
     xlim, ylim = plot_dumbbell_data(dumb_data["data"], ax=axArr1[2][0])
+    plot_dumbbell_contour(*dumb_data.values()[:-1], ax=axArr1[2][1],
+                          xlim=xlim, ylim=ylim)
 
     return
 
@@ -526,10 +528,72 @@ def plot_dumbbell_contour(
         shrink_peak_dens2,
         cent_peak_dens2,
         xlim=None, ylim=None,
-        save=False,
+        save=False, markersize=6,
         plot_path="../../paper/figures/drafts/",
         plot_fig_name="confidence_regions_dumbbell.pdf", ax=None):
 
+    if ax is None:
+        fig = plt.figure()
+        ax = fig.add_subplot()
+
+    if xlim is not None:
+        ax.set_xlim(xlim)
+    if ylim is not None:
+        ax.set_ylim(ylim)
+
+    plot_cf_contour(KDE_peak_dens2["estimate"],
+                    KDE_peak_dens2["eval_points"][0],
+                    KDE_peak_dens2["eval_points"][1],
+                    colors=b_colors, ax=ax)
+    ax.annotate('KDE dominant\npeak confidence region', (0.55, 0.53),
+                textcoords='axes fraction',
+                color='b')
+
+    plot_cf_contour(KDE_peak_dens2b["estimate"],
+                    KDE_peak_dens2b["eval_points"][0],
+                    KDE_peak_dens2b["eval_points"][1],
+                    colors=b_colors, ax=ax)
+
+    ax.annotate('KDE subdominant\npeak confidence region', (0.49, 0.35),
+                textcoords='axes fraction',
+                color='b')
+    # ax.figtext(0.49, 0.35, 'KDE subdominant peak\nconfidence region',
+    #            color='b')
+
+    plot_cf_contour(shrink_peak_dens2["estimate"],
+                    shrink_peak_dens2["eval_points"][0],
+                    shrink_peak_dens2["eval_points"][1],
+                    colors=g_colors, ax=ax)
+
+    ax.annotate('Shrink apert peak\nconfidence region', (0.45, 0.65),
+                textcoords='axes fraction',
+                color='g')
+    # ax.figtext(0.45, 0.65, 'Shrink apert peak\nconfidence region',
+    #            color='g')
+
+    plot_cf_contour(cent_peak_dens2["estimate"],
+                    cent_peak_dens2["eval_points"][0],
+                    cent_peak_dens2["eval_points"][1],
+                    colors=r_colors, ax=ax)
+    ax.annotate('Centroid \nconfidence region', (0.43, 0.55),
+                textcoords='axes fraction',
+                color='r')
+    # ax.figtext(0.43, 0.55, 'Centroid \nconfidence region', color='r')
+
+    markersize = 8
+    ax.plot(2, 2, "kx", mew=2,
+            label="Mean of dominant Gaussian",
+            markersize=markersize)
+    ax.plot(-2, -2, "x", color="grey", mew=3,
+            label="Mean of subdominant Gaussian",
+            markersize=markersize)
+    ax.plot(0, 0, "x", color="grey", mew=3,
+            label="Mean of subdominant Gaussian",
+            markersize=markersize)
+    ax.legend(loc='lower right', frameon=False, fontsize='small')
+
+    # ax.title('Confidence regions and best estimates of peak finding methods',
+    #          fontsize=13)
 
     return
 
