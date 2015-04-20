@@ -26,7 +26,7 @@ allClst = int(sys.argv[1])
 compute_relaxedness0 = False
 
 wts_key = ["SubhaloMass", "SubhaloMassType4", "i_lum"]
-wt_suffix = ["I_lum", "tot_mass", "stel_mass", "I_band_lum"]
+wt_suffix = ["I_lum", "subhalo_mass", "stel_mass", "I_band_lum"]
 wt_suffix = ["shrink_" + w for w in wt_suffix]
 
 file_suffix = '_{0}'.format(allClst) + '.h5'
@@ -60,8 +60,8 @@ for j in range(len(wts_key)):
     offsets_list = np.array([result_list[i][:2] for i in range(allClst)])
 
     df_outlist.append(pd.DataFrame(offsets_list,
-                                columns=["offset_" + wt_suffix[j],
-                                         "offset_R200_" + wt_suffix[j]]))
+                                columns=[wt_suffix[j],
+                                         "R200_" + wt_suffix[j]]))
 
     fhat_list = [result_list[i][2] for i in range(allClst)]
 

@@ -63,7 +63,7 @@ for j, wts_key in enumerate(wts_keys):
 
     # put offset list with different weights each become a col of data frame
     df_outlist.append(pd.DataFrame(offsets_list,
-                                   columns=["offset_" + wt_suffix[j]]))
+                                   columns=[wt_suffix[j]]))
 
 
 # cbind aka column bind

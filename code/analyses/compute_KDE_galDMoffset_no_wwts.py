@@ -42,8 +42,8 @@ result_list = \
 # reformat the outputs and save to a dataframe
 offsets_list = np.array([result_list[i][:2] for i in range(allClst)])
 
-df = pd.DataFrame(offsets_list, columns=["offset_no_wwts",
-                                         "offset_R200_no_wwts"])
+df = pd.DataFrame(offsets_list, columns=["no_wwts",
+                                         "R200_no_wwts"])
 
 fhat_list = [result_list[i][2] for i in range(allClst)]
 
