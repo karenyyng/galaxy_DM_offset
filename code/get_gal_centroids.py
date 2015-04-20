@@ -13,7 +13,7 @@ base = importr("base")  # not really needed in the script
 robjects.r('source("ks_KDE.r")')
 
 
-# --------- methods for computing gal-DM offsets-------------------------
+# --------- functions for computing gal-DM offsets-------------------------
 def find_peaks_from_py_diff(fhat, estKey="estimate", gridKey="eval_points"):
     """
     :note: side effects for fhat
@@ -203,8 +203,21 @@ def compute_shrinking_aperture_offset(df, f, clstNo, cut_method, cut_kwargs,
     return compute_euclidean_dist(shrink_cent)
 
 
+def convert_fhat_to_df(fhat, clstNo, weights_used=None):
+    """
+    :param fhat: python dictionary obtained from `convert_rfhat_to_dict`
+    :param weights_used: string, metadata about the data set
+    """
+    fixed_size_data_keys = ["eval_points", "estimate", "bandwidth_matrix_H"]
+    variable_size_data_keys = ["peaks_xcoords", "peaks_ycoords", "peaks_rowIx",
+                               "peaks_colIx"]
+
+
+
+    return
+
 # ------------python wrapper to ks_KDE.r code ---------------------------
-def convert_fhat_to_dict(r_fhat):
+def convert_rfhat_to_dict(r_fhat):
     """preserves the returned object structure with a dict
     :param r_fhat: robject of the output evaluated from ks.KDE
 
@@ -218,15 +231,15 @@ def convert_fhat_to_dict(r_fhat):
 
     :to do: convert this to a h5 object instead
     """
-    return {"data_x": np.array(r_fhat[0]),
-            "eval_points": np.array(r_fhat[1]),
-            "estimate": np.array(r_fhat[2]),
-            "bandwidth_matrix_H": np.array(r_fhat[3]),
-            "gridtype": tuple(r_fhat[4]),
+    return {"data_x": np.array(r_fhat[0]),  # don't have to store
+            "eval_points": np.array(r_fhat[1]),  # fixed 2D size
+            "estimate": np.array(r_fhat[2]),  # fixed size
+            "bandwidth_matrix_H": np.array(r_fhat[3]),  # fixed size
+            "gridtype": tuple(r_fhat[4]),   # ('linear', 'linear') don't store
             "gridded": bool(r_fhat[5]),  # don't really have to store this
             "binned": bool(r_fhat[6]),  # don't really have to store this
-            "names": list(r_fhat[7]),
-            "weight_w": np.array(r_fhat[8])}
+            "names": list(r_fhat[7]),  # useless
+            "weight_w": np.array(r_fhat[8])}  # don't have to store
 
 
 def get_density_weights(fhat, ix_rkey="peaks_rowIx",
@@ -272,7 +285,7 @@ def do_KDE(x, w=None, dom_peak_no=1):
 
     :returns list of 2 R objects:
         :R matrix of peaks: each row correspond to coordinates of one peak
-        :R object: fhat this should be fed to convert_fhat_to_dict()
+        :R object: fhat this should be fed to convert_rfhat_to_dict()
             if you wish to examine the object in python
 
     :stability: untested
@@ -290,7 +303,7 @@ def do_KDE(x, w=None, dom_peak_no=1):
 
 def do_KDE_and_get_peaks(x, w=None, dom_peak_no=1):
     res = do_KDE(x, w=w, dom_peak_no=dom_peak_no)
-    fhat = convert_fhat_to_dict(res)
+    fhat = convert_rfhat_to_dict(res)
     find_peaks_from_py_diff(fhat, estKey="estimate", gridKey="eval_points")
     return fhat
 
@@ -341,16 +354,21 @@ def rmvnorm_mixt(n, mus, Sigmas, props):
 def shrinking_apert(data, center_coord=None, r0=None, debug=False, w=None):
     """
     :param center_coord: list of floats or array of floats
-    :param data: np.array
+    :param data: numpy array
         with shape[1] == center_coord.shape[0]
         shape[0] = number of observations
     :param r0: float, aperture to consider in the data
 
+    :returns: numpy array,
+        with same shape as center_coord
     :note: I want to write this procedure so that it would work in both 2D and
     3D
     """
 
     data, normalization = normalize_data(data)
+
+    if w is None:
+        w = np.ones(len(data))
 
     if center_coord is not None:
         c1 = np.array(center_coord)
@@ -391,7 +409,7 @@ def shrinking_apert(data, center_coord=None, r0=None, debug=False, w=None):
                                                               np.sum(mask))
             print "mdist = {0}".format(mdist)
         c0 = c1
-        c1 = compute_weighted_centroids(data[mask], w=w)  # compute new centroid
+        c1 = compute_weighted_centroids(data[mask], w=w[mask])  # compute new centroid
         dist = compute_euclidean_dist(data - c1)  # compute new dist
         r0 *= 0.95  # shrink the aperture
         mask = dist < r0
@@ -455,7 +473,7 @@ def compute_weighted_centroids(x, w=None):
     if w is None:
         return np.mean(x, axis=0)
     elif w.ndim == 1:
-        w.reshape(w.shape[0], 1)
+        w = w.reshape(w.shape[0], 1)
 
     assert len(x) == len(w), "row no of data and weights have to be the same"
     return np.sum(x * w, axis=0) / np.sum(w)
@@ -516,7 +534,7 @@ def get_shrinking_apert_conf_reg(data_realizations):
 
     # use KDE to find the distribution of the shrinking aperture peaks
     shrink_peak_dens2 = do_KDE(shrink_peaks2)
-    shrink_peak_dens2 = convert_fhat_to_dict(shrink_peak_dens2)
+    shrink_peak_dens2 = convert_rfhat_to_dict(shrink_peak_dens2)
     find_peaks_from_py_diff(shrink_peak_dens2)
 
     return shrink_peak_dens2
@@ -538,7 +556,7 @@ def get_KDE_conf_reg(data_realizations, second_peak=False):
                                      fhat2["peaks_ycoords"][0]])
                            for fhat2 in KDE_fhat2])
     KDE_peak_dens2 = do_KDE(KDE_peaks2)
-    KDE_peak_dens2 = convert_fhat_to_dict(KDE_peak_dens2)
+    KDE_peak_dens2 = convert_rfhat_to_dict(KDE_peak_dens2)
     find_peaks_from_py_diff(KDE_peak_dens2)
 
     # get second KDE peak
@@ -548,7 +566,7 @@ def get_KDE_conf_reg(data_realizations, second_peak=False):
                                 for fhat2 in KDE_fhat2
                                 if len(fhat2["peaks_xcoords"]) > 1])
         KDE_peak_dens2b = do_KDE(KDE_peaks2b)
-        KDE_peak_dens2b = convert_fhat_to_dict(KDE_peak_dens2b)
+        KDE_peak_dens2b = convert_rfhat_to_dict(KDE_peak_dens2b)
         find_peaks_from_py_diff(KDE_peak_dens2b)
 
         return KDE_peak_dens2, KDE_peak_dens2b
@@ -566,7 +584,7 @@ def get_centroid_conf_reg(data_realizations):
     cent_fhat2 = [compute_weighted_centroids(g_data)
                   for g_data in data_realizations]
     cent_peak_dens2 = do_KDE(cent_fhat2)
-    cent_peak_dens2 = convert_fhat_to_dict(cent_peak_dens2)
+    cent_peak_dens2 = convert_rfhat_to_dict(cent_peak_dens2)
     find_peaks_from_py_diff(cent_peak_dens2)
 
     return cent_peak_dens2
@@ -631,7 +649,7 @@ def dict_to_h5objs(fhat):
 #     peaks_ix = findPeaks(fhat)  # fhat[2] = fhat$estimate
 #     dom_peaks = np.array(findDomPeaks(fhat, peaks_ix, no_of_peaks))
 #
-#     fhat = convert_fhat_to_dict(fhat)
+#     fhat = convert_rfhat_to_dict(fhat)
 #     # subtracting 1 from the peak_coords since python is zeroth index,
 #     # R has 1 as the first index
 #     fhat["peaks_py_ix"] = np.array(peaks_ix) - 1

@@ -13,6 +13,7 @@ function()
                 c(1, 1, 1, 1, 2, 1),
                 c(1, 1, 1, 1, 1, 1))
 
+  # there should be fewer peaks after taking into count corner values 
   peak_row_ix <- as.integer(c(2, 3, 4, 6)) 
   peak_col_ix <- as.integer(c(2, 3, 5, 5))
 

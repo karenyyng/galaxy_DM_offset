@@ -6,7 +6,7 @@ Required python libraries:
 
 ### to run the python tests: 
 ```
-$ py.test test_*.py
+$ py.test -v test_*.py
 ```
 
 ### to run the R tests: 

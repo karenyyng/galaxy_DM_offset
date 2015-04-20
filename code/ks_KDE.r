@@ -6,7 +6,8 @@
 library(ks)
 library(parallel)
 
-do_KDE=
+do_KDE = function(data, bandwidth_selector=Hscv, w=rep.int(1, nrow(data)), 
+                  verbose=F, dom_peak_no=1L){
   # group most of the steps for performing KDE to minimize the number of
   # functions that I need to wrap in python 
   # @param
@@ -15,8 +16,6 @@ do_KDE=
   # w = vector of floats that is same size as data that denotes the weight
   # @return
   # fhat_pi1 = R object from the ks package  
-function(data, bandwidth_selector=Hscv, w=rep.int(1, nrow(data)), 
-         verbose=F, dom_peak_no=1L){
   H <- bandwidth_selector(x=data)
   fhat_pi1 <- kde(x=data, H=H, w=w, binned = FALSE) 
 
@@ -24,7 +23,7 @@ function(data, bandwidth_selector=Hscv, w=rep.int(1, nrow(data)),
 }
 
 
-find_peaks_from_2nd_deriv= 
+find_peaks_from_2nd_deriv = function(fhat, verbose=F, return_peak_ix=T){
   # do numerical differentiation to find peaks 
   # @params
   # fhat = object returned by ks.KDE 
@@ -36,8 +35,6 @@ find_peaks_from_2nd_deriv=
   #
   # @note can consider rewriting this using a faster language than R ...
   # @stability passed test case 
-function(fhat, verbose=F, return_peak_ix=T)
-{
   dens <- as.matrix(fhat$estimate)
   add_row <- c(rep(0, each=dim(dens)[[2]]))
   add_col <- c(rep(0, each=dim(dens)[[1]]))
@@ -78,7 +75,7 @@ function(fhat, verbose=F, return_peak_ix=T)
 }
 
 
-find_dominant_peaks=
+find_dominant_peaks = function(fhat, coords_ix, dom_peak_no=1L, verbose=T){
   # find dominant peaks 
   #
   # @params
@@ -92,8 +89,6 @@ find_dominant_peaks=
   # first column of the matrix corresponds to the x coordinate, 
   # second col = y coord
   # it runs without the world crashing and burning but use with caution
-function(fhat, coords_ix, dom_peak_no=1L, verbose=T)
-{
   # should indicate how many peaks were found 
   if(verbose) print(sprintf("Total num. of peaks found: %d", dim(coords_ix)[[1]]))
 
@@ -122,9 +117,7 @@ function(fhat, coords_ix, dom_peak_no=1L, verbose=T)
 # {
 # }
  
-gaussian_mixture_data=
-function(samp_no = 5e2, cwt = 1 / 11, set_seed = F)
-{
+gaussian_mixture_data = function(samp_no = 5e2, cwt = 1 / 11, set_seed = F){
   if(set_seed){
     seed <- 8192
     set.seed(seed)  
@@ -148,21 +141,18 @@ function(samp_no = 5e2, cwt = 1 / 11, set_seed = F)
   x <- rmvnorm.mixt(n=samp_no, mus=mu_s, Sigmas=Sigma_s, props=weights)
 }
 
-gaussian_mixture_data3D=
-function()
-{
+gaussian_mixture_data3D = function(){
 }
 
 
 
-TwoDtestCase1 = 
-function(samp_no = 5e2, cwt = 1 / 11)
+TwoDtestCase1 = function(samp_no = 5e2, cwt = 1 / 11)
+{ 
   # test case with 3 normal mixtures 
   # @param 
   # samp_no = integer, number of data points to draw 
   # cwt = float, 
   #       weight for the central normal mixture that acts as contaminant  
-{ 
   x <- gaussian_mixture_data(samp_no, cwt) 
 
   # use bandwidth selector either Hpi or Hscv or replace with Hscv 
@@ -170,15 +160,14 @@ function(samp_no = 5e2, cwt = 1 / 11)
 }
 
 
-plot_KDE_peaks=
+plot_KDE_peaks = function(fhat_pi1, cf_lvl=c(1:4 * 20.), 
+                          plot_name="./plots/R_KDE_plot.png",
+                          save=F, open=F, dom_peak_no=1L){ 
   # get the parameters that we want
   # @param fhat_pi1 = object returned by ks.KDE 
   # @param plot = bool 
   # @param plot_name = str
   # @param dom_peak_no = integer 
-function(fhat_pi1, cf_lvl=c(1:4 * 20.), plot_name="./plots/R_KDE_plot.png",
-         save=F, open=F, dom_peak_no=1L)
-{ 
   coords_ix <- find_peaks_from_2nd_deriv(fhat_pi1) 
   peaks <- find_dominant_peaks(fhat_pi1, coords_ix, dom_peak_no=dom_peak_no)
 
@@ -224,16 +213,14 @@ function(fhat_pi1, cf_lvl=c(1:4 * 20.), plot_name="./plots/R_KDE_plot.png",
 # }
 
 
-bootstrap_KDE=
+bootstrap_KDE = function(data_x, bootNo=4L, nrows=nrow(data_x), ncpus=2L, dom_peak_no=1L,
+                         bw_selector=Hscv, w=rep.int(1, nrow(data_x))){ 
   # perform bootstrapping for getting confidence regions 
   # @param data_x:  matrix 
   # @param bootNo: integer 
   # etc.
   # @stability : needs much more debugging to see how the results are stacked
   # and returned
-function(data_x, bootNo=4L, nrows=nrow(data_x), ncpus=2L, dom_peak_no=1L,
-         bw_selector=Hscv, w=rep.int(1, nrow(data_x)))
-{ 
   cl <- makeCluster(ncpus, "FORK")
   ix_list <- lapply(1:bootNo, function(i) 
                     ix <- sample(1:nrows, nrows, replace=T))
@@ -249,12 +236,9 @@ function(data_x, bootNo=4L, nrows=nrow(data_x), ncpus=2L, dom_peak_no=1L,
   return(t(res))
 }
 
-
-plot_bootst_KDE_peaks=
+plot_bootst_KDE_peaks = function(bt_peaks, truth=NULL){
   # rough draft of how we can plot the peaks
   # params bt_peaks = vector from bootstrap_KDE function
-function(bt_peaks, truth=NULL)
-{
   
   # assuming that we really just select the first 2 peaks
   plot(rbind(t(bt_peaks[1:2,]), t(bt_peaks[3:4, ])), 
@@ -262,11 +246,9 @@ function(bt_peaks, truth=NULL)
   title('bootstrapped peak locations')
 }
 
-sort_peaks=
+sort_peaks = function(peaks){
   # sort according to the x coordinate  
-function(peaks)
-{
- peaks <- peaks[, sort(peaks[1,], index.return=T)$ix]  
+  peaks <- peaks[, sort(peaks[1,], index.return=T)$ix]  
 }
 
 
