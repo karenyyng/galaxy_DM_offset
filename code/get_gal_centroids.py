@@ -147,8 +147,8 @@ def cut_reliable_galaxies(df, DM_cut=1e3, star_cut=1e2):
     :notes:
     http://illustris-project.org/w/index.php/Data_Details#Snapshot_Contents
     """
-    return np.logical_and(df["SubhaloLenType1"] > DM_cut,
-                          df["SubhaloLenType4"] > star_cut)
+    return np.array(np.logical_and(df["SubhaloLenType1"] > DM_cut,
+                                   df["SubhaloLenType4"] > star_cut))
 
 
 def compute_KDE_peak_offsets(df, f, clstNo, cut_method, cut_kwargs, w=None,
@@ -200,6 +200,7 @@ def compute_shrinking_aperture_offset(df, f, clstNo, cut_method, cut_kwargs,
     data = np.array(df[col][mask])
 
     if w is not None:  # make sure the weight dimensions match data
+        w = np.array(w)  # convert pandas weights to np.array
         w = w[mask]
 
     shrink_cent = shrinking_apert(data, w=w)
@@ -372,6 +373,8 @@ def shrinking_apert(data, center_coord=None, r0=None, debug=False, w=None):
 
     if w is None:
         w = np.ones(len(data))
+    elif len(w) != len(data):
+        raise InputError("length mismatch between data `data` and weights `w`")
 
     if center_coord is not None:
         c1 = np.array(center_coord)
@@ -479,7 +482,8 @@ def compute_weighted_centroids(x, w=None):
     elif w.ndim == 1:
         w = w.reshape(w.shape[0], 1)
 
-    assert len(x) == len(w), "row no of data and weights have to be the same"
+    if len(x) != len(w):
+        raise InputError("length of data and weights have to be the same")
     return np.sum(x * w, axis=0) / np.sum(w)
 
 
