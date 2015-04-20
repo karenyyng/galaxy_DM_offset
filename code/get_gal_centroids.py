@@ -198,8 +198,11 @@ def compute_shrinking_aperture_offset(df, f, clstNo, cut_method, cut_kwargs,
 
     col = ["SubhaloPos0", "SubhaloPos1"]
     data = np.array(df[col][mask])
-    shrink_cent = np.array([shrinking_apert(d, w) for d in data])
 
+    if w is not None:  # make sure the weight dimensions match data
+        w = w[mask]
+
+    shrink_cent = shrinking_apert(data, w=w)
     return compute_euclidean_dist(shrink_cent)
 
 
@@ -409,7 +412,8 @@ def shrinking_apert(data, center_coord=None, r0=None, debug=False, w=None):
                                                               np.sum(mask))
             print "mdist = {0}".format(mdist)
         c0 = c1
-        c1 = compute_weighted_centroids(data[mask], w=w[mask])  # compute new centroid
+        # compute new centroid
+        c1 = compute_weighted_centroids(data[mask], w=w[mask])
         dist = compute_euclidean_dist(data - c1)  # compute new dist
         r0 *= 0.95  # shrink the aperture
         mask = dist < r0
