@@ -50,8 +50,8 @@ def find_peaks_from_py_diff(fhat, estKey="estimate", gridKey="eval_points"):
     rowIx, colIx = check_peak_higher_than_corner_values(fhat, rowIx, colIx)
     rowIx, colIx = sort_peaks_with_decreasing_density(fhat, rowIx, colIx)
 
-    fhat["peaks_xcoords"] = fhat["eval_points"][0][rowIx]
-    fhat["peaks_ycoords"] = fhat["eval_points"][1][colIx]
+    fhat["peaks_xcoords"] = fhat[gridKey][0][rowIx]
+    fhat["peaks_ycoords"] = fhat[gridKey][1][colIx]
     fhat["peaks_rowIx"] = rowIx
     fhat["peaks_colIx"] = colIx
 

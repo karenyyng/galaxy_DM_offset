@@ -11,6 +11,7 @@ import pytest
 
 # def test_get_py_peaks_and_density_weights():
 #     """ Regression test """
+#     x =
 #     res = do_KDE_and_get_peaks(x)
 #     fhat = convert_fhat_to_dict(res)
 #
@@ -35,6 +36,7 @@ import pytest
 #     plot_KDE_peaks(fhat, allPeaks=True, showData=True)
 #     return
 
+
 @pytest.fixture
 def test_data1():
     fhat = {}
@@ -46,21 +48,24 @@ def test_data1():
                                  [1, 1, 1, 1, 2, 1, 1],
                                  [1, 1, 1, 1, 1, 1, 1]])
 
-    a = np.arange(fhat["estimate"].shape[0])
-    fhat["eval_points"] = np.vstack((a, a))
-    return fhat["estimate"]
+    fhat["eval_points"] = np.array([range(fhat["estimate"].shape[0]),
+                                    range(fhat["estimate"].shape[1])])
+
+    return fhat
 
 
-# def test_find_peak_from_py_deriv():
-#     fhat = test_data1()
-#     # ans put in descending density
-#     correct_peaks_rowIx = [2, 3]
-#     correct_peaks_colIx = [2, 4]
-#
-#     assert fhat["peak_x"] == correct_peaks_rowIx
-#     assert fhat["peak_y"] == correct_peaks_rowIx
-#
-#     return
+def test_find_peaks_from_py_deriv(test_data1):
+    fhat = test_data1
+    # ans put in descending density
+    correct_peaks_rowIx = [2, 3]
+    correct_peaks_colIx = [2, 4]
+
+    find_peaks_from_py_diff(fhat)
+
+    assert np.array_equal(fhat["peaks_rowIx"], correct_peaks_rowIx)
+    assert np.array_equal(fhat["peaks_colIx"], correct_peaks_colIx)
+
+    return
 
 
 def test_compute_centroids():
@@ -92,7 +97,3 @@ def test_shrink_apert_no_weights():
 
     return
 
-if __name__ == "__main__":
-    x = test_data1()  # random seed is set to 8192 by default
-    test_get_py_peaks_and_density_weights(x)
-    # test_weights_of_do_KDE_and_get_peaks(x)
