@@ -6,6 +6,12 @@ If you use any part of this repo, please cite Ng et al. (in prep)
 
 
 # prerequisites 
-* package_version.md 
+* see `/code/package_version.txt`
+
+To install the package prerequisites, use `pip`:
+```bash
+$ pip install -r /code/package_version.txt
+```
+You are advised to install the package prerequisites to a python virtual environment.
 
 

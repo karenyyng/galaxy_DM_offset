@@ -245,20 +245,34 @@ def compute_shrinking_aperture_offset(df, f, clstNo, cut_method, cut_kwargs,
             "Haven't generalized to compute offset for ndim > 2")
 
 
-def convert_fhat_to_df(fhat, clstNo, weights_used=None):
+def convert_dict_to_df(fhat, clstNo, wt=None, phi=0, xi=0):
     """
     :param fhat: python dictionary obtained from `convert_rfhat_to_dict`
+    :param clstNo: integer, denotes which cluster the data belong to
     :param weights_used: string, metadata about the data set
     """
     fixed_size_data_keys = ["eval_points", "estimate", "bandwidth_matrix_H"]
     variable_size_data_keys = ["peaks_xcoords", "peaks_ycoords", "peaks_rowIx",
-                               "peaks_colIx"]
+                               "peaks_colIx", "peak_dens", "normed_peak_dens"]
 
 
 
     return
 
+
+def convert_fhat_pkl_to_h5():
+    return
+
+
+def same_projection(phi1, xi1, phi2, xi2):
+    """
+    determine
+    """
+    return
+
 # ------------python wrapper to ks_KDE.r code ---------------------------
+
+
 def convert_rfhat_to_dict(r_fhat):
     """preserves the returned object structure with a dict
     :param r_fhat: robject of the output evaluated from ks.KDE
@@ -288,6 +302,10 @@ def get_density_weights(fhat, ix_rkey="peaks_rowIx",
                         ix_ckey="peaks_colIx",
                         pt_key="eval_points"):
     """
+    :param fhat: python dict containing the following keys
+    :param ix_rkey: string, key of dict / df that contains the rowIx
+    :param ix_ckey: string, key of dict / df that contains the colIx
+    :param pt_ckey: string, key of dict / df that contains the eval_point
     :note: fhat is passed by reference, fhat is modified!
     """
     rowIx = fhat[ix_rkey]
@@ -317,7 +335,7 @@ def gaussian_mixture_data(samp_no=int(5e2), cwt=1. / 11., set_seed=True):
 
     :returns: R matrix of coords
     """
-    return robjects.r["gaussian_mixture_data"](samp_no, cwt, set_seed=True)
+    return robjects.r["gaussian_mixture_data"](samp_no, cwt, set_seed=set_seed)
 
 
 def do_KDE(x, w=None, dom_peak_no=1):
@@ -531,7 +549,7 @@ def get_BCG(df, DM_cut=1e3, star_cut=1e2):
     """
     # sort by U, B, V, K, g, r, i, z bands
     # magnitude : brighter = smaller magnitude
-    raise NotImplemented
+    raise NotImplementedError("Haven't implemented get_BCG")
 
     return
 
@@ -568,7 +586,8 @@ def mag_to_lum(mag):
 
 def get_shrinking_apert_conf_reg(data_realizations):
     """
-    :param data_realizations: list of data_realizations
+    :param data_realizations: list of data sets
+        each generated from same distribution
 
     :return fhat: dictionary of properties
         of shrinking aperture peaks

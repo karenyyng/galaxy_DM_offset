@@ -2,9 +2,9 @@
 source("../ks_KDE.r")
 
 
-test_find_peaks_from_2nd_deriv= 
-function()
-{
+test_find_peaks_from_2nd_deriv = function(){
+  # I need to adjust the answer that we test against 
+  # also fix this code
   dens <- rbind(c(1, 1, 1, 1, 1, 1),
                 c(1, 8, 3, 2, 1, 1),
                 c(1, 7, 9, 3, 1, 1),
@@ -28,9 +28,9 @@ function()
 }
 
 
-test_do_KDE_with_weights=
-function()
-{
+test_do_KDE_with_weights = function(){
+  # @note I don't think `do_KDE_and_get_peaks` works now
+  # it might have been commneted out 
   # want to test on same data set
   x <- gaussian_mixture_data(set_seed=T)
   orig <- c(-2, 2)
