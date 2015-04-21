@@ -140,6 +140,7 @@ def cut_reliable_galaxies(df, DM_cut=1e3, star_cut=1e2):
         subhalos to be reliable
     :params star_cut: integer, how many stellar particles needed for us to
         consider subhalos to be reliable
+    :returns: numpy array of booleans
 
     :usage:
         >>> cut_reliable_galaxies(df, **cut_kwargs)
@@ -152,29 +153,31 @@ def cut_reliable_galaxies(df, DM_cut=1e3, star_cut=1e2):
 
 
 def compute_KDE_peak_offsets(df, f, clstNo, cut_method, cut_kwargs, w=None,
-                             verbose=False):
+                             col=["SubhaloPos0", "SubhaloPos1"],
+                             projection=None, verbose=False):
     """
-    :params df: pandas dataframe for each cluster
-    :params cut_method: function
-    :params w: floats, weight
+    :param df: pandas dataframe for each cluster
+    :param cut_method: function
+    :param w: floats, weight
+    :param col: list of strings, the strings should be df keys
+    :param projection: 2-tuple of floats, (theta, phi), not yet implemented
 
     :return: list of [offset, offsetR200]
         offset: offset in unit of c kpc/h
         offset: offset in terms of the R200C of the cluster
     :to do:
-        needs major revamp to restructure the outputs
+        * needs major revamp to restructure the outputs, i.e. fhat
+        * may want to check the dimension of input data
     :note:
         can think of making this function even more general
         by having the peak inference function passed in
     """
     # prepare the data for KDE
     mask = cut_method(df, **cut_kwargs)
+    data = np.array(df[col][mask])
+
     if verbose:
         print "# of subhalos after the cut = {0}".format(np.sum(mask))
-
-    col = ["SubhaloPos0", "SubhaloPos1"]
-    data = np.array(df[col][mask])
-    print "data shape is ", data.shape
 
     fhat = do_KDE_and_get_peaks(data, w=w)
 
@@ -191,12 +194,37 @@ def compute_KDE_peak_offsets(df, f, clstNo, cut_method, cut_kwargs, w=None,
 
 
 def compute_shrinking_aperture_offset(df, f, clstNo, cut_method, cut_kwargs,
-                                      w=None, verbose=True):
+                                      w=None, verbose=True,
+                                      col=["SubhaloPos0", "SubhaloPos1"],
+                                      projection=None, output='both'):
+    """
+    :param df: pandas dataframe for each cluster
+    :param cut_method: function
+    :param w: floats, weight
+    :param col: list of strings, the strings should be df keys
+    :param projection: 2-tuple of floats, (theta, phi), not yet implemented
+
+    :return:
+        if output is 'both'
+        list of [1st_spatial_peak_loc, 2nd_spatial_peak_loc, offset]
+
+        offset: offset is in unit of c kpc/h
+
+
+
+    :to do:
+        needs major revamp to restructure the outputs, i.e. fhat
+    :note:
+        can think of making this function even more general
+        by having the peak inference function passed in
+    """
+    if output not in ['both', 'peaks_only', 'offsets_only']:
+        raise NotImplementedError("Implemented output types are " +
+                                  "`both`, `peaks_only`, `offsets_only`")
     mask = cut_method(df, **cut_kwargs)
     if verbose:
         print "# of subhalos after the cut = {0}".format(np.sum(mask))
 
-    col = ["SubhaloPos0", "SubhaloPos1"]
     data = np.array(df[col][mask])
 
     if w is not None:  # make sure the weight dimensions match data
@@ -204,7 +232,17 @@ def compute_shrinking_aperture_offset(df, f, clstNo, cut_method, cut_kwargs,
         w = w[mask]
 
     shrink_cent = shrinking_apert(data, w=w)
-    return compute_euclidean_dist(shrink_cent)
+    offset = compute_euclidean_dist(shrink_cent)
+
+    if shrink_cent.ndim == 2 and output == 'both':
+        return np.array([shrink_cent[0], shrink_cent[1], offset])
+    elif output == 'peaks_only':
+        return shrink_cent
+    elif output == 'offsets_only':
+        return offset
+    else:
+        raise NotImplementedError(
+            "Haven't generalized to compute offset for ndim > 2")
 
 
 def convert_fhat_to_df(fhat, clstNo, weights_used=None):

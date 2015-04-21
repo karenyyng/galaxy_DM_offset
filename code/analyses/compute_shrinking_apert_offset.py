@@ -1,6 +1,7 @@
 # ------------ read in df to be appended------------------
 import pandas as pd
-old_df = pd.read_hdf("../../data/offset_stat_129.h5", "df")
+storage_h5 = "../../data/offset_stat_129.h5"
+old_df = pd.read_hdf(storage_h5, "df")
 
 # ---------- import other libraries -------------
 import numpy as np
@@ -31,11 +32,13 @@ file_suffix = '_{0}'.format(allClst) + '.h5'
 print "examining {0} clusters in total".format(allClst)
 
 # ------------ script parameters --------------------------------
+save = False
 compute_relaxedness0 = False
 
 # weights to be used, DON"T CHANGE THE ORDER, last key should be i_lum
 wts_keys = ["SubhaloMass", "SubhaloMassType4", "i_lum"]
-wt_suffix = ["tot_mass", "stel_mass", "I_band_lum"]
+# should incorporate projection info in the key later on
+wt_suffix = ["subhalo_mass", "stel_mass", "I_band_lum"]
 wt_suffix = [wt + "_shrink" for wt in wt_suffix]
 
 
@@ -48,32 +51,34 @@ for df in df_list:
 
 results = {}
 df_outlist = []
-j = 0
-file_suffix = "_" + wt_suffix[j] + '.pkl'
 
 for j, wts_key in enumerate(wts_keys):
-    # alternative syntax for line below is do a groupby using clusterNo then
-    # use apply using lambda function
-    offsets_list = \
-        [cent.compute_shrinking_aperture_offset(df_list[i], f, i,
-                                                cent.cut_reliable_galaxies,
-                                                cut_kwargs,
-                                                w=df_list[i][wts_key])
-         for i in range(allClst)]
+    # this gives a df containing [peak_loc1, peak_loc2, offset]
+    # for each type of weights
+    out_df = pd.DataFrame(
+        [cent.compute_shrinking_aperture_offset(
+            df_list[i], f, i, cent.cut_reliable_galaxies, cut_kwargs,
+            w=df_list[i][wts_key])
+            for i in range(allClst)],
+        columns=[wt_suffix[j] + "_peak0",
+                 wt_suffix[j] + "_peak1",
+                 wt_suffix[j]])
 
-    # put offset list with different weights each become a col of data frame
-    df_outlist.append(pd.DataFrame(offsets_list,
-                                   columns=[wt_suffix[j]]))
+    # gather 3-col dfs with different weights
+    df_outlist.append(out_df)
 
-
-# cbind aka column bind
-# df = pd.concat(df_outlist, axis=1)
+# cbind aka column bind the different 3-col df to become one big df
+out_df = pd.concat(df_outlist, axis=1)
 
 if compute_relaxedness0:
     df["relaxedness1"] = [cp.compute_relaxedness0(df_list[i], f, i) for i in
                           range(allClst)]
 
 f.close()
+
+if save:
+    out_df.to_hdf(storage_h5, "shrink_df")
+
 #---- Example code for appending to existing dataframe----------
 # pd.concat([old_df, df], axis=1)
 
