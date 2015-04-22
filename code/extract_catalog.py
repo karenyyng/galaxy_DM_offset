@@ -28,10 +28,6 @@ def default_keys():
 
 def extract_clst(f, clstNo, output=False, keys=default_keys(),
                  fix_phot_band=True, outputFolder="../../data/", verbose=True):
-    """
-    :param f: filestream object to the hdf5 file
-    :param clstNo: integer that denotes the cluster number
-    """
 
     clst_df = pd.DataFrame(fix_clst_cat(f, clstNo, keys))
 
@@ -202,7 +198,7 @@ extract_clst.__doc__ = \
     :fix_phot_band: bool, whether to change the names of photometric bands
     :verbose: bool, if printing is wanted
 
-    :return: None
+    :return: clst_df
 
     :stability: works
 

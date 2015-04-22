@@ -543,15 +543,34 @@ def compute_weighted_centroids(x, w=None):
     return np.sum(x * w, axis=0) / np.sum(w)
 
 
-def get_BCG(df, DM_cut=1e3, star_cut=1e2):
+def get_BCG_ix(df, DM_cut=1e3, star_cut=1e2,
+               bands=None, verbose=True):
     """ return the position information of the BCG
-    :param df: pandas dataframe containing all subhalos of each cluster
+    :param df: pandas dataframe, contains all subhalos of each cluster
+    :param DM_cut: integer,
+        no. of DM particles that we require for a subhalo to be qualified as a
+        galaxy
+    :param gal_cut: integer,
+        no. of star particles that we require for a subhalo to be qualified as
+        a galaxy
     """
     # sort by U, B, V, K, g, r, i, z bands
     # magnitude : brighter = smaller magnitude
-    raise NotImplementedError("Haven't implemented get_BCG")
+    df = df[cut_reliable_galaxies(df, DM_cut, star_cut)]
 
-    return
+    if bands is None:
+        bands = [k for k in df.keys() if "band" in k]
+
+    ixes = np.argmin(np.array(df[bands]), axis=0)
+
+    if len(np.unique(ixes)) == 1:
+        print("BCG is consistently the brightest in all bands")
+        return ixes[0]
+    else:
+        print("BCG is not consistently the brightest in all bands" +
+              "no of bright galaxies = {0}".format(np.unique(ixes)))
+        return ixes
+
 
 
 def sort_peaks_with_decreasing_density(fhat, rowIx, colIx):
