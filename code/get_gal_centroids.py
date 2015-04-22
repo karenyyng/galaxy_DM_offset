@@ -544,32 +544,39 @@ def compute_weighted_centroids(x, w=None):
 
 
 def get_BCG_ix(df, DM_cut=1e3, star_cut=1e2,
-               bands=None, verbose=True):
-    """ return the position information of the BCG
-    :param df: pandas dataframe, contains all subhalos of each cluster
-    :param DM_cut: integer,
-        no. of DM particles that we require for a subhalo to be qualified as a
-        galaxy
-    :param gal_cut: integer,
-        no. of star particles that we require for a subhalo to be qualified as
-        a galaxy
+               bands=None, verbose=False):
     """
+    :param df: pandas dataframe, contains all subhalos of each cluster
+    :param DM_cut (optional): integer,
+        min. no. of DM particles that we require for a subhalo to be qualified
+        as a galaxy
+    :param gal_cut (optional): integer,
+        min. no. of star particles that we require for a subhalo to be
+        qualified as a galaxy
+    :param bands (optional): list of strings, each string should be a key
+        in the df. If not provided, default redder bands are used.
+
+    :returns: the row index of the BCG in the dataframe
+        if the BCG is not the brightest in all bands,
+        the galaxy that are the brightest in most number of bands is returned
+    """
+    from scipy.stats import mode
     # sort by U, B, V, K, g, r, i, z bands
     # magnitude : brighter = smaller magnitude
     df = df[cut_reliable_galaxies(df, DM_cut, star_cut)]
 
     if bands is None:
-        bands = [k for k in df.keys() if "band" in k]
+        bands = ['r_band', 'i_band', 'z_band', 'K_band']
 
     ixes = np.argmin(np.array(df[bands]), axis=0)
 
-    if len(np.unique(ixes)) == 1:
+    if len(np.unique(ixes)) == 1 and verbose:
         print("BCG is consistently the brightest in all bands")
-        return ixes[0]
-    else:
-        print("BCG is not consistently the brightest in all bands" +
+        # return ixes[0]
+    elif verbose:
+        print("BCG is not consistently the brightest in all bands\n" +
               "no of bright galaxies = {0}".format(np.unique(ixes)))
-        return ixes
+    return mode(ixes)[0][0]
 
 
 

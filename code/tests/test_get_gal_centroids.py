@@ -63,7 +63,7 @@ def test_compute_weighted_centroids():
 
 
 def test_shrink_apert_no_weights():
-    data = draw_gaussian(mean=np.ones(2), cov=np.eye(2), data_size=50000)
+    data = draw_gaussian(mean=np.ones(2), cov=np.eye(2), data_size=10000)
     shrink_peak = shrinking_apert(data)
 
     assert np.abs(shrink_peak[0] - 1.) < 1e-1  # performance may vary
@@ -74,6 +74,8 @@ def test_shrink_apert_no_weights():
 
 def test_get_BCG_without_cuts():
     bands = ["U_band", "B_band"]
+
+    # test_df has increasing magnitude, smaller is brighter
     test_df = pd.DataFrame(np.array([[i, j]
                                     for i in np.arange(1, 5)
                                     for j in np.arange(5, 10)]),
@@ -83,6 +85,7 @@ def test_get_BCG_without_cuts():
 
     ix = get_BCG_ix(test_df, DM_cut=0, star_cut=0)
 
+    # correct BCG is the first entry
     assert ix == 0
 
     return
