@@ -73,7 +73,7 @@ def test_shrink_apert_no_weights():
 
 
 def test_get_BCG_without_cuts():
-    bands = ["U_band", "B_band"]
+    bands = ["r_band", "i_band"]
 
     # test_df has increasing magnitude, smaller is brighter
     test_df = pd.DataFrame(np.array([[i, j]
@@ -83,7 +83,7 @@ def test_get_BCG_without_cuts():
     test_df["SubhaloLenType1"] = np.ones(test_df.shape[0])
     test_df["SubhaloLenType4"] = np.ones(test_df.shape[0])
 
-    ix = get_BCG_ix(test_df, DM_cut=0, star_cut=0)
+    ix = get_BCG_ix(test_df, DM_cut=0, star_cut=0, bands=bands)
 
     # correct BCG is the first entry
     assert ix == 0
