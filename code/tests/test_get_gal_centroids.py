@@ -66,8 +66,8 @@ def test_shrink_apert_no_weights():
     data = draw_gaussian(mean=np.ones(2), cov=np.eye(2), data_size=10000)
     shrink_peak = shrinking_apert(data)
 
-    assert np.abs(shrink_peak[0] - 1.) < 1e-1  # performance may vary
-    assert np.abs(shrink_peak[1] - 1.) < 1e-1
+    assert np.abs(shrink_peak[0] - 1.) < 5e-1  # performance may vary
+    assert np.abs(shrink_peak[1] - 1.) < 5e-1
 
     return
 
