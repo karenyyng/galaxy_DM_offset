@@ -584,6 +584,31 @@ def get_BCG_ix(df, DM_cut=1e3, star_cut=1e2,
         return np.unique(ixes)
 
 
+def get_BCG_offset(df, phi=None, xi=None,
+                   cut_kwargs={"DM_cut": 1e3, "star_cut": 1e2},
+                   bands=None, verbose=False):
+    """
+    :param df: pandas dataframe with dataframe containing
+        subhalos of each clusters, i.e. output from calling extract_clst from
+        using list comprehension
+    :param phi: (NOT IMPLEMENTED) float, azimuthal angle
+    :param xi: (NOT IMPLEMENTED) float, elevation angle
+    :param cut_kwargs: (optional) dictionary of cuts parameters,
+        that should be used to ensure subhalos correspond to galaxies
+    :param bands: (optional) list of strings that correspond to the name of the
+        bands for use to determine which galaxy is a BCG
+    :param verbose: (optional) boolean, any message should be printed
+    """
+    ix = get_BCG_ix(df, bands=bands, **cut_kwargs)
+    if phi is None and xi is None:
+        BCG_offset = \
+            np.array(df[["SubhaloPos0", "SubhaloPos1"]].iloc[ix])
+        return np.sqrt(np.dot(BCG_offset, BCG_offset))
+    else:
+        raise NotImplementedError("general projection not implemented")
+
+
+
 
 def sort_peaks_with_decreasing_density(fhat, rowIx, colIx):
     """

@@ -91,6 +91,24 @@ def test_get_BCG_without_cuts():
     return
 
 
+def test_get_BCG_offsets_without_cuts():
+    bands = ["r_band", "i_band"]
+
+    # test_df has increasing magnitude, smaller is brighter
+    test_df = pd.DataFrame(np.array([[i, j]
+                                    for i in np.arange(1, 5)
+                                    for j in np.arange(5, 10)]),
+                           columns=bands)
+    test_df["SubhaloLenType1"] = np.ones(test_df.shape[0])
+    test_df["SubhaloLenType4"] = np.ones(test_df.shape[0])
+    test_df["SubhaloPos0"] = np.arange(3, 3 + test_df.shape[0])
+    test_df["SubhaloPos1"] = np.arange(6, 6 + test_df.shape[0])
+
+    # correct BCG is the first entry
+    assert get_BCG_offset(test_df, cut_kwargs={"DM_cut": 0, "star_cut": 0},
+                          bands=bands) == np.sqrt(3. ** 2 + 6. ** 2)
+    return
+
 # def test_get_py_peaks_and_density_weights():
 #     """ Regression test """
 #     x =
