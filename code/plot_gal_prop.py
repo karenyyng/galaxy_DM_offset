@@ -120,7 +120,8 @@ def plot_KDE_peaks(fhat, lvls=range(2, 100, 10), allPeaks=False,
                    fileName="KDE_plot_cluster", clstNo=None,
                    clabel=False, showData=False, xlabel="x (kpc / h)",
                    ylabel="y (kpc / h)", showDomPeak=True,
-                   fileDir="../plots/", fill=False, showContour=True, ax=None):
+                   fileDir="../plots/", fill=False, showContour=True,
+                   ax=None, fig=None):
     """make a plot of the fhat along with other important info
     :param fhat:
     """
@@ -157,8 +158,8 @@ def plot_KDE_peaks(fhat, lvls=range(2, 100, 10), allPeaks=False,
     if showDomPeak:
         ax.plot(fhat["peaks_xcoords"][0],
                 fhat["peaks_ycoords"][0],
-                's', mew=1.5, markersize=9, label='dominant KDE peak',
-                fillstyle='none', color='orange')
+                's', mew=4., markersize=9, label='dominant KDE peak',
+                fillstyle='none', color='gold')
 
     ax.set_title("Clst {0}: ".format(clstNo) +
                  "No of peaks found = {0}\n".format(len(fhat["peaks_dens"])) +
@@ -168,10 +169,10 @@ def plot_KDE_peaks(fhat, lvls=range(2, 100, 10), allPeaks=False,
     # ax.set_xticklabels(ax.get_xticklabels(), rotation=45)
 
     if R200C is not None:
-        R200_circl = plt.Circle((0, 0), radius=R200C, color='g', lw=2,
+        R200_circl = plt.Circle((0, 0), radius=R200C, color='k', lw=2,
                                 ls='solid', fill=False, label="R200C")
-        plt.plot(0, 0, 'go', fillstyle='none', label='center of R200C circle',
-                 mew=1.5)
+        plt.plot(0, 0, 'ko', fillstyle='none', label='center of R200C circle',
+                 mew=1.5, ms=10)
         # fig = plt.gcf()
         fig.gca().add_artist(R200_circl)
 

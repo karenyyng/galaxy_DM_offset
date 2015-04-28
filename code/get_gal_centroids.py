@@ -544,17 +544,19 @@ def compute_weighted_centroids(x, w=None):
 
 
 def get_BCG_ix(df, DM_cut=1e3, star_cut=1e2,
-               bands=None, verbose=False):
+               bands=None, verbose=False, brightest_only=True):
     """
     :param df: pandas dataframe, contains all subhalos of each cluster
-    :param DM_cut (optional): integer,
+    :param DM_cut: (optional) integer,
         min. no. of DM particles that we require for a subhalo to be qualified
         as a galaxy
-    :param gal_cut (optional): integer,
+    :param gal_cut: (optional) integer,
         min. no. of star particles that we require for a subhalo to be
         qualified as a galaxy
-    :param bands (optional): list of strings, each string should be a key
+    :param bands: (optional) list of strings, each string should be a key
         in the df. If not provided, default redder bands are used.
+    :param brightest_only: (optional) boolean, if only the galaxy that is
+    brighter in more number of bands is returned
 
     :returns: the row index of the BCG in the dataframe
         if the BCG is not the brightest in all bands,
@@ -576,7 +578,10 @@ def get_BCG_ix(df, DM_cut=1e3, star_cut=1e2,
     elif verbose:
         print("BCG is not consistently the brightest in all bands\n" +
               "no of bright galaxies = {0}".format(np.unique(ixes)))
-    return mode(ixes)[0][0]
+    if brightest_only:
+        return mode(ixes)[0][0]
+    else:
+        return np.unique(ixes)
 
 
 
