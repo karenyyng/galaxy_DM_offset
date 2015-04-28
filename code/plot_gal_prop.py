@@ -120,21 +120,23 @@ def plot_KDE_peaks(fhat, lvls=range(2, 100, 10), allPeaks=False,
                    fileName="KDE_plot_cluster", clstNo=None,
                    clabel=False, showData=False, xlabel="x (kpc / h)",
                    ylabel="y (kpc / h)", showDomPeak=True,
-                   fileDir="../plots/", fill=False, showContour=True):
+                   fileDir="../plots/", fill=False, showContour=True, ax=None):
     """make a plot of the fhat along with other important info
     :param fhat:
     """
 
-    plt.axes().set_aspect('equal')
+    if ax is None:
+        fig = plt.figure()
+        ax = fig.add_subplot(111, aspect='equal')
 
     if showContour:
         plot_cf_contour(fhat["estimate"],
                         fhat["eval_points"][0], fhat["eval_points"][1],
-                        lvls=lvls, clabel=clabel, fill=fill)
+                        lvls=lvls, clabel=clabel, fill=fill, ax=ax)
 
     if plotDataPoints:
-        plt.plot(fhat["data_x"].transpose()[0],
-                 fhat["data_x"].transpose()[1], 'r.', alpha=1)
+        ax.plot(fhat["data_x"].transpose()[0],
+                fhat["data_x"].transpose()[1], 'r.', alpha=1)
 
     low_xlim, up_xlim = plt.xlim()
     low_ylim, up_ylim = plt.ylim()
@@ -145,35 +147,35 @@ def plot_KDE_peaks(fhat, lvls=range(2, 100, 10), allPeaks=False,
     if allPeaks:
         cm = plt.cm.get_cmap('bwr')
         for i in range(len(fhat["peaks_dens"])):
-            sc = plt.scatter(fhat["peaks_xcoords"][i],
-                             fhat["peaks_ycoords"][i],
-                             c=fhat["peaks_dens"][i],
-                             cmap=cm, vmin=0, vmax=1.0, edgecolor='k',
-                             s=35, marker='s')
-        plt.colorbar(sc)
+            sc = ax.scatter(fhat["peaks_xcoords"][i],
+                            fhat["peaks_ycoords"][i],
+                            c=fhat["peaks_dens"][i],
+                            cmap=cm, vmin=0, vmax=1.0, edgecolor='k',
+                            s=35, marker='s')
+        fig.colorbar(sc)
 
     if showDomPeak:
-        plt.plot(fhat["peaks_xcoords"][0],
-                 fhat["peaks_ycoords"][0],
-                 's', mew=1.5, markersize=9, label='dominant KDE peak',
-                 fillstyle='none', color='orange')
+        ax.plot(fhat["peaks_xcoords"][0],
+                fhat["peaks_ycoords"][0],
+                's', mew=1.5, markersize=9, label='dominant KDE peak',
+                fillstyle='none', color='orange')
 
-    plt.title("Clst {0}: ".format(clstNo) +
-              "No of peaks found = {0}\n".format(len(fhat["peaks_dens"])) +
-              "Total peak dens = {0:.3g}".format(np.sum(fhat["peaks_dens"])))
-    plt.xlabel(xlabel)
-    plt.ylabel(ylabel)
-    plt.xticks(rotation=45)
+    ax.set_title("Clst {0}: ".format(clstNo) +
+                 "No of peaks found = {0}\n".format(len(fhat["peaks_dens"])) +
+                 "Total peak dens = {0:.3g}".format(np.sum(fhat["peaks_dens"])))
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
+    # ax.set_xticklabels(ax.get_xticklabels(), rotation=45)
 
     if R200C is not None:
         R200_circl = plt.Circle((0, 0), radius=R200C, color='g', lw=2,
                                 ls='solid', fill=False, label="R200C")
         plt.plot(0, 0, 'go', fillstyle='none', label='center of R200C circle',
                  mew=1.5)
-        fig = plt.gcf()
+        # fig = plt.gcf()
         fig.gca().add_artist(R200_circl)
 
-    plt.legend(loc='best', frameon=False)
+    ax.legend(loc='best', frameon=False, numpoints=1)
 
     if save and clstNo is not None:
         plt.savefig(fileDir + fileName + str(clstNo) + ".png",
