@@ -255,6 +255,14 @@ def convert_dict_peaks_to_df(fhat_list, wt, phi=0, xi=0, save=False,
 
     :return: df
     """
+    # check if df already exists
+    try:
+        old_df = pd.read_hdf(output_path + peak_h5, wt + "df")
+        append = True
+    except IOError:
+        append = False
+
+
     peak_df_list = []
     peak_info_keys = ["peaks_xcoords", "peaks_ycoords", "peaks_rowIx",
                       "peaks_colIx", "peaks_dens"]
@@ -267,7 +275,12 @@ def convert_dict_peaks_to_df(fhat_list, wt, phi=0, xi=0, save=False,
         peak_df_list.append(peak_df.copy())
 
     peak_df = pd.concat(peak_df_list, axis=0)
-    peak_df["weight"] = [wt for i in range(peak_df.shape[0])]
+    peak_df["phi"] = [phi for i in range(peak_df.shape[0])]
+    peak_df["xi"] = [xi for i in range(peak_df.shape[0])]
+
+    if append:
+        peak_df = pd.concat(old_df, peak_df, axis=0)
+        peak_df = peak_df.drop_duplicates()
 
     if save:
         peak_df.to_hdf(output_path + peak_h5, wt + "_df", complevel=9,
@@ -284,22 +297,37 @@ def convert_dict_dens_to_h5(fhat_list, wt, phi=0, xi=0, save=False,
     f = h5py.File(output_path + dens_h5, mode="a", compression="gzip",
                   compression_opts=9)
 
-    # first create the group that tells us which wt scheme it uses
-    subgroup = f.create_group(wt)
+    # first create the group that tells us which weighting (wt) scheme it uses
+    try:
+        subgroup = f.create_group(wt)
+    except ValueError:
+        print ("ValueError was raised due to create existing group")
+        subgroup = f[wt]
 
-    # then create the names of each element
-    map(subgroup.create_group, fixed_size_data_keys)
+    # create projection
+    try:
+        subgroup1 = subgroup.create_group(str(phi))
+    except ValueError:
+        print ("ValueError was raised due to create existing group")
+        subgroup1 = f[wt + "/" + str(phi)]
+    try:
+        subgroup2 = subgroup1.create_group(str(xi))
+    except ValueError:
+        print ("ValueError was raised due to create existing group")
+        subgroup2 = f[wt + "/" + str(phi) + "/" + str(xi)]
+
+    # then create the names of each element as a subgroup
+    try:
+        map(subgroup2.create_group, fixed_size_data_keys)
+    except ValueError:
+        print ("ValueError was raised due to create existing subgroups")
 
     for i, fhat in enumerate(fhat_list):
         for fkeys in fixed_size_data_keys:
             # the final key is the clstNo
-            key = wt + "/" + fkeys + "/" + str(i)
-            try:
-                f[key] = fhat[fkeys]
-            except RuntimeError:
-                print ("\nRuntimeError was raised probably due to trying" +
-                       "to overwrite existing object in h5 file " +
-                       "{0}".format(output_path + dens_h5))
+            key = wt + "/" + str(phi) + "/" + str(xi) + "/"  + \
+                fkeys + "/" + str(i)
+            f[key] = fhat[fkeys]
 
     f.close()
     return
