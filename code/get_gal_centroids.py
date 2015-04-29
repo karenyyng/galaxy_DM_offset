@@ -6,7 +6,6 @@ Python functions
 from __future__ import division
 import numpy as np
 import pandas as pd
-import h5py
 import rpy2.robjects as robjects
 from rpy2.robjects.packages import importr
 base = importr("base")  # not really needed in the script
@@ -247,9 +246,8 @@ def compute_shrinking_aperture_offset(df, f, clstNo, cut_method, cut_kwargs,
             "Haven't generalized to compute offset for ndim > 2")
 
 
-def convert_dict_to_df(fhat_list, wt, phi=0, xi=0, save=False,
-                       output_path="../../data", peak_h5="fhat_peak.h5",
-                       dens_h5="fhat_dens.h5"):
+def convert_dict_peaks_to_df(fhat_list, wt, phi=0, xi=0, save=False,
+                             output_path="../data/", peak_h5="fhat_peak.h5"):
     """
     :param fhat_list: list of python dictionary obtained from
         `convert_rfhat_to_dict`
@@ -258,12 +256,8 @@ def convert_dict_to_df(fhat_list, wt, phi=0, xi=0, save=False,
     :return: df
     """
     peak_df_list = []
-    fixed_size_data_keys = ["eval_points", "estimate", "bandwidth_matrix_H"]
     peak_info_keys = ["peaks_xcoords", "peaks_ycoords", "peaks_rowIx",
                       "peaks_colIx", "peaks_dens"]
-
-    if save:
-        f = h5py.File(dens_h5, "a")
 
     for i, fhat in enumerate(fhat_list):
         peak_df = pd.DataFrame()
@@ -272,21 +266,37 @@ def convert_dict_to_df(fhat_list, wt, phi=0, xi=0, save=False,
         peak_df['clstNo'] = i
         peak_df_list.append(peak_df.copy())
 
-        if save:
-            for fkeys in fixed_size_data_keys:
-                f[fkeys + str(i) + "_" + wt] = fhat[fkeys]
-
     peak_df = pd.concat(peak_df_list, axis=0)
     peak_df["weight"] = [wt for i in range(peak_df.shape[0])]
+
     if save:
-        peak_df.to_hdf(peak_h5, wt + "_df")
-        f.close()
+        peak_df.to_hdf(output_path + peak_h5, wt + "_df", complevel=9,
+                       complib="zlib")
 
     return peak_df
 
 
-def convert_fhat_pkl_to_h5():
+def convert_dict_dens_to_h5(fhat_list, wt, phi=0, xi=0, save=False,
+                            output_path="../data/",
+                            dens_h5="fhat_dens.h5"):
+    import h5py
+    fixed_size_data_keys = ["eval_points", "estimate", "bandwidth_matrix_H"]
+    f = h5py.File(output_path + dens_h5, mode="a", compression="gzip",
+                  compression_opts=9)
+
+    for i, fhat in enumerate(fhat_list):
+        for fkeys in fixed_size_data_keys:
+            key = fkeys + str(i) + "_" + wt
+            try:
+                f[key] = fhat[fkeys]
+            except RuntimeError:
+                print ("\nRuntimeError was raised probably due to trying to\n" +
+                       "overwrite existing object in h5 file {0}".format(output_path +
+                                                               dens_h5))
+
+    f.close()
     return
+
 
 
 def same_projection(phi1, xi1, phi2, xi2):
