@@ -608,8 +608,6 @@ def get_BCG_offset(df, phi=None, xi=None,
         raise NotImplementedError("general projection not implemented")
 
 
-
-
 def sort_peaks_with_decreasing_density(fhat, rowIx, colIx):
     """
     :param fhat: dictionary
