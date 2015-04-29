@@ -284,19 +284,25 @@ def convert_dict_dens_to_h5(fhat_list, wt, phi=0, xi=0, save=False,
     f = h5py.File(output_path + dens_h5, mode="a", compression="gzip",
                   compression_opts=9)
 
+    # first create the group that tells us which wt scheme it uses
+    subgroup = f.create_group(wt)
+
+    # then create the names of each element
+    map(subgroup.create_group, fixed_size_data_keys)
+
     for i, fhat in enumerate(fhat_list):
         for fkeys in fixed_size_data_keys:
-            key = fkeys + str(i) + "_" + wt
+            # the final key is the clstNo
+            key = wt + "/" + fkeys + "/" + str(i)
             try:
                 f[key] = fhat[fkeys]
             except RuntimeError:
-                print ("\nRuntimeError was raised probably due to trying to\n" +
-                       "overwrite existing object in h5 file {0}".format(output_path +
-                                                               dens_h5))
+                print ("\nRuntimeError was raised probably due to trying" +
+                       "to overwrite existing object in h5 file " +
+                       "{0}".format(output_path + dens_h5))
 
     f.close()
     return
-
 
 
 def same_projection(phi1, xi1, phi2, xi2):
@@ -322,15 +328,16 @@ def convert_rfhat_to_dict(r_fhat):
 
     :to do: convert this to a h5 object instead
     """
-    return {"data_x": np.array(r_fhat[0]),  # don't have to store
-            "eval_points": np.array(r_fhat[1]),  # fixed 2D size
+    return {"eval_points": np.array(r_fhat[1]),  # fixed 2D size
             "estimate": np.array(r_fhat[2]),  # fixed size
             "bandwidth_matrix_H": np.array(r_fhat[3]),  # fixed size
-            "gridtype": tuple(r_fhat[4]),   # ('linear', 'linear') don't store
-            "gridded": bool(r_fhat[5]),  # don't really have to store this
-            "binned": bool(r_fhat[6]),  # don't really have to store this
-            "names": list(r_fhat[7]),  # useless
-            "weight_w": np.array(r_fhat[8])}  # don't have to store
+            # "gridtype": tuple(r_fhat[4]),   # ('linear', 'linear')
+            # "gridded": bool(r_fhat[5]),  # don't really have to store this
+            # "binned": bool(r_fhat[6]),  # don't really have to store this
+            # "names": list(r_fhat[7]),  # useless
+            # "weight_w": np.array(r_fhat[8]),  # don't have to store
+            # "data_x": np.array(r_fhat[0]),  # don't have to store
+    }
 
 
 def get_density_weights(fhat, ix_rkey="peaks_rowIx",
