@@ -234,7 +234,12 @@ def read_in_data_for_left_3_cols(folder_path="../../data/fig2_data/",
     return gauss_data, bi_data, dumb_data
 
 
-def grid_spec_plot(gauss_data, bimodal_data, dumb_data, figsize=(13, 13)):
+def plot_grid_spec(gauss_data, bimodal_data, dumb_data, figsize=(13, 13)):
+    """
+    :param gauss_data: hdf5 hierarchial data structure
+    :param bimodal_data: hdf5 hierarchial data structure
+    :param dumb_data: hdf5 hierarchial data structure
+    """
     import matplotlib.gridspec as gridspec
     from matplotlib.ticker import MaxNLocator
 
@@ -264,24 +269,42 @@ def grid_spec_plot(gauss_data, bimodal_data, dumb_data, figsize=(13, 13)):
 
     # first row of plots
     xlim, ylim = plot_gauss_data(gauss_data["data"], ax=axArr1[0][0])
-    plot_gauss_contour(*gauss_data.values(), ax=axArr1[0][1], xlim=xlim,
+    plot_gauss_contour(gauss_data["KDE"],
+                       gauss_data["shrink"],
+                       gauss_data["cent"],
+                       ax=axArr1[0][1], xlim=xlim,
                        ylim=ylim)
-    plot_gauss_zoomed_contours(*gauss_data.values()[:-1], ax=axArr2[0][0])
+    plot_gauss_zoomed_contours(gauss_data["KDE"],
+                               gauss_data["shrink"],
+                               gauss_data["cent"],
+                               ax=axArr2[0][0])
 
     # second row of plots
     xlim, ylim = plot_one_big_one_small_gaussian(bimodal_data["data"],
                                                  ax=axArr1[1][0])
-    plot_one_big_one_small_gaussian_contour(*bimodal_data.values(),
+    plot_one_big_one_small_gaussian_contour(bimodal_data["KDE"],
+                                            bimodal_data["shrink"],
+                                            bimodal_data["cent"],
                                             xlim=xlim, ylim=ylim,
                                             ax=axArr1[1][1])
-    plot_one_big_one_small_gaussian_zoomed_contour(*bimodal_data.values()[:-1],
+    plot_one_big_one_small_gaussian_zoomed_contour(bimodal_data["KDE"],
+                                                   bimodal_data["shrink"],
+                                                   bimodal_data["cent"],
                                                    ax=axArr2[1][0])
 
     # third row of plots
     xlim, ylim = plot_dumbbell_data(dumb_data["data"], ax=axArr1[2][0])
-    plot_dumbbell_contour(*dumb_data.values()[:-1], ax=axArr1[2][1],
+    plot_dumbbell_contour(dumb_data["KDE1"],
+                          dumb_data["KDE2"],
+                          dumb_data["shrink"],
+                          dumb_data["cent"],
+                          ax=axArr1[2][1],
                           xlim=xlim, ylim=ylim)
-    plot_dumbbell_zoomed_contour(*dumb_data.values()[:-1], ax=axArr2[2][0])
+    plot_dumbbell_zoomed_contour(dumb_data["KDE1"],
+                                 dumb_data["KDE2"],
+                                 dumb_data["shrink"],
+                                 dumb_data["cent"],
+                                 ax=axArr2[2][0])
 
     return
 
@@ -291,7 +314,8 @@ def plot_gauss_data(gauss_data, ax=None, xlim=None,
     if ax is None:
         fig = plt.figure()
         ax = fig.add_subplot(111)
-    ax.plot(gauss_data[:, 0], gauss_data[:, 1], 'k.', alpha=0.3)
+
+    ax.plot(gauss_data[:][:, 0], gauss_data[:][:, 1], 'k.', alpha=0.3)
     ax.plot(1, 1, 'kx', mew=2, ms=10, label='Mean of Gaussian')
     ax.legend(loc='best', frameon=False)
 
@@ -304,27 +328,27 @@ def plot_gauss_data(gauss_data, ax=None, xlim=None,
 
 
 def plot_gauss_contour(KDE_peak_dens, shrink_peak_dens,
-                       cent_peak_dens, gauss_data, ax=None, xlim=None,
+                       cent_peak_dens, ax=None, xlim=None,
                        ylim=None):
-    plot_cf_contour(KDE_peak_dens["estimate"],
-                    KDE_peak_dens["eval_points"][0],
-                    KDE_peak_dens["eval_points"][1],
+    plot_cf_contour(KDE_peak_dens["estimate"][:],
+                    KDE_peak_dens["eval_points"][:][0],
+                    KDE_peak_dens["eval_points"][:][1],
                     colors=b_colors, ax=ax)
     ax.annotate('KDE peak\nconfidence region', (0.3, 0.62),
                 textcoords='axes fraction',
                 color='b')
 
-    plot_cf_contour(shrink_peak_dens["estimate"],
-                    shrink_peak_dens["eval_points"][0],
-                    shrink_peak_dens["eval_points"][1],
+    plot_cf_contour(shrink_peak_dens["estimate"][:],
+                    shrink_peak_dens["eval_points"][:][0],
+                    shrink_peak_dens["eval_points"][:][1],
                     colors=g_colors, ax=ax)
     ax.annotate('Shrink. apert. peak\nconfidence region', (0.3, 0.25),
                 textcoords='axes fraction',
                 color='g')
 
-    plot_cf_contour(cent_peak_dens["estimate"],
-                    cent_peak_dens["eval_points"][0],
-                    cent_peak_dens["eval_points"][1],
+    plot_cf_contour(cent_peak_dens["estimate"][:],
+                    cent_peak_dens["eval_points"][:][0],
+                    cent_peak_dens["eval_points"][:][1],
                     colors=r_colors, ax=ax)
     ax.annotate('Centroid\nconfidence region', (0.6, 0.5),
                 textcoords='axes fraction',
@@ -350,35 +374,35 @@ def plot_gauss_zoomed_contours(KDE_peak_dens1, shrink_peak_dens1,
         ax = fig.add_subplot(111)
 
     # plot KDE dominant peak contour
-    plot_cf_contour(KDE_peak_dens1["estimate"],
-                    KDE_peak_dens1["eval_points"][0],
-                    KDE_peak_dens1["eval_points"][1],
+    plot_cf_contour(KDE_peak_dens1["estimate"][:],
+                    KDE_peak_dens1["eval_points"][:][0],
+                    KDE_peak_dens1["eval_points"][:][1],
                     colors=b_colors, ax=ax)
 
-    ax.plot(KDE_peak_dens1["peaks_xcoords"][0],
-            KDE_peak_dens1["peaks_ycoords"][0],
+    ax.plot(KDE_peak_dens1["peaks_xcoords"][:][0],
+            KDE_peak_dens1["peaks_ycoords"][:][0],
             'bx', mew=2, markersize=markersize,
             label="KDE peak best est")
 
     # plot shrinking aperture contour
-    plot_cf_contour(shrink_peak_dens1["estimate"],
-                    shrink_peak_dens1["eval_points"][0],
-                    shrink_peak_dens1["eval_points"][1],
+    plot_cf_contour(shrink_peak_dens1["estimate"][:],
+                    shrink_peak_dens1["eval_points"][:][0],
+                    shrink_peak_dens1["eval_points"][:][1],
                     colors=g_colors, ax=ax)
 
-    ax.plot(shrink_peak_dens1["peaks_xcoords"][0],
-            shrink_peak_dens1["peaks_ycoords"][0],
+    ax.plot(shrink_peak_dens1["peaks_xcoords"][:][0],
+            shrink_peak_dens1["peaks_ycoords"][:][0],
             'gx', mew=2, markersize=markersize,
             label="Shrink peak best est")
 
     # plot centroid contour
-    plot_cf_contour(cent_peak_dens1["estimate"],
-                    cent_peak_dens1["eval_points"][0],
-                    cent_peak_dens1["eval_points"][1],
+    plot_cf_contour(cent_peak_dens1["estimate"][:],
+                    cent_peak_dens1["eval_points"][:][0],
+                    cent_peak_dens1["eval_points"][:][1],
                     colors=r_colors, ax=ax)
 
-    ax.plot(cent_peak_dens1["peaks_xcoords"][0],
-            cent_peak_dens1["peaks_ycoords"][0],
+    ax.plot(cent_peak_dens1["peaks_xcoords"][:][0],
+            cent_peak_dens1["peaks_ycoords"][:][0],
             'rx', mew=2, markersize=markersize,
             label="Centroid peak best est")
 
@@ -410,7 +434,7 @@ def plot_one_big_one_small_gaussian(
         fig = plt.figure()
         ax = fig.add_subplot(111)
 
-    ax.plot(bimodal_data[:, 0], bimodal_data[:, 1], 'k.', alpha=0.3)
+    ax.plot(bimodal_data[:][:, 0], bimodal_data[:][:, 1], 'k.', alpha=0.3)
     ax.plot(2, 2, 'kx', mew=2, ms=10, label='Mean of dominant Gaussian')
     ax.plot(0, 0, 'x', color='grey',
             mew=2, ms=10, label='Mean of subdominant Gaussian')
@@ -432,25 +456,25 @@ def plot_one_big_one_small_gaussian_contour(
         fig = plt.figure()
         ax = fig.add_subplot(111)
 
-    plot_cf_contour(KDE_peak_dens1["estimate"],
-                    KDE_peak_dens1["eval_points"][0],
-                    KDE_peak_dens1["eval_points"][1],
+    plot_cf_contour(KDE_peak_dens1["estimate"][:],
+                    KDE_peak_dens1["eval_points"][:][0],
+                    KDE_peak_dens1["eval_points"][:][1],
                     colors=b_colors, ax=ax)
     ax.annotate('KDE peak\nconfidence region', (0.12, 0.52),
                 textcoords='axes fraction',
                 color='b')
 
-    plot_cf_contour(shrink_peak_dens1["estimate"],
-                    shrink_peak_dens1["eval_points"][0],
-                    shrink_peak_dens1["eval_points"][1],
+    plot_cf_contour(shrink_peak_dens1["estimate"][:],
+                    shrink_peak_dens1["eval_points"][:][0],
+                    shrink_peak_dens1["eval_points"][:][1],
                     colors=g_colors, ax=ax)
     ax.annotate('Shrink. apert. peak\nconfidence region', (0.3, 0.7),
                 textcoords='axes fraction',
                 color='g')
 
-    plot_cf_contour(cent_peak_dens1["estimate"],
-                    cent_peak_dens1["eval_points"][0],
-                    cent_peak_dens1["eval_points"][1],
+    plot_cf_contour(cent_peak_dens1["estimate"][:],
+                    cent_peak_dens1["eval_points"][:][0],
+                    cent_peak_dens1["eval_points"][:][1],
                     colors=r_colors, ax=ax)
     ax.annotate('Centroid\nconfidence region', (0.3, 0.42),
                 textcoords='axes fraction',
@@ -479,35 +503,35 @@ def plot_one_big_one_small_gaussian_zoomed_contour(
         ax = fig.add_subplot(111)
 
     # plot KDE dominant peak contour
-    plot_cf_contour(KDE_peak_dens1["estimate"],
-                    KDE_peak_dens1["eval_points"][0],
-                    KDE_peak_dens1["eval_points"][1],
+    plot_cf_contour(KDE_peak_dens1["estimate"][:],
+                    KDE_peak_dens1["eval_points"][:][0],
+                    KDE_peak_dens1["eval_points"][:][1],
                     colors=b_colors, ax=ax)
 
-    ax.plot(KDE_peak_dens1["peaks_xcoords"][0],
-            KDE_peak_dens1["peaks_ycoords"][0],
+    ax.plot(KDE_peak_dens1["peaks_xcoords"][:][0],
+            KDE_peak_dens1["peaks_ycoords"][:][0],
             'bx', mew=2, markersize=markersize,
             label="KDE peak best est")
 
     # plot shrinking aperture contour
-    plot_cf_contour(shrink_peak_dens1["estimate"],
-                    shrink_peak_dens1["eval_points"][0],
-                    shrink_peak_dens1["eval_points"][1],
+    plot_cf_contour(shrink_peak_dens1["estimate"][:],
+                    shrink_peak_dens1["eval_points"][:][0],
+                    shrink_peak_dens1["eval_points"][:][1],
                     colors=g_colors, ax=ax)
 
-    ax.plot(shrink_peak_dens1["peaks_xcoords"][0],
-            shrink_peak_dens1["peaks_ycoords"][0],
+    ax.plot(shrink_peak_dens1["peaks_xcoords"][:][0],
+            shrink_peak_dens1["peaks_ycoords"][:][0],
             'gx', mew=2, markersize=markersize,
             label="Shrink peak best est")
 
     # plot centroid contour
-    plot_cf_contour(cent_peak_dens1["estimate"],
-                    cent_peak_dens1["eval_points"][0],
-                    cent_peak_dens1["eval_points"][1],
+    plot_cf_contour(cent_peak_dens1["estimate"][:],
+                    cent_peak_dens1["eval_points"][:][0],
+                    cent_peak_dens1["eval_points"][:][1],
                     colors=r_colors, ax=ax)
 
-    ax.plot(cent_peak_dens1["peaks_xcoords"][0],
-            cent_peak_dens1["peaks_ycoords"][0],
+    ax.plot(cent_peak_dens1["peaks_xcoords"][:][0],
+            cent_peak_dens1["peaks_ycoords"][:][0],
             'rx', mew=2, markersize=markersize,
             label="Centroid peak best est")
 
@@ -532,7 +556,7 @@ def plot_dumbbell_data(
         fig = plt.figure()
         ax = fig.add_subplot(111)
 
-    ax.plot(dumb_data[:, 0], dumb_data[:, 1], '.', color='grey')
+    ax.plot(dumb_data[:][:, 0], dumb_data[:][:, 1], '.', color='grey')
     ax.plot(2, 2, "ko", mew=2,
             label="Mean of dominant Gaussian", fillstyle='none',
             markersize=markersize)
@@ -554,8 +578,8 @@ def plot_dumbbell_data(
 
 
 def plot_dumbbell_contour(
-        KDE_peak_dens2b,
         KDE_peak_dens2,
+        KDE_peak_dens2b,
         shrink_peak_dens2,
         cent_peak_dens2,
         xlim=None, ylim=None,
@@ -572,17 +596,17 @@ def plot_dumbbell_contour(
     if ylim is not None:
         ax.set_ylim(ylim)
 
-    plot_cf_contour(KDE_peak_dens2["estimate"],
-                    KDE_peak_dens2["eval_points"][0],
-                    KDE_peak_dens2["eval_points"][1],
+    plot_cf_contour(KDE_peak_dens2["estimate"][:],
+                    KDE_peak_dens2["eval_points"][:][0],
+                    KDE_peak_dens2["eval_points"][:][1],
                     colors=b_colors, ax=ax)
     ax.annotate('KDE dominant\npeak confidence region', (0.55, 0.53),
                 textcoords='axes fraction',
                 color='b')
 
-    plot_cf_contour(KDE_peak_dens2b["estimate"],
-                    KDE_peak_dens2b["eval_points"][0],
-                    KDE_peak_dens2b["eval_points"][1],
+    plot_cf_contour(KDE_peak_dens2b["estimate"][:],
+                    KDE_peak_dens2b["eval_points"][:][0],
+                    KDE_peak_dens2b["eval_points"][:][1],
                     colors=b_colors, ax=ax)
 
     ax.annotate('KDE subdominant\npeak confidence region', (0.49, 0.35),
@@ -591,9 +615,9 @@ def plot_dumbbell_contour(
     # ax.figtext(0.49, 0.35, 'KDE subdominant peak\nconfidence region',
     #            color='b')
 
-    plot_cf_contour(shrink_peak_dens2["estimate"],
-                    shrink_peak_dens2["eval_points"][0],
-                    shrink_peak_dens2["eval_points"][1],
+    plot_cf_contour(shrink_peak_dens2["estimate"][:],
+                    shrink_peak_dens2["eval_points"][:][0],
+                    shrink_peak_dens2["eval_points"][:][1],
                     colors=g_colors, ax=ax)
 
     ax.annotate('Shrink apert peak\nconfidence region', (0.45, 0.65),
@@ -602,9 +626,9 @@ def plot_dumbbell_contour(
     # ax.figtext(0.45, 0.65, 'Shrink apert peak\nconfidence region',
     #            color='g')
 
-    plot_cf_contour(cent_peak_dens2["estimate"],
-                    cent_peak_dens2["eval_points"][0],
-                    cent_peak_dens2["eval_points"][1],
+    plot_cf_contour(cent_peak_dens2["estimate"][:],
+                    cent_peak_dens2["eval_points"][:][0],
+                    cent_peak_dens2["eval_points"][:][1],
                     colors=r_colors, ax=ax)
     ax.annotate('Centroid \nconfidence region', (0.43, 0.55),
                 textcoords='axes fraction',
@@ -630,8 +654,8 @@ def plot_dumbbell_contour(
 
 
 def plot_dumbbell_zoomed_contour(
-        KDE_peak_dens2b,
         KDE_peak_dens2,
+        KDE_peak_dens2b,
         shrink_peak_dens2,
         cent_peak_dens2, markersize=10,
         xlim=(0.25, 4), ylim=(-0.6, 4),
@@ -650,25 +674,25 @@ def plot_dumbbell_zoomed_contour(
 
     markersize = 10
     # plot KDE dominant peak contour
-    plot_cf_contour(KDE_peak_dens2["estimate"],
-                    KDE_peak_dens2["eval_points"][0],
-                    KDE_peak_dens2["eval_points"][1],
+    plot_cf_contour(KDE_peak_dens2["estimate"][:],
+                    KDE_peak_dens2["eval_points"][:][0],
+                    KDE_peak_dens2["eval_points"][:][1],
                     colors=b_colors, ax=ax)
 
     # plot KDE subdominant peak contour
-    ax.plot(KDE_peak_dens2["peaks_xcoords"][0],
-            KDE_peak_dens2["peaks_ycoords"][0],
+    ax.plot(KDE_peak_dens2["peaks_xcoords"][:][0],
+            KDE_peak_dens2["peaks_ycoords"][:][0],
             'bx', mew=2, markersize=markersize, fillstyle='none',
             label="KDE peak best est")
 
     # plot shrinking aperture contour
-    plot_cf_contour(shrink_peak_dens2["estimate"],
-                    shrink_peak_dens2["eval_points"][0],
-                    shrink_peak_dens2["eval_points"][1],
+    plot_cf_contour(shrink_peak_dens2["estimate"][:],
+                    shrink_peak_dens2["eval_points"][:][0],
+                    shrink_peak_dens2["eval_points"][:][1],
                     colors=g_colors, ax=ax)
 
-    ax.plot(shrink_peak_dens2["peaks_xcoords"][0],
-            shrink_peak_dens2["peaks_ycoords"][0],
+    ax.plot(shrink_peak_dens2["peaks_xcoords"][:][0],
+            shrink_peak_dens2["peaks_ycoords"][:][0],
             'gx', mew=2, markersize=markersize,
             label="Shrink peak best est")
 
