@@ -315,7 +315,7 @@ def plot_gauss_data(gauss_data, ax=None, xlim=None,
         fig = plt.figure()
         ax = fig.add_subplot(111)
 
-    ax.plot(gauss_data[:][:, 0], gauss_data[:][:, 1], 'k.', alpha=0.3)
+    ax.plot(gauss_data[:][0][:, 0], gauss_data[:][0][:, 1], 'k.', alpha=0.3)
     ax.plot(1, 1, 'kx', mew=2, ms=10, label='Mean of Gaussian')
     ax.legend(loc='best', frameon=False)
 
@@ -434,7 +434,7 @@ def plot_one_big_one_small_gaussian(
         fig = plt.figure()
         ax = fig.add_subplot(111)
 
-    ax.plot(bimodal_data[:][:, 0], bimodal_data[:][:, 1], 'k.', alpha=0.3)
+    ax.plot(bimodal_data[:][0][:, 0], bimodal_data[:][0][:, 1], 'k.', alpha=0.3)
     ax.plot(2, 2, 'kx', mew=2, ms=10, label='Mean of dominant Gaussian')
     ax.plot(0, 0, 'x', color='grey',
             mew=2, ms=10, label='Mean of subdominant Gaussian')
@@ -556,7 +556,7 @@ def plot_dumbbell_data(
         fig = plt.figure()
         ax = fig.add_subplot(111)
 
-    ax.plot(dumb_data[:][:, 0], dumb_data[:][:, 1], '.', color='grey')
+    ax.plot(dumb_data[:][0][:, 0], dumb_data[:][0][:, 1], '.', color='grey')
     ax.plot(2, 2, "ko", mew=2,
             label="Mean of dominant Gaussian", fillstyle='none',
             markersize=markersize)
