@@ -39,7 +39,7 @@ def draw_gaussian(mean=np.ones(2),
 def call_gaussian_and_prepare_data(data_size=500, bootNo=100, save=False,
                                    path="../../data/"):
     d = OrderedDict()
-    gausskey = "gauss" + str(data_size)
+    gausskey = "gauss"  # + str(data_size)
     d[gausskey] = [draw_gaussian(mean=np.ones(2),
                                  cov=np.eye(2),
                                  data_size=data_size)
@@ -55,7 +55,7 @@ def call_gaussian_and_prepare_data(data_size=500, bootNo=100, save=False,
     d["cent"] = get_gal.get_centroid_conf_reg(d[gausskey])
 
     if save:
-        save_data(d, path)
+        save_data_to_h5(d, data_size, path)
 
     return d
 
@@ -76,7 +76,7 @@ def one_big_gaussian_one_small_gaussian(data_size=500,
 def call_one_big_one_small_gaussian(data_size=500, bootNo=100, save=False,
                                     path="../../data/"):
     d = OrderedDict()
-    bimodalkey = "bimodal" + str(data_size)
+    bimodalkey = "bimodal"  # + str(data_size)
     d[bimodalkey] = \
         [one_big_gaussian_one_small_gaussian(data_size=data_size)
          for i in range(bootNo)]
@@ -88,7 +88,7 @@ def call_one_big_one_small_gaussian(data_size=500, bootNo=100, save=False,
     d["cent"] = get_gal.get_centroid_conf_reg(d[bimodalkey])
 
     if save:
-        save_data(d, path)
+        save_data_to_h5(d, data_size, path)
 
     return d
 
@@ -122,7 +122,7 @@ def call_dumbbell_example_and_prepare_data(data_size=500, bootNo=100,
 
     d = OrderedDict()
 
-    dumbkey = "dumb" + str(data_size)
+    dumbkey = "dumb"  # + str(data_size)
     d[dumbkey] = \
         [dumbbell_data(mixture_fraction=mixture_fraction,
                        data_size=data_size)
@@ -139,12 +139,12 @@ def call_dumbbell_example_and_prepare_data(data_size=500, bootNo=100,
     d["cent"] = get_gal.get_centroid_conf_reg(d[dumbkey])
 
     if save:
-        save_data(d, path)
+        save_data_to_h5(d, data_size, path)
 
     return d
 
 
-def save_data(d, path="../../data/"):
+def save_data_to_pkl(d, path="../../data/"):
     dataDetail = d.keys()[0]
     for k, v in d.iteritems():
         if k == dataDetail:
@@ -153,6 +153,36 @@ def save_data(d, path="../../data/"):
             filename = path + k + "_" + dataDetail + ".pkl"
         print(filename)
         cPickle.dump(v, open(filename, "w"))
+    return
+
+
+def save_data_to_h5(d, data_size, path="../../data", h5="compare_methods.h5"):
+    """ to be debugged"""
+    import h5py
+    dataDetail = d.keys()[0]
+    f = h5py.File(path + h5, "a", compression="gzip", complevel=9)
+    try:
+        gp = f.create_group(str(data_size))
+    except ValueError:
+        gp = f[str(data_size)]
+
+    try:
+        gp1 = gp.create_group(dataDetail)
+    except ValueError:
+        gp1 = gp[dataDetail]
+
+    for k, v in d.iteritems():
+        if k == dataDetail:
+            gp1["data"] = v
+        else:
+            gp1.create_group(k)
+            fhat = v
+            for fhat_key, fhat_val in fhat.iteritems():
+                gp1[k + "/" + fhat_key] = fhat_val
+
+            # get_gal.convert_dict_peaks_to_df(gp1[k], wt="", save=False)
+
+    f.close()
     return
 
 # -----------------plotting functions ----------------------
@@ -652,10 +682,15 @@ def plot_dumbbell_zoomed_contour(
     return
 # ------------previous drafts --------------
 
-def plot_compare_one_big_one_small_gaussian(
+
+def plot_compare_one_big_one_small_gaussian(bimodal_data,
         KDE_peak_dens1, shrink_peak_dens1, cent_peak_dens1,
         figsize=7, fig_path="../../paper/figures/drafts/",
         fig_name="confidence_regions_bimodal.pdf", save=False, ax=None):
+
+    if ax is None:
+        fig = plt.figure()
+        ax = fig.add_subplot(111, aspect='equal')
 
     ax.plot(bimodal_data[0][:, 0], bimodal_data[0][:, 1], 'k.', alpha=0.3)
     ax.plot(2, 2, 'kx', mew=2, ms=10, label='Mean of dominant Gaussian')
@@ -797,7 +832,7 @@ def plot_one_big_one_small_gaussian_500(
 
     if ax is None:
         fig = plt.figure()
-        ax = fig.add_subplot(111)
+        ax = fig.add_subplot(111, aspect='equal')
 
     # ax.figure(figsize=(figsize * 3, figsize))
     # ax.subplot(131)
@@ -808,7 +843,7 @@ def plot_one_big_one_small_gaussian_500(
     ax.legend(loc='best', frameon=False)
 
     if save:
-        ax.savefig(figname, bbox_inches='tight')
+        ax.savefig(fig_name, bbox_inches='tight')
 
     return
 
@@ -821,8 +856,12 @@ def plot_dumbbell_500_comparison(
         cent_peak_dens2,
         figsidesize=7,
         plot_path="../../paper/figures/drafts/",
-        plot_fig_name="confidence_regions_dumbbell_500.pdf"):
+        plot_fig_name="confidence_regions_dumbbell_500.pdf", ax=None):
     """ for plot in appendix, tweaked labels to look best on fig"""
+
+    if ax is None:
+        fig = plt.figure()
+        ax = fig.add_subplot(111, aspect='equal')
 
     ax.figure(figsize=(figsidesize * 3, figsidesize))
 
