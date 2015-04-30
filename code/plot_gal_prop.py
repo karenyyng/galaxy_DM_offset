@@ -62,14 +62,18 @@ def plot_color_mag_diag(df, bluer_band, redder_band, band_limit,
 def plot_cf_contour(dens, x, y, lvls=[68, 95], show=False, clabel=False,
                     fill=False, colors=None, ax=None):
     """this sort through the density, add them up til they are
-    below the required confidence level, then plot
+    below the required confidence level, then
+    draw contour lines at the values specified in sequence lvl_vals
 
     :param dens: np.array, the density estimate, should integrate to 1
     :param x: np.array, x coord of the density estimate
     :param y: np.array, y coord of the density estimate
     :param lvls: list of floats, denotes percentile
 
-    :returns: None
+    :returns: dictionary containing points that correspond to the contours
+        key of the dictionary are the `lvls` supplied
+    :notes:
+    http://stackoverflow.com/questions/5666056/matplotlib-extracting-data-from-contour-lines
     """
     if ax is None:
         fig = plt.figure()
@@ -112,7 +116,11 @@ def plot_cf_contour(dens, x, y, lvls=[68, 95], show=False, clabel=False,
     if show:
         ax.show()
 
-    return lvl_vals
+    lvl_contours = {}
+    for i, lvl in enumerate(lvls):
+        p = CS.collections[i].get_paths()[0]
+        lvl_contours[lvl] = p.vertices
+    return lvl_contours
 
 
 def plot_KDE_peaks(fhat, lvls=range(2, 100, 10), allPeaks=False,
