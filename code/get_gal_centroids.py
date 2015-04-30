@@ -292,6 +292,9 @@ def convert_dict_peaks_to_df(fhat_list, wt, phi=0, xi=0, save=False,
 def convert_dict_dens_to_h5(fhat_list, wt, phi=0, xi=0, save=False,
                             output_path="../data/",
                             dens_h5="fhat_dens.h5"):
+    """
+    INCOMPLETE : needs one more subgroup for clstNo
+    """
     import h5py
     fixed_size_data_keys = ["eval_points", "estimate", "bandwidth_matrix_H"]
     f = h5py.File(output_path + dens_h5, mode="a", compression="gzip",

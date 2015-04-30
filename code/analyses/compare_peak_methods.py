@@ -234,11 +234,12 @@ def read_in_data_for_left_3_cols(folder_path="../../data/fig2_data/",
     return gauss_data, bi_data, dumb_data
 
 
-def plot_grid_spec(gauss_data, bimodal_data, dumb_data, figsize=(13, 13)):
+def plot_grid_spec(gauss_data, bimodal_data, dumb_data, f, figsize=(13, 13)):
     """
     :param gauss_data: hdf5 hierarchial data structure
     :param bimodal_data: hdf5 hierarchial data structure
     :param dumb_data: hdf5 hierarchial data structure
+    :param f: hdf5 hierarchical file stream
     """
     import matplotlib.gridspec as gridspec
     from matplotlib.ticker import MaxNLocator
@@ -257,7 +258,7 @@ def plot_grid_spec(gauss_data, bimodal_data, dumb_data, figsize=(13, 13)):
     # plot the right two columns
     gs2 = gridspec.GridSpec(rowNo, colNo)
     gs2.update(left=0.51, right=0.98, wspace=0.4, hspace=hspace)
-    axArr2 = [[plt.subplot(gs2[i, j], aspect='equal')
+    axArr2 = [[plt.subplot(gs2[i, j])
                for j in range(colNo)] for i in range(rowNo)]
 
     plt.setp([axArr1[j][1].get_yticklabels()
@@ -267,7 +268,6 @@ def plot_grid_spec(gauss_data, bimodal_data, dumb_data, figsize=(13, 13)):
         axArr1[j][1].xaxis.set_major_locator(
             MaxNLocator(nbins=5, prune="lower"))
 
-    contours = {}
     # first row of plots
     xlim, ylim = plot_gauss_data(gauss_data["data"], ax=axArr1[0][0])
     plot_gauss_contour(gauss_data["KDE"],
@@ -275,10 +275,10 @@ def plot_grid_spec(gauss_data, bimodal_data, dumb_data, figsize=(13, 13)):
                        gauss_data["cent"],
                        ax=axArr1[0][1], xlim=xlim,
                        ylim=ylim)
-    contours["gauss"] = plot_gauss_zoomed_contours(gauss_data["KDE"],
-                                                   gauss_data["shrink"],
-                                                   gauss_data["cent"],
-                                                   ax=axArr2[0][0])
+    plot_gauss_zoomed_contours(gauss_data["KDE"],
+                               gauss_data["shrink"],
+                               gauss_data["cent"],
+                               ax=axArr2[0][0])
 
     # second row of plots
     xlim, ylim = plot_one_big_one_small_gaussian(bimodal_data["data"],
@@ -288,11 +288,11 @@ def plot_grid_spec(gauss_data, bimodal_data, dumb_data, figsize=(13, 13)):
                                             bimodal_data["cent"],
                                             xlim=xlim, ylim=ylim,
                                             ax=axArr1[1][1])
-    contours["bimodal"] = plot_one_big_one_small_gaussian_zoomed_contour(
-        bimodal_data["KDE"],
-        bimodal_data["shrink"],
-        bimodal_data["cent"],
-        ax=axArr2[1][0])
+    plot_one_big_one_small_gaussian_zoomed_contour(
+                                                   bimodal_data["KDE"],
+                                                   bimodal_data["shrink"],
+                                                   bimodal_data["cent"],
+                                                   ax=axArr2[1][0])
 
     # third row of plots
     xlim, ylim = plot_dumbbell_data(dumb_data["data"], ax=axArr1[2][0])
@@ -302,13 +302,82 @@ def plot_grid_spec(gauss_data, bimodal_data, dumb_data, figsize=(13, 13)):
                           dumb_data["cent"],
                           ax=axArr1[2][1],
                           xlim=xlim, ylim=ylim)
-    contours["dumb"] = plot_dumbbell_zoomed_contour(dumb_data["KDE1"],
-                                                    dumb_data["KDE2"],
-                                                    dumb_data["shrink"],
-                                                    dumb_data["cent"],
-                                                    ax=axArr2[2][0])
+    plot_dumbbell_zoomed_contour(dumb_data["KDE1"],
+                                 dumb_data["KDE2"],
+                                 dumb_data["shrink"],
+                                 dumb_data["cent"],
+                                 ax=axArr2[2][0])
+
+
+    # first row rightmost column
+    plot_error_as_a_func_of_data_pts(f, "gauss",
+                                     ax=axArr2[0][1])
+    plot_error_as_a_func_of_data_pts(f, "bimodal",
+                                     ax=axArr2[1][1])
+    plot_error_as_a_func_of_data_pts(f, "dumb",
+                                     ax=axArr2[2][1],
+                                     methods=["KDE1", "shrink", "cent"])
 
     return
+
+
+def plot_error_as_a_func_of_data_pts(f, data_set, colors=['b', 'g', 'r'],
+                                     ax=None, methods=["KDE",
+                                                       "shrink",
+                                                       "cent"]):
+    if ax is None:
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+
+    data_size = [20, 50, 100, 500]
+
+    if len(colors) != len(methods):
+        raise ValueError("Number of color supplied for plotting must\n" +
+                         "match number of peak finding methods")
+
+    errs = compute_errors_from_data(f, data_set, methods=methods,
+                                    data_size=data_size)
+
+    for i, method in enumerate(methods):
+        for j in [0, 1]:
+            for size in data_size:
+                ax.plot(size, errs[str(size)][method].values()[j], 'x',
+                        linestyle='-', mew=2, ms=10,
+                        color=colors[i], label=method)
+
+    ax.set_xlim(0, 550)
+    ax.set_ylabel("Uncertainty", size="small")
+    ax.set_xlabel("Number of data points", size="small")
+    return
+
+
+def compute_errors_from_data(f, data_set, methods,
+                             data_size=[20, 50, 100, 500]):
+
+
+    errs = {}
+    for size in data_size:
+        errs[str(size)] = {}
+        gp = f[str(size) + "/" + data_set]
+        for method in methods:
+            errs[str(size)][method] = {}
+            contours = plot_cf_contour(gp[method]["estimate"][:],
+                                       gp[method]["eval_points"][:][0],
+                                       gp[method]["eval_points"][:][1])
+            plt.clf()
+            plt.close()
+            peaks = np.array([gp[method]["peaks_xcoords"][:][0],
+                              gp[method]["peaks_ycoords"][:][0]])
+            for k, ctr in contours.iteritems():
+                errs[str(size)][method][k] = calculate_error_from_contour(ctr,
+                                                                         peaks)
+
+    return errs
+
+
+def calculate_error_from_contour(contour, peak):
+    err = np.array([np.sqrt(np.dot(diff, diff)) for diff in contour - peak])
+    return np.median(err)
 
 
 def plot_gauss_data(gauss_data, ax=None, xlim=None,
@@ -332,6 +401,11 @@ def plot_gauss_data(gauss_data, ax=None, xlim=None,
 def plot_gauss_contour(KDE_peak_dens, shrink_peak_dens,
                        cent_peak_dens, ax=None, xlim=None,
                        ylim=None):
+    if ax is None:
+        fig = plt.figure()
+        ax = fig.add_subplot(111, aspect='equal')
+
+    contours = {}
     plot_cf_contour(KDE_peak_dens["estimate"][:],
                     KDE_peak_dens["eval_points"][:][0],
                     KDE_peak_dens["eval_points"][:][1],
@@ -383,12 +457,11 @@ def plot_gauss_zoomed_contours(KDE_peak_dens1, shrink_peak_dens1,
         fig = plt.figure()
         ax = fig.add_subplot(111)
 
-    contours{}
     # plot KDE dominant peak contour
-    contours["KDE"] = plot_cf_contour(KDE_peak_dens1["estimate"][:],
-                                      KDE_peak_dens1["eval_points"][:][0],
-                                      KDE_peak_dens1["eval_points"][:][1],
-                                      colors=b_colors, ax=ax)
+    plot_cf_contour(KDE_peak_dens1["estimate"][:],
+                    KDE_peak_dens1["eval_points"][:][0],
+                    KDE_peak_dens1["eval_points"][:][1],
+                    colors=b_colors, ax=ax)
 
     ax.plot(KDE_peak_dens1["peaks_xcoords"][:][0],
             KDE_peak_dens1["peaks_ycoords"][:][0],
@@ -396,10 +469,10 @@ def plot_gauss_zoomed_contours(KDE_peak_dens1, shrink_peak_dens1,
             label="KDE peak best est")
 
     # plot shrinking aperture contour
-    contours["shrink"] = plot_cf_contour(shrink_peak_dens1["estimate"][:],
-                                         shrink_peak_dens1["eval_points"][:][0],
-                                         shrink_peak_dens1["eval_points"][:][1],
-                                         colors=g_colors, ax=ax)
+    plot_cf_contour(shrink_peak_dens1["estimate"][:],
+                    shrink_peak_dens1["eval_points"][:][0],
+                    shrink_peak_dens1["eval_points"][:][1],
+                    colors=g_colors, ax=ax)
 
     ax.plot(shrink_peak_dens1["peaks_xcoords"][:][0],
             shrink_peak_dens1["peaks_ycoords"][:][0],
@@ -407,10 +480,10 @@ def plot_gauss_zoomed_contours(KDE_peak_dens1, shrink_peak_dens1,
             label="Shrink peak best est")
 
     # plot centroid contour
-    contours["cent"] = plot_cf_contour(cent_peak_dens1["estimate"][:],
-                                       cent_peak_dens1["eval_points"][:][0],
-                                       cent_peak_dens1["eval_points"][:][1],
-                                       colors=r_colors, ax=ax)
+    plot_cf_contour(cent_peak_dens1["estimate"][:],
+                    cent_peak_dens1["eval_points"][:][0],
+                    cent_peak_dens1["eval_points"][:][1],
+                    colors=r_colors, ax=ax)
 
     ax.plot(cent_peak_dens1["peaks_xcoords"][:][0],
             cent_peak_dens1["peaks_ycoords"][:][0],
@@ -434,7 +507,7 @@ def plot_gauss_zoomed_contours(KDE_peak_dens1, shrink_peak_dens1,
     #     print("saving figure to" + fig_path + fig_name)
     #     ax.savefig(fig_path + fig_name, bbox_inches='tight')
 
-    return contours
+    return
 
 
 def plot_one_big_one_small_gaussian(
@@ -1326,3 +1399,35 @@ def plot_gauss_comparison(gauss_data, shrink_peak_dens, KDE_peak_dens,
 
 def infer_CR():
     return
+
+plot_error_as_a_func_of_data_pts.__doc__ = \
+    """
+    :param f: hdf5 hierarchical structure
+
+
+    f
+    |
+    |_20__"gauss"_____"KDE"
+    |      |          |
+    |      |          "shrink"
+    |      |          |
+    |      |          "cent"
+    |      |
+    |      "bimodal"__"KDE"
+    |      |          |
+    |      |          "shrink
+    |      |          |
+    |      |          "cent"
+    |      |
+    |      |
+    |      "dumb"_____"KDE"
+    |                 |
+    |                 "shrink
+    |                 |
+    |                 "cent"
+    |
+    |_50 (with children structure the same as `20`)
+    |_100
+    |_500
+
+    """
