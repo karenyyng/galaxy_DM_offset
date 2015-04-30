@@ -234,7 +234,9 @@ def read_in_data_for_left_3_cols(folder_path="../../data/fig2_data/",
     return gauss_data, bi_data, dumb_data
 
 
-def plot_grid_spec(gauss_data, bimodal_data, dumb_data, f, figsize=(13, 13)):
+def plot_grid_spec(gauss_data, bimodal_data, dumb_data, f, figsize=(13, 13),
+                   save=False, output_path="../../paper/figures/drafts/",
+                   name="fig2.eps"):
     """
     :param gauss_data: hdf5 hierarchial data structure
     :param bimodal_data: hdf5 hierarchial data structure
@@ -308,7 +310,6 @@ def plot_grid_spec(gauss_data, bimodal_data, dumb_data, f, figsize=(13, 13)):
                                  dumb_data["cent"],
                                  ax=axArr2[2][0])
 
-
     # first row rightmost column
     plot_error_as_a_func_of_data_pts(f, "gauss",
                                      ax=axArr2[0][1])
@@ -317,6 +318,8 @@ def plot_grid_spec(gauss_data, bimodal_data, dumb_data, f, figsize=(13, 13)):
     plot_error_as_a_func_of_data_pts(f, "dumb",
                                      ax=axArr2[2][1],
                                      methods=["KDE1", "shrink", "cent"])
+
+    plt.savefig(output_path + name, bbox_inches='tight')
 
     return
 
