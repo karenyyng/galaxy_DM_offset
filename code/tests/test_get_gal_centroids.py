@@ -109,6 +109,29 @@ def test_get_BCG_offsets_without_cuts():
                           bands=bands) == np.sqrt(3. ** 2 + 6. ** 2)
     return
 
+
+def test_rot_projection_of_project_coords():
+
+    # to avoid numerical error due to 0 becomes very small number
+    # we use allclose to check answers instead
+    inputs = [(0, 0, 1), (1, 0, 0), (0, 1, 0)]
+    ans = [(0, 1, 0), (0, 0, -1), (-1, 0, 0)]
+
+    for i, input_ele in enumerate(inputs):
+        assert np.allclose(project_coords(input_ele, 90, 90, (1, 1, 1)),
+                           np.array(ans[i]))
+    return
+
+
+def test_project_to_lower_dim_of_project_coords():
+    proj_planes = [(1, 1, 0), (1, 0, 1), (0, 1, 1)]
+    inputs = [(0, 0, 1), (1, 0, 0), (0, 1, 0)]
+    ans = [(0, 1, 0), (0, 0, -1), (0, 0, 0)]
+    for i, input_ele in enumerate(inputs):
+        assert np.allclose(project_coords(input_ele, 90, 90, proj_planes[i]),
+                           np.array(ans[i]))
+    return
+
 # def test_get_py_peaks_and_density_weights():
 #     """ Regression test """
 #     x =

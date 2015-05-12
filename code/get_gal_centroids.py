@@ -782,10 +782,32 @@ def get_centroid_conf_reg(data_realizations):
     return cent_peak_dens2
 
 
-# ---------- Utilities for converting
+# --------- compute projection matrix ----------------------------------
+def project_coords(coords, xi, phi, proj_plane):
+    if len(proj_plane) != 3:
+        raise ValueError("proj_plane must be a tuple / list / array" +
+                         "of length 3")
 
-def dict_to_h5objs(fhat):
-    return
+    xi = 90. / 180. * np.pi
+    phi = 90. / 180. * np.pi
+
+    if type(coords) != np.ndarray:
+        coords = np.array(coords)
+
+    if type(proj_plane) != np.ndarray:
+        proj_plane = np.array(proj_plane)
+    from numpy import cos, sin
+    mtx = np.array([[cos(phi)*cos(xi), -sin(phi), cos(phi)],
+                    [sin(phi)*cos(xi), cos(phi), sin(phi)*sin(xi)],
+                    [-sin(xi), 0, cos(xi)]])
+
+    # we do the rotation of the view point before projecting
+    # to a lower dimension
+    return proj_plane * np.dot(mtx, coords)
+
+
+# ---------- Utilities for converting dictionaries to h5 objects -------
+
 
 
 # def convert_R_peak_ix_to_py_peaks(fhat, ix_key="peak_coords_ix",
