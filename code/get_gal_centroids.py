@@ -803,12 +803,11 @@ def los_axis_to_vector(los_axis):
 def project_coords(coords, xi, phi, los_axis=2):
     """
     """
-    xi = 90. / 180. * np.pi
-    phi = 90. / 180. * np.pi
+    xi = xi / 180. * np.pi
+    phi = phi / 180. * np.pi
 
     if type(coords) != np.ndarray:
         coords = np.array(coords)
-    print coords
 
     from numpy import cos, sin
     # rotate our view point, origin is at (0, 0, 0)
