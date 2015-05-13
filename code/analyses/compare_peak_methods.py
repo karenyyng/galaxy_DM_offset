@@ -1,7 +1,7 @@
 """ constructs the Gaussian data sets to test the performance of different
 centroiding methods
 
-Author: Karen Ng
+Author: Karen Ng <karenyng@ucdavis.edu>
 """
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)

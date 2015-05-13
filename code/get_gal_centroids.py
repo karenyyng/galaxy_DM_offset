@@ -246,6 +246,7 @@ def compute_shrinking_aperture_offset(df, f, clstNo, cut_method, cut_kwargs,
             "Haven't generalized to compute offset for ndim > 2")
 
 
+# ---------- Utilities for converting dictionaries to h5 objects -------
 def convert_dict_peaks_to_df(fhat_list, wt, phi=0, xi=0, los_axis=2,
                              save=False, output_path="../data/",
                              peak_h5="fhat_peak.h5"):
@@ -335,12 +336,6 @@ def convert_dict_dens_to_h5(fhat_list, wt, phi=0, xi=0, los_axis=2,
     f.close()
     return
 
-
-def same_projection(phi1, xi1, phi2, xi2):
-    """
-    determine
-    """
-    return
 
 # ------------python wrapper to ks_KDE.r code ---------------------------
 
@@ -483,7 +478,7 @@ def rmvnorm_mixt(n, mus, Sigmas, props):
     return None
 
 
-def check_KDE_peak_without_bandwidth_matrix():
+def check_KDE_peak_against_bandwidth_matrix():
     return
 
 # -----------other centroid methods ------------------------------------
@@ -813,10 +808,11 @@ def project_coords(coords, xi, phi, los_axis=2):
 
     if type(coords) != np.ndarray:
         coords = np.array(coords)
+    print coords
 
     from numpy import cos, sin
     # rotate our view point, origin is at (0, 0, 0)
-    mtx = np.array([[cos(phi)*cos(xi), -sin(phi), cos(phi)],
+    mtx = np.array([[cos(phi)*cos(xi), -sin(phi), cos(phi)*sin(xi)],
                     [sin(phi)*cos(xi), cos(phi), sin(phi)*sin(xi)],
                     [-sin(xi), 0, cos(xi)]])
 
@@ -826,7 +822,12 @@ def project_coords(coords, xi, phi, los_axis=2):
     return proj_plane * np.dot(mtx, coords)
 
 
-# ---------- Utilities for converting dictionaries to h5 objects -------
+def same_projection(phi1, xi1, phi2, xi2):
+    """
+    determine if two sets of angles correspond to the same projection
+    """
+    return
+
 
 # def convert_R_peak_ix_to_py_peaks(fhat, ix_key="peak_coords_ix",
 #                                   pt_key="eval_points"):
