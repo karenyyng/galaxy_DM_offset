@@ -246,8 +246,9 @@ def compute_shrinking_aperture_offset(df, f, clstNo, cut_method, cut_kwargs,
             "Haven't generalized to compute offset for ndim > 2")
 
 
-def convert_dict_peaks_to_df(fhat_list, wt, phi=0, xi=0, save=False,
-                             output_path="../data/", peak_h5="fhat_peak.h5"):
+def convert_dict_peaks_to_df(fhat_list, wt, phi=0, xi=0, los_axis=2,
+                             save=False, output_path="../data/",
+                             peak_h5="fhat_peak.h5"):
     """
     :param fhat_list: list of python dictionary obtained from
         `convert_rfhat_to_dict`
@@ -261,7 +262,6 @@ def convert_dict_peaks_to_df(fhat_list, wt, phi=0, xi=0, save=False,
         append = True
     except IOError:
         append = False
-
 
     peak_df_list = []
     peak_info_keys = ["peaks_xcoords", "peaks_ycoords", "peaks_rowIx",
@@ -289,8 +289,8 @@ def convert_dict_peaks_to_df(fhat_list, wt, phi=0, xi=0, save=False,
     return peak_df
 
 
-def convert_dict_dens_to_h5(fhat_list, wt, phi=0, xi=0, save=False,
-                            output_path="../data/",
+def convert_dict_dens_to_h5(fhat_list, wt, phi=0, xi=0, los_axis=2,
+                            save=False, output_path="../data/",
                             dens_h5="fhat_dens.h5"):
     """
     INCOMPLETE : needs one more subgroup for clstNo
@@ -483,6 +483,9 @@ def rmvnorm_mixt(n, mus, Sigmas, props):
     return None
 
 
+def check_KDE_peak_without_bandwidth_matrix():
+    return
+
 # -----------other centroid methods ------------------------------------
 def shrinking_apert(data, center_coord=None, r0=None, debug=False, w=None):
     """
@@ -507,7 +510,7 @@ def shrinking_apert(data, center_coord=None, r0=None, debug=False, w=None):
 
     if center_coord is not None:
         c1 = np.array(center_coord)
-        # We don't want to worry about different scales of the data
+        # We don't want to worry about different scales of the data.
         c1 = c1 / normalization
     else:
         # Start with mean of the data.
@@ -654,10 +657,12 @@ def get_BCG_ix(df, DM_cut=1e3, star_cut=1e2,
     if brightest_only:
         return mode(ixes)[0][0]
     else:
+        # if we want more than 1 brightest galaxies - return
+        # all galaxies that are the brightest in any of the 4 bands
         return np.unique(ixes)
 
 
-def get_BCG_offset(df, phi=None, xi=None,
+def get_BCG_offset(df, spat_key1="SubhaloPos0", spat_key2="SubhaloPos1",
                    cut_kwargs={"DM_cut": 1e3, "star_cut": 1e2},
                    bands=None, verbose=False):
     """
@@ -671,14 +676,13 @@ def get_BCG_offset(df, phi=None, xi=None,
     :param bands: (optional) list of strings that correspond to the name of the
         bands for use to determine which galaxy is a BCG
     :param verbose: (optional) boolean, any message should be printed
+
+    :returns: scalar value / vector of scalars of the offset
     """
     ix = get_BCG_ix(df, bands=bands, **cut_kwargs)
-    if phi is None and xi is None:
-        BCG_offset = \
-            np.array(df[["SubhaloPos0", "SubhaloPos1"]].iloc[ix])
-        return np.sqrt(np.dot(BCG_offset, BCG_offset))
-    else:
-        raise NotImplementedError("general projection not implemented")
+    BCG_offset = \
+        np.array(df[[spat_key1, spat_key2]].iloc[ix])
+    return compute_euclidean_dist(BCG_offset)
 
 
 def sort_peaks_with_decreasing_density(fhat, rowIx, colIx):
@@ -702,6 +706,20 @@ def find_3D_peaks():
     # needs to check 27 - 7 points from the cube
     return
 
+
+def galaxies_closest_to_peak(df, list_of_coord_keys, peak_coords,
+                             k_nearest_neighbor=None):
+    from scipy.spatial import KDTree
+
+    if k_nearest_neighbor is None:
+        k_nearest_neighbor = int(df.shape[0] * 0.05)
+
+    tree = KDTree(np.array(df[list_of_coord_keys]))
+    if type(peak_coords) != np.ndarray:
+        peak_coords = np.array(peak_coords)
+
+    # we use Euclidean distance for our query, i.e. p=2
+    return tree.query(peak_coords, k=k_nearest_neighbor, p=2)
 
 # ---------- weights --------------------------------------------------
 
@@ -783,19 +801,17 @@ def get_centroid_conf_reg(data_realizations):
 
 
 # --------- compute projection matrix ----------------------------------
-def project_coords(coords, xi, phi, proj_plane):
-    if len(proj_plane) != 3:
-        raise ValueError("proj_plane must be a tuple / list / array" +
-                         "of length 3")
+def los_axis_to_vector(los_axis):
+    return np.arange(3) != los_axis
 
+
+def project_coords(coords, xi, phi, los_axis=2):
     xi = 90. / 180. * np.pi
     phi = 90. / 180. * np.pi
 
     if type(coords) != np.ndarray:
         coords = np.array(coords)
 
-    if type(proj_plane) != np.ndarray:
-        proj_plane = np.array(proj_plane)
     from numpy import cos, sin
     mtx = np.array([[cos(phi)*cos(xi), -sin(phi), cos(phi)],
                     [sin(phi)*cos(xi), cos(phi), sin(phi)*sin(xi)],
@@ -803,6 +819,7 @@ def project_coords(coords, xi, phi, proj_plane):
 
     # we do the rotation of the view point before projecting
     # to a lower dimension
+    proj_plane = los_axis_to_vector(los_axis)
     return proj_plane * np.dot(mtx, coords)
 
 

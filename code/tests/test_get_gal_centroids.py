@@ -118,19 +118,34 @@ def test_rot_projection_of_project_coords():
     ans = [(0, 1, 0), (0, 0, -1), (-1, 0, 0)]
 
     for i, input_ele in enumerate(inputs):
-        assert np.allclose(project_coords(input_ele, 90, 90, (1, 1, 1)),
+        assert np.allclose(project_coords(input_ele, 90, 90, 4),
                            np.array(ans[i]))
     return
 
 
 def test_project_to_lower_dim_of_project_coords():
-    proj_planes = [(1, 1, 0), (1, 0, 1), (0, 1, 1)]
+    proj_planes = [2, 1, 0]
     inputs = [(0, 0, 1), (1, 0, 0), (0, 1, 0)]
     ans = [(0, 1, 0), (0, 0, -1), (0, 0, 0)]
     for i, input_ele in enumerate(inputs):
         assert np.allclose(project_coords(input_ele, 90, 90, proj_planes[i]),
                            np.array(ans[i]))
     return
+
+
+def test_galaxies_closest_to_peak():
+    col = [0, 1]
+    df = pd.DataFrame([[i, i] for i in np.arange(10)], columns=col)
+    peak_coords = [(3.25, 3.5), (1., 1.5)]
+
+    dist, ixes = galaxies_closest_to_peak(df, col, peak_coords,
+                                          k_nearest_neighbor=1)
+    # KDTree.query returns an integer if k_nearest_neighbor = 1
+    assert ixes[0] == 3
+    assert ixes[1] == 1
+
+    return
+
 
 # def test_get_py_peaks_and_density_weights():
 #     """ Regression test """
