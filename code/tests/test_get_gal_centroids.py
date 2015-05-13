@@ -125,6 +125,9 @@ def test_rot_projection_of_project_coords():
 
 
 def test_project_to_lower_dim_of_project_coords():
+    """
+    :tasks: should test values that are not multiples of 90
+    """
     los_axes = [2, 1, 0]
     inputs = [(0, 0, 1), (1, 0, 0), (0, 1, 0)]
     ans = [(0, 1, 0), (0, 0, -1), (0, 0, 0)]
@@ -147,6 +150,17 @@ def test_galaxies_closest_to_peak():
 
     return
 
+
+def test_angles_given_HEALpix_nsides():
+    """regression test"""
+    xi = np.array([ 0.84106867,  0.84106867,  1.57079633,  1.57079633,
+                    2.30052398, 2.30052398]),
+    phi = np.array([ 0.78539816,  2.35619449,  0.        ,  1.57079633,
+                    0.78539816, 2.35619449])
+
+    test_xi, test_phi = angles_given_HEALpix_nsides(1)
+    assert np.allclose(xi, test_xi)
+    assert np.allclose(phi, test_phi)
 
 # def test_get_py_peaks_and_density_weights():
 #     """ Regression test """

@@ -339,7 +339,6 @@ def convert_dict_dens_to_h5(fhat_list, wt, phi=0, xi=0, los_axis=2,
 
 # ------------python wrapper to ks_KDE.r code ---------------------------
 
-
 def convert_rfhat_to_dict(r_fhat):
     """preserves the returned object structure with a dict
     :param r_fhat: robject of the output evaluated from ks.KDE
@@ -479,6 +478,28 @@ def rmvnorm_mixt(n, mus, Sigmas, props):
 
 
 def check_KDE_peak_against_bandwidth_matrix():
+    return
+
+
+def sort_peaks_with_decreasing_density(fhat, rowIx, colIx):
+    """
+    :param fhat: dictionary
+    :param rowIx: list of integers
+    :param colIx: list of integers
+
+    :return sortedRowIx: sorted list of integers
+    :return sortedColIx: sorted list of integers
+    """
+    order = np.argsort(fhat["estimate"][rowIx, colIx])[::-1]
+    sortedRowIx = np.array([rowIx[i] for i in order])
+    sortedColIx = np.array([colIx[i] for i in order])
+
+    return sortedRowIx, sortedColIx
+
+
+def find_3D_peaks():
+    # find
+    # needs to check 27 - 7 points from the cube
     return
 
 # -----------other centroid methods ------------------------------------
@@ -680,34 +701,15 @@ def get_BCG_offset(df, spat_key1="SubhaloPos0", spat_key2="SubhaloPos1",
     return compute_euclidean_dist(BCG_offset)
 
 
-def sort_peaks_with_decreasing_density(fhat, rowIx, colIx):
-    """
-    :param fhat: dictionary
-    :param rowIx: list of integers
-    :param colIx: list of integers
-
-    :return sortedRowIx: sorted list of integers
-    :return sortedColIx: sorted list of integers
-    """
-    order = np.argsort(fhat["estimate"][rowIx, colIx])[::-1]
-    sortedRowIx = np.array([rowIx[i] for i in order])
-    sortedColIx = np.array([colIx[i] for i in order])
-
-    return sortedRowIx, sortedColIx
-
-
-def find_3D_peaks():
-    # find
-    # needs to check 27 - 7 points from the cube
-    return
-
-
 def galaxies_closest_to_peak(df, list_of_coord_keys, peak_coords,
                              k_nearest_neighbor=None):
     from scipy.spatial import KDTree
 
     if k_nearest_neighbor is None:
-        k_nearest_neighbor = int(df.shape[0] * 0.05)
+        if int(df.shape[0] * 0.05) > 5:
+            k_nearest_neighbor = int(df.shape[0] * 0.05)
+        else:
+            k_nearest_neighbor = 3
 
     tree = KDTree(np.array(df[list_of_coord_keys]))
     if type(peak_coords) != np.ndarray:
@@ -797,11 +799,18 @@ def get_centroid_conf_reg(data_realizations):
 
 # --------- compute projection matrix ----------------------------------
 def los_axis_to_vector(los_axis):
+    """return a vector for dot product projction"""
     return np.arange(3) != los_axis
 
 
 def project_coords(coords, xi, phi, los_axis=2):
     """
+    :param coords: array like / df
+    :param xi: float, elevation angle in degree
+    :param phi: float, azimuthal angle in degree
+    :param los_axis: integer, line-of-sight (los) axis, 0 = x, 1 = y, 2 = z
+
+    :return: same type of array like object as coords, same dimension
     """
     xi = xi / 180. * np.pi
     phi = phi / 180. * np.pi
@@ -825,8 +834,26 @@ def same_projection(phi1, xi1, phi2, xi2):
     """
     determine if two sets of angles correspond to the same projection
     """
+    raise NotImplementedError
     return
 
+
+def angles_given_HEALpix_nsides(nside):
+    """
+    :param nside: integer, must be powers of 2
+    :returns: tuple of two arrays, each array corresponds to xi and phi values
+    """
+    from healpy import pix2ang
+    from healpy.pixelfunc import nside2npix
+
+    npix = nside2npix(nside)
+    # we only want half the pixels on the sphere due to symmetry
+    angle_idxes = np.array([range(2 * (i - 1), 2 * (i - 1) + 2)
+                            for i in np.arange(1, int(npix / 2), 2)]
+                           ).ravel()  # flatten array
+    xi, phi = pix2ang(nside, angle_idxes)
+
+    return xi, phi
 
 # def convert_R_peak_ix_to_py_peaks(fhat, ix_key="peak_coords_ix",
 #                                   pt_key="eval_points"):
