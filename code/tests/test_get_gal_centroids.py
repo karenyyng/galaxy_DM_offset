@@ -118,17 +118,18 @@ def test_rot_projection_of_project_coords():
     ans = [(0, 1, 0), (0, 0, -1), (-1, 0, 0)]
 
     for i, input_ele in enumerate(inputs):
+        # not projecting anything so los_axis = 4
         assert np.allclose(project_coords(input_ele, 90, 90, 4),
                            np.array(ans[i]))
     return
 
 
 def test_project_to_lower_dim_of_project_coords():
-    proj_planes = [2, 1, 0]
+    los_axes = [2, 1, 0]
     inputs = [(0, 0, 1), (1, 0, 0), (0, 1, 0)]
     ans = [(0, 1, 0), (0, 0, -1), (0, 0, 0)]
     for i, input_ele in enumerate(inputs):
-        assert np.allclose(project_coords(input_ele, 90, 90, proj_planes[i]),
+        assert np.allclose(project_coords(input_ele, 90, 90, los_axes[i]),
                            np.array(ans[i]))
     return
 

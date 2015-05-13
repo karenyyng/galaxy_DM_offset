@@ -806,6 +806,8 @@ def los_axis_to_vector(los_axis):
 
 
 def project_coords(coords, xi, phi, los_axis=2):
+    """
+    """
     xi = 90. / 180. * np.pi
     phi = 90. / 180. * np.pi
 
@@ -813,6 +815,7 @@ def project_coords(coords, xi, phi, los_axis=2):
         coords = np.array(coords)
 
     from numpy import cos, sin
+    # rotate our view point, origin is at (0, 0, 0)
     mtx = np.array([[cos(phi)*cos(xi), -sin(phi), cos(phi)],
                     [sin(phi)*cos(xi), cos(phi), sin(phi)*sin(xi)],
                     [-sin(xi), 0, cos(xi)]])
@@ -824,8 +827,6 @@ def project_coords(coords, xi, phi, los_axis=2):
 
 
 # ---------- Utilities for converting dictionaries to h5 objects -------
-
-
 
 # def convert_R_peak_ix_to_py_peaks(fhat, ix_key="peak_coords_ix",
 #                                   pt_key="eval_points"):
