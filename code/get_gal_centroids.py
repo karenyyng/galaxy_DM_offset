@@ -153,14 +153,41 @@ def cut_reliable_galaxies(df, DM_cut=1e3, star_cut=1e2):
                                    df["SubhaloLenType4"] > star_cut))
 
 
-def compute_KDE_peak_offsets(df, f, clstNo, cut_method, cut_kwargs, w=None,
-                             col=["SubhaloPos0", "SubhaloPos1"],
-                             projection=None, verbose=False):
+def prep_data_with_cuts_and_proj(df, cut_method, cut_kwargs, nside_pow=None,
+                                 verbose=False, los_axis=2):
     """
-    :param df: pandas dataframe for each cluster
+    :param df: pandas dataframe containing all subhalos for each cluster
     :param cut_method: function
+    :param nside_pow: (optional) integer, nside = 2 ** nside_pow
+        This should be a number between [0, 30]
+        this decides how many pixels of the projections will have.
+        The smaller nside_pow is, the less number of pixels / projections
+        the function computes.
+    """
+
+    mask = cut_method(df, **cut_kwargs)
+    if verbose:
+        print "# of subhalos after the cut = {0}".format(np.sum(mask))
+
+    col = ["SubhaloPos{0}".format(i) for i in range(3)]
+    data = np.array(df[col][mask])
+
+    if nside_pow is not None:
+        nside = 2 ** nside_pow
+        xi_array, phi_array = angles_given_HEALpix_nsides(nside)
+
+        coords = map(lambda xi, phi: project_coords(data, xi, phi,
+                                                    los_axis=los_axis,
+                                                    radian=True),
+                     xi_array, phi_array)
+
+    return coords, xi_array, phi_array, los_axis
+
+
+def compute_KDE_peak_offsets(data, f, clstNo, w=None, xi=0, phi=0,
+                             los_axis=2):
+    """
     :param w: floats, weight
-    :param col: list of strings, the strings should be df keys
     :param projection: 2-tuple of floats, (theta, phi), not yet implemented
 
     :return: list of [offset, offsetR200]
@@ -173,18 +200,15 @@ def compute_KDE_peak_offsets(df, f, clstNo, cut_method, cut_kwargs, w=None,
         can think of making this function even more general
         by having the peak inference function passed in
     """
-    # prepare the data for KDE
-    mask = cut_method(df, **cut_kwargs)
-    data = np.array(df[col][mask])
-
-    if verbose:
-        print "# of subhalos after the cut = {0}".format(np.sum(mask))
-
     fhat = do_KDE_and_get_peaks(data, w=w)
 
+    # each cluster only have one R200C
     R200C = f["Group"]["Group_R_Crit200"][clstNo]
 
     fhat["peaks_dens"] = get_density_weights(fhat)
+    fhat["xi"] = xi
+    fhat["phi"] = phi
+    fhat["los_axis"] = los_axis
 
     # we have sorted the density so that the highest density peak is the first
     peaks = np.array(fhat["peaks_xcoords"][0], fhat["peaks_ycoords"][0])
@@ -247,7 +271,7 @@ def compute_shrinking_aperture_offset(df, f, clstNo, cut_method, cut_kwargs,
 
 
 # ---------- Utilities for converting dictionaries to h5 objects -------
-def convert_dict_peaks_to_df(fhat_list, wt, phi=0, xi=0, los_axis=2,
+def convert_dict_peaks_to_df(fhat_list, wt,
                              save=False, output_path="../data/",
                              peak_h5="fhat_peak.h5"):
     """
@@ -274,10 +298,12 @@ def convert_dict_peaks_to_df(fhat_list, wt, phi=0, xi=0, los_axis=2,
             peak_df[key] = fhat[key]
         peak_df['clstNo'] = i
         peak_df_list.append(peak_df.copy())
+        peak_df["phi"] = [fhat["phi"] for i in range(peak_df.shape[0])]
+        peak_df["xi"] = [fhat["xi"] for i in range(peak_df.shape[0])]
+        peak_df["los_axis"] = [fhat["los_axis"]
+                               for i in range(peak_df.shape[0])]
 
     peak_df = pd.concat(peak_df_list, axis=0)
-    peak_df["phi"] = [phi for i in range(peak_df.shape[0])]
-    peak_df["xi"] = [xi for i in range(peak_df.shape[0])]
 
     if append:
         peak_df = pd.concat(old_df, peak_df, axis=0)
@@ -522,7 +548,7 @@ def shrinking_apert(data, center_coord=None, r0=None, debug=False, w=None):
     if w is None:
         w = np.ones(len(data))
     elif len(w) != len(data):
-        raise InputError("length mismatch between data `data` and weights `w`")
+        raise ValueError("length mismatch between data `data` and weights `w`")
 
     if center_coord is not None:
         c1 = np.array(center_coord)
@@ -631,7 +657,7 @@ def compute_weighted_centroids(x, w=None):
         w = w.reshape(w.shape[0], 1)
 
     if len(x) != len(w):
-        raise InputError("length of data and weights have to be the same")
+        raise ValueError("length of data and weights have to be the same")
     return np.sum(x * w, axis=0) / np.sum(w)
 
 
@@ -803,7 +829,7 @@ def los_axis_to_vector(los_axis):
     return np.arange(3) != los_axis
 
 
-def project_coords(coords, xi, phi, los_axis=2):
+def project_coords(coords, xi, phi, los_axis=2, radian=True):
     """
     :param coords: array like / df
     :param xi: float, elevation angle in degree
@@ -812,11 +838,9 @@ def project_coords(coords, xi, phi, los_axis=2):
 
     :return: same type of array like object as coords, same dimension
     """
-    xi = xi / 180. * np.pi
-    phi = phi / 180. * np.pi
-
-    if type(coords) != np.ndarray:
-        coords = np.array(coords)
+    if not radian:
+        xi = xi / 180. * np.pi
+        phi = phi / 180. * np.pi
 
     from numpy import cos, sin
     # rotate our view point, origin is at (0, 0, 0)
@@ -824,10 +848,17 @@ def project_coords(coords, xi, phi, los_axis=2):
                     [sin(phi)*cos(xi), cos(phi), sin(phi)*sin(xi)],
                     [-sin(xi), 0, cos(xi)]])
 
-    # we do the rotation of the view point before projecting
-    # to a lower dimension
+    if type(coords) != np.ndarray:
+        coords = np.array(coords)
+
     proj_plane = los_axis_to_vector(los_axis)
-    return proj_plane * np.dot(mtx, coords)
+    if coords.ndim == 1:
+        # we do the rotation of the view point before projecting
+        # to a lower dimension
+        return proj_plane * np.dot(mtx, coords)
+    elif coords.ndim > 1:
+        data = map(lambda d: proj_plane * np.dot(mtx, d), coords)
+        return data
 
 
 def same_projection(phi1, xi1, phi2, xi2):
@@ -842,6 +873,13 @@ def angles_given_HEALpix_nsides(nside):
     """
     :param nside: integer, must be powers of 2
     :returns: tuple of two arrays, each array corresponds to xi and phi values
+        values are in radians
+
+    angle_idxes convert indexes such as
+    [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+    to
+    [0, 1, 4, 5, 8, 9]
+    so we only want to sample half the pixels
     """
     from healpy import pix2ang
     from healpy.pixelfunc import nside2npix
@@ -854,6 +892,7 @@ def angles_given_HEALpix_nsides(nside):
     xi, phi = pix2ang(nside, angle_idxes)
 
     return xi, phi
+
 
 # def convert_R_peak_ix_to_py_peaks(fhat, ix_key="peak_coords_ix",
 #                                   pt_key="eval_points"):

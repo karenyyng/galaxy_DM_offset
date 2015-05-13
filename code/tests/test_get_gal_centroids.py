@@ -111,16 +111,21 @@ def test_get_BCG_offsets_without_cuts():
 
 
 def test_rot_projection_of_project_coords():
-
     # to avoid numerical error due to 0 becomes very small number
     # we use allclose to check answers instead
     inputs = [(0, 0, 1), (1, 0, 0), (0, 1, 0)]
-    ans = [(0, 1, 0), (0, 0, -1), (-1, 0, 0)]
+    ans = np.array([(0, 1, 0), (0, 0, -1), (-1, 0, 0)])
 
     for i, input_ele in enumerate(inputs):
         # not projecting anything so los_axis = 4
-        assert np.allclose(project_coords(input_ele, 90, 90, 4),
+        # test ans from feeding each row of input
+        assert np.allclose(project_coords(input_ele, 90, 90, 4, radian=False),
                            np.array(ans[i]))
+
+    # test vectorization
+    test_outputs = project_coords(inputs, 90, 90, 4, radian=False)
+
+    assert np.allclose(ans, test_outputs)
     return
 
 
@@ -132,7 +137,8 @@ def test_project_to_lower_dim_of_project_coords():
     inputs = [(0, 0, 1), (1, 0, 0), (0, 1, 0)]
     ans = [(0, 1, 0), (0, 0, -1), (0, 0, 0)]
     for i, input_ele in enumerate(inputs):
-        assert np.allclose(project_coords(input_ele, 90, 90, los_axes[i]),
+        assert np.allclose(project_coords(input_ele, 90, 90, los_axes[i],
+                                          radian=False),
                            np.array(ans[i]))
     return
 
