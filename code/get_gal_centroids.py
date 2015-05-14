@@ -185,7 +185,7 @@ def prep_data_with_cuts_and_proj(df, cut_method, cut_kwargs, nside_pow=None,
 
 
 def compute_KDE_peak_offsets(data, f, clstNo, w=None, xi=0, phi=0,
-                             los_axis=2):
+                             los_axis=2, weight=None):
     """
     :param w: floats, weight
     :param projection: 2-tuple of floats, (theta, phi), not yet implemented
@@ -206,9 +206,7 @@ def compute_KDE_peak_offsets(data, f, clstNo, w=None, xi=0, phi=0,
     R200C = f["Group"]["Group_R_Crit200"][clstNo]
 
     fhat["peaks_dens"] = get_density_weights(fhat)
-    fhat["xi"] = xi
-    fhat["phi"] = phi
-    fhat["los_axis"] = los_axis
+
 
     # we have sorted the density so that the highest density peak is the first
     peaks = np.array(fhat["peaks_xcoords"][0], fhat["peaks_ycoords"][0])
@@ -271,7 +269,7 @@ def compute_shrinking_aperture_offset(df, f, clstNo, cut_method, cut_kwargs,
 
 
 # ---------- Utilities for converting dictionaries to h5 objects -------
-def convert_dict_peaks_to_df(fhat_list, wt,
+def convert_dict_peaks_to_df(fhat_list, metadata_list,
                              save=False, output_path="../data/",
                              peak_h5="fhat_peak.h5"):
     """
@@ -282,6 +280,8 @@ def convert_dict_peaks_to_df(fhat_list, wt,
     :return: df
     """
     # check if df already exists
+    if wt is None:
+        wt = "None"
     try:
         old_df = pd.read_hdf(output_path + peak_h5, wt + "df")
         append = True
@@ -296,12 +296,17 @@ def convert_dict_peaks_to_df(fhat_list, wt,
         peak_df = pd.DataFrame()
         for key in peak_info_keys:
             peak_df[key] = fhat[key]
+        # starts storing meta data
+
+
         peak_df['clstNo'] = i
+        peak_df["phi"] = fhat["phi"]
+        peak_df["xi"] = fhat["xi"]
+        peak_df["los_axis"] = fhat["los_axis"]
+        peak_df["weights"] = fhat["cuts"]
+        peak_df["cuts"] = fhat["cuts"]
+
         peak_df_list.append(peak_df.copy())
-        peak_df["phi"] = [fhat["phi"] for i in range(peak_df.shape[0])]
-        peak_df["xi"] = [fhat["xi"] for i in range(peak_df.shape[0])]
-        peak_df["los_axis"] = [fhat["los_axis"]
-                               for i in range(peak_df.shape[0])]
 
     peak_df = pd.concat(peak_df_list, axis=0)
 
@@ -316,12 +321,13 @@ def convert_dict_peaks_to_df(fhat_list, wt,
     return peak_df
 
 
-def convert_dict_dens_to_h5(fhat_list, wt, phi=0, xi=0, los_axis=2,
+def convert_dict_dens_to_h5(fhat_list, meta_data,
                             save=False, output_path="../data/",
                             dens_h5="fhat_dens.h5"):
     """
     INCOMPLETE : needs one more subgroup for clstNo
     """
+
     import h5py
     fixed_size_data_keys = ["eval_points", "estimate", "bandwidth_matrix_H"]
     f = h5py.File(output_path + dens_h5, mode="a", compression="gzip",
@@ -527,6 +533,7 @@ def find_3D_peaks():
     # find
     # needs to check 27 - 7 points from the cube
     return
+
 
 # -----------other centroid methods ------------------------------------
 def shrinking_apert(data, center_coord=None, r0=None, debug=False, w=None):
@@ -893,6 +900,8 @@ def angles_given_HEALpix_nsides(nside):
 
     return xi, phi
 
+
+# --------- meta data handling -----------------------------------------
 
 # def convert_R_peak_ix_to_py_peaks(fhat, ix_key="peak_coords_ix",
 #                                   pt_key="eval_points"):

@@ -9,7 +9,7 @@ def plot_cluster_mass_distribution(ticks, y_data,
                                    save=True, path="../../paper/figures/"):
     """
     :param ticks: numpy array of floats
-    :y_data: list of numpy array of data
+    :param y_data: list of numpy array of data
 
     """
     assert len(y_legend) == len(y_data), "number of legends has to match " + \
