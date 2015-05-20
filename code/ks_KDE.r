@@ -22,7 +22,13 @@ do_KDE = function(data, bandwidth_selector=Hscv, w=rep.int(1, nrow(data)),
   return(fhat_pi1)
 }
 
-gaussian_mixture_data = function(samp_no = 5e2, cwt = 1 / 11, set_seed = F){
+gaussian_mixture_data = function(samp_no = 5e2, cwt = 1 / 11, set_seed = FALSE){
+  # this prepares samples from 3 gaussian mixtures for test purpose
+  # @param sample_no : integer, number of data points to sample in total 
+  # @param cwt: fraction < 1 , central contaiminant mixture weight     
+  # @param set_seed : boolean, whether to set random seed for reproducibility 
+  # @returns fhat R object from ks.KDE method
+
   if(set_seed){
     seed <- 8192
     set.seed(seed)  
@@ -45,10 +51,6 @@ gaussian_mixture_data = function(samp_no = 5e2, cwt = 1 / 11, set_seed = F){
   # draw data
   x <- rmvnorm.mixt(n=samp_no, mus=mu_s, Sigmas=Sigma_s, props=weights)
 }
-
-# gaussian_mixture_data3D = function(){
-# }
-
 
 TwoDtestCase1 = function(samp_no = 5e2, cwt = 1 / 11)
 { 
