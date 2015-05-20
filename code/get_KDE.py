@@ -293,7 +293,7 @@ def sort_peaks_with_decreasing_density(fhat, rowIx, colIx):
 
 def get_KDE_conf_reg(data_realizations, second_peak=False):
     """
-    :param data_realizations: list of data_realizations
+    :param data_realizations: list of bootstrapped fhat data_realizations
     :param 2nd_peak: boolean, whether we want the result from the
         2nd peak
 
