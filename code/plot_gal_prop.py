@@ -68,7 +68,13 @@ def plot_cf_contour(dens, x, y, lvls=[68, 95], show=False, clabel=False,
     :param dens: np.array, the density estimate, should integrate to 1
     :param x: np.array, x coord of the density estimate
     :param y: np.array, y coord of the density estimate
-    :param lvls: list of floats, denotes percentile
+    :param lvls: list of floats, denotes percentile, 65 means 65th percentile
+    :param show: boolean, whether to show the plot
+    :param clabel: boolean, whether to add contour label indicating the level
+    :param fill: boolean, whether to fill the contour
+    :param colors: list of tuples,
+        each tuple should contain 3 color float values to use for contours
+        the list should be as long as `lvls`
 
     :returns: dictionary containing points that correspond to the contours
         key of the dictionary are the `lvls` supplied
