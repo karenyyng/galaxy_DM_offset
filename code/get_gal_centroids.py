@@ -241,7 +241,6 @@ def convert_dict_dens_to_h5(fhat_list, meta_data,
     return
 
 
-
 def find_3D_peaks():
     # find
     # needs to check 27 - 7 points from the cube
