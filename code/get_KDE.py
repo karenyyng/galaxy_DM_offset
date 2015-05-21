@@ -259,6 +259,11 @@ def do_KDE_and_get_peaks(x, w=None, dom_peak_no=1):
 
     :return: python dictionary - fhat
     :keys bandwidth_matrix_H: covariance matrix
+    :keys peaks_dens: array of floats,
+        relative density of the peaks arranged in same order
+        as the coordinate arrays described below.
+        The densities are computed relatively by dividing out the density of
+        the densest peak.
     :keys peaks_ycoords: np array of 2nd coordinates of the found peaks
     :keys peaks_xcoords: np array of 1st coordinates of the found peaks
     :keys peaks_rowIx: np array
