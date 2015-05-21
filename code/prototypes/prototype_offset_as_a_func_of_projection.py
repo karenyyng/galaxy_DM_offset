@@ -39,14 +39,15 @@ cut_cols = {"min": pos_cols}
 metadata["cuts"] = {"min": cut_kwargs}
 
 # weights
-metadata["weights"] = OrderedDict({"no": None,
+metadata["weights"] = OrderedDict({# "no": None,
                                    "i_band": getg.mag_to_lum})
 # projections
-nside = 1
+nside = 16
 metadata["los_axis"] = [2]  # use z-axis as los axis
 # nsides of HEALpix are powers of 2
 metadata["xi"], metadata["phi"] = getg.angles_given_HEALpix_nsides(nside)
 
+# ============== set up output file structure  ===========
 # check_metadata against illegal types
 # create HDF5 file structure first!
 output_fhat_path = "test_fhat.h5"
@@ -78,7 +79,7 @@ for clstNo in metadata["clstNo"]:
             for los_axis in metadata["los_axis"]:
                 clst_metadata["los_axis"] = los_axis
 
-                for i in range(1):  # range(len(metadata["xi"])):
+                for i in range(len(metadata["xi"])):
                     clst_metadata["xi"] = metadata["xi"][i]
                     clst_metadata["phi"] = metadata["phi"][i]
 
@@ -102,25 +103,4 @@ for clstNo in metadata["clstNo"]:
                     getg.convert_dict_dens_to_h5(fhat, clst_metadata,
                                                  h5_fstream)
 
-    # for df in dfs_with_cuts.values():
-    #     proj, xi_array, phi_array = \
-    #         getg.project_cluster_df(df[pos_cols], metadata["nside_pow"],
-    #                                 metadata["los_axis"], verbose)
-
-    # do_KDE_and_get_peaks()
-    # stuff = map(lambda d, xi, phi:
-    #             getg.compute_KDE_peak_offsets(d, original_f, clstNo, xi=xi,
-    #                                           phi=phi, los_axis=los_axis),
-    #             data_arr[:proj_no], xi_array[:proj_no], phi_array[:proj_no])
-#
-# offset_list = [s[0] for s in stuff]
-# offset_R200_list = [s[1] for s in stuff]
-# fhat_list = [s[2] for s in stuff]
-#
-# # compile list of meta data for one cluster!
-#
-#
-# peak_df = getg.convert_dict_peaks_to_df(fhat_list, wt="None")
-
-# getg.convert_dict_dens_to_h5(fhat_list, wt="None")
 store.close()

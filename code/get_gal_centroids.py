@@ -64,37 +64,15 @@ def mag_to_lum(mag):
     return np.exp(-mag + 23.)
 
 
-# def project_cluster_df(df, nside_pow=None, los_axis=2, verbose=True):
-#     """
-#     :param df: pandas dataframe containing all subhalos for each cluster
-#     :param nside_pow: (optional) integer, nside = 2 ** nside_pow
-#         This should be a number between [0, 30]
-#         this decides how many pixels of the projections will have.
-#         The smaller nside_pow is, the less number of pixels / projections
-#         the function computes.
-#     """
-#     if nside_pow is not None:
-#         nside = 2 ** nside_pow
-#
-#     coords = map(lambda xi, phi: project_coords(df, xi, phi,
-#                                                 los_axis=los_axis,
-#                                                 radian=True),
-#                  xi_array, phi_array)
-#     return coords, xi_array, phi_array
-
 # --------- functions for computing gal-DM offsets-------------------------
-def compute_KDE_peak_offsets(fhat, f, clstNo):
+def compute_KDE_offsets(peak_xcoords, peak_ycoords):
     """
     :param fhat: dictionary
         with `peak_xcoords` and `peak_ycoords` obtained from
         `do_KDE_and_get_peaks`
-    :param f: hdf5 file stream object
-        connecting to the Illustris SUBFIND catalog
-    :param clstNo: integer
 
     :return: list of [offset, offsetR200]
         offset: offset in unit of c kpc/h
-        offset: offset in terms of the R200C of the cluster
     :to do:
         * needs major revamp to restructure the outputs, i.e. fhat
         * may want to check the dimension of input data
@@ -103,15 +81,36 @@ def compute_KDE_peak_offsets(fhat, f, clstNo):
         by having the peak inference function passed in
     """
 
+    # we have sorted the density so that the highest density peak is the first
+    if (type(peak_xcoords) == np.ndarray and
+        type(peak_ycoords == np.ndarray)) or \
+        (type(peak_xcoords) == pd.core.series.Series and
+            type(peak_ycoords) == pd.core.series.Series):
+        peaks = np.array([peak_xcoords, peak_ycoords]).transpose()
+    elif type(peak_xcoords) == float and type(peak_ycoords) == float:
+        peaks = np.array([peak_xcoords, peak_ycoords])
+
+    return compute_euclidean_dist(peaks)
+
+
+def compute_KDE_R200Coffsets(offset, f, clstNo):
+    """
+    :param f: hdf5 file stream object
+        connecting to the Illustris SUBFIND catalog
+    :param clstNo: integer
+
+    :return: offsetR200
+        offset: offset in terms of the R200C of the cluster
+    :note:
+        can think of making this function even more general
+        by having the peak inference function passed in
+    """
+
     # each cluster only have one R200C
     R200C = f["Group"]["Group_R_Crit200"][clstNo]
 
-    # we have sorted the density so that the highest density peak is the first
-    peaks = np.array(fhat["peaks_xcoords"][0], fhat["peaks_ycoords"][0])
-    fhat["offset"] = np.sqrt(np.dot(peaks, peaks))
-    fhat["offsetR200"] = fhat["offset"] / R200C
+    return offset / R200C
 
-    return
 
 
 def compute_shrinking_aperture_offset(df, f, clstNo, cut_method, cut_kwargs,
@@ -213,10 +212,19 @@ def construct_h5_file_for_saving_fhat(metadata, output_path="../../data/",
                     lvl4 = lvl3.create_group(str(los_axis))
 
                     for xi in np.unique(metadata["xi"]):
-                        lvl5 = lvl4.create_group(str(xi))
+                        try:
+                            lvl5 = lvl4.create_group(str(xi))
+                        except ValueError:
+                            print(
+                                "ValueError raised due to creating existing groups")
 
                         for phi in np.unique(metadata["phi"]):
-                            lvl6 = lvl5.create_group(str(phi))
+                            try:
+                                lvl6 = lvl5.create_group(str(phi))
+                            except ValueError:
+                                print(
+                                    "ValueError raised due to creating existing groups")
+
 
     return h5_fstream
 
