@@ -2,10 +2,15 @@
 from __future__ import (print_function,
                         division, absolute_import)
 import pandas as pd
+import os
+
 dataPath = "../../data/"
-store = pd.HDFStore(dataPath + "test_framework.h5")
+StoreFile = "test_framework.h5"
+if os.path.isfile(dataPath + StoreFile):
+    os.remove(dataPath + StoreFile)
+store = pd.HDFStore(dataPath + StoreFile)
+
 import numpy as np
-# import matplotlib.pyplot as plt
 import sys
 sys.path.append("../")
 
@@ -20,29 +25,38 @@ original_f = h5py.File(dataPath +
                        "Illustris-1_fof_subhalo_myCompleteHaloCatalog_00135.hdf5")
 
 # ================ make all decisions ===========================
+
 pos_cols = ["SubhaloPos{0}".format(i) for i in range(3)]
 metadata = OrderedDict({})
+
+# no. of clsters
 metadata["clstNo"] = [4]  # , 5]
 
+# cuts
 cut_kwargs = {"DM_cut": 1e3, "star_cut": 5e2}
 cut_methods = {"min": getg.cut_reliable_galaxies}
 cut_cols = {"min": pos_cols}
 metadata["cuts"] = {"min": cut_kwargs}
 
+# weights
+metadata["weights"] = OrderedDict({"no": None,
+                                   "i_band": getg.mag_to_lum})
+# projections
 nside = 1
-metadata["los_axis"] = 2  # use z-axis as los axis
+metadata["los_axis"] = [2]  # use z-axis as los axis
 # nsides of HEALpix are powers of 2
 metadata["xi"], metadata["phi"] = getg.angles_given_HEALpix_nsides(nside)
 
-metadata["weights"] = OrderedDict({"no": None,
-                                   "i_band": getg.mag_to_lum})
-
-# check_metadata
+# check_metadata against illegal types
 # create HDF5 file structure first!
+output_fhat_path = "test_fhat.h5"
+if os.path.isfile(dataPath + output_fhat_path):
+    os.remove(dataPath + output_fhat_path)
+h5_fstream = getg.construct_h5_file_for_saving_fhat(metadata, dataPath,
+                                                    output_fhat_path)
 
 # ============== prepare data based on the metadata ===========
-clst_metadata = {}
-list_peak_df = []
+clst_metadata = OrderedDict({})
 for clstNo in metadata["clstNo"]:
     peak_df = pd.DataFrame()
     clst_metadata["clstNo"] = clstNo
@@ -61,34 +75,32 @@ for clstNo in metadata["clstNo"]:
             clst_metadata["weights"] = wt_key
             weights = thisdf[wt_key + "_wt"]
 
-            for i in range(1):  # range(len(metadata["xi"])):
-                clst_metadata["xi"] = metadata["xi"][i]
-                clst_metadata["phi"] = metadata["phi"][i]
+            for los_axis in metadata["los_axis"]:
+                clst_metadata["los_axis"] = los_axis
 
-                data = getg.project_coords(np.array(thisdf[pos_cols]),
-                                           clst_metadata["xi"],
-                                           clst_metadata["phi"],
-                                           los_axis=metadata["los_axis"])
+                for i in range(1):  # range(len(metadata["xi"])):
+                    clst_metadata["xi"] = metadata["xi"][i]
+                    clst_metadata["phi"] = metadata["phi"][i]
 
-                col = np.arange(data.shape[1]) != metadata["los_axis"]
-                data = data[:, col]
+                    data = getg.project_coords(np.array(thisdf[pos_cols]),
+                                               clst_metadata["xi"],
+                                               clst_metadata["phi"],
+                                               los_axis=metadata["los_axis"])
 
-                fhat = KDE.do_KDE_and_get_peaks(data, weights)
-                # this is not needed since the offset will be computed
-                # w.r.t. dark matter peak instead
-                # getg.compute_KDE_peak_offsets(fhat, original_f,
-                #                               clst_metadata["clstNo"])
-                peak_df = \
-                    getg.convert_dict_peaks_to_df(fhat, clst_metadata)
+                    col = np.arange(data.shape[1]) != metadata["los_axis"]
+                    data = data[:, col]
 
+                    fhat = KDE.do_KDE_and_get_peaks(data, weights)
+                    # this is not needed since the offset will be computed
+                    # w.r.t. dark matter peak instead
+                    # getg.compute_KDE_peak_offsets(fhat, original_f,
+                    #                               clst_metadata["clstNo"])
+                    peak_df = \
+                        getg.convert_dict_peaks_to_df(fhat, clst_metadata)
+                    store.append("peak_df", peak_df)
 
-                store.append("peak_df", peak_df)
-
-
-
-
-
-
+                    getg.convert_dict_dens_to_h5(fhat, clst_metadata,
+                                                 h5_fstream)
 
     # for df in dfs_with_cuts.values():
     #     proj, xi_array, phi_array = \

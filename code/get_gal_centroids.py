@@ -64,16 +64,15 @@ def mag_to_lum(mag):
     return np.exp(-mag + 23.)
 
 
-def project_cluster_df(df, nside_pow=None, los_axis=2, verbose=True):
-    """
-    :param df: pandas dataframe containing all subhalos for each cluster
-    :param nside_pow: (optional) integer, nside = 2 ** nside_pow
-        This should be a number between [0, 30]
-        this decides how many pixels of the projections will have.
-        The smaller nside_pow is, the less number of pixels / projections
-        the function computes.
-    """
-
+# def project_cluster_df(df, nside_pow=None, los_axis=2, verbose=True):
+#     """
+#     :param df: pandas dataframe containing all subhalos for each cluster
+#     :param nside_pow: (optional) integer, nside = 2 ** nside_pow
+#         This should be a number between [0, 30]
+#         this decides how many pixels of the projections will have.
+#         The smaller nside_pow is, the less number of pixels / projections
+#         the function computes.
+#     """
 #     if nside_pow is not None:
 #         nside = 2 ** nside_pow
 #
@@ -82,8 +81,6 @@ def project_cluster_df(df, nside_pow=None, los_axis=2, verbose=True):
 #                                                 radian=True),
 #                  xi_array, phi_array)
 #     return coords, xi_array, phi_array
-
-
 
 # --------- functions for computing gal-DM offsets-------------------------
 def compute_KDE_peak_offsets(fhat, f, clstNo):
@@ -105,8 +102,6 @@ def compute_KDE_peak_offsets(fhat, f, clstNo):
         can think of making this function even more general
         by having the peak inference function passed in
     """
-
-    # fhat = do_KDE_and_get_peaks(data, w=w)
 
     # each cluster only have one R200C
     R200C = f["Group"]["Group_R_Crit200"][clstNo]
@@ -182,12 +177,6 @@ def convert_dict_peaks_to_df(fhat, metadata,
 
     :return: df
     """
-    # try:
-    #     old_df = pd.read_hdf(output_path + peak_h5, wt + "df")
-    #     append = True
-    # except IOError:
-    #     append = False
-
     peak_df_list = []
     peak_info_keys = ["peaks_xcoords", "peaks_ycoords", "peaks_rowIx",
                       "peaks_colIx", "peaks_dens"]
@@ -195,71 +184,59 @@ def convert_dict_peaks_to_df(fhat, metadata,
     peak_df = pd.DataFrame()
     for key in peak_info_keys:
         peak_df[key] = fhat[key]
-    # starts storing meta data
 
+    # starts storing meta data
     for key, val in metadata.iteritems():
         peak_df[key] = val
-
-    # peak_df_list.append(peak_df.copy())
-
-    # peak_df = pd.concat(peak_df_list, axis=0)
-
-    # if append:
-    #     peak_df = pd.concat(old_df, peak_df, axis=0)
-    #     peak_df = peak_df.drop_duplicates()
-
-    # if save:
-    #     peak_df.to_hdf(output_path + peak_h5, wt + "_df", complevel=9,
-    #                    complib="zlib")
 
     return peak_df
 
 
-def convert_dict_dens_to_h5(fhat_list, meta_data,
-                            save=False, output_path="../data/",
-                            dens_h5="fhat_dens.h5"):
-    """
-    INCOMPLETE : needs one more subgroup for clstNo
-    """
-
+def construct_h5_file_for_saving_fhat(metadata, output_path="../../data/",
+                                      dens_h5="test_fhat.h5"):
     import h5py
+    h5_fstream = h5py.File(output_path + dens_h5,
+                           mode="a", compression="gzip",
+                           compression_opts=9)
+
+    # would implement this recursively if the data structure were more regular
+    for clstNo in metadata["clstNo"]:
+        lvl1 = h5_fstream.create_group(str(clstNo))
+
+        for cuts in metadata["cuts"].keys():
+            lvl2 = lvl1.create_group(cuts)
+
+            for weights in metadata["weights"].keys():
+                lvl3 = lvl2.create_group(weights)
+
+                for los_axis in metadata["los_axis"]:
+                    lvl4 = lvl3.create_group(str(los_axis))
+
+                    for xi in np.unique(metadata["xi"]):
+                        lvl5 = lvl4.create_group(str(xi))
+
+                        for phi in np.unique(metadata["phi"]):
+                            lvl6 = lvl5.create_group(str(phi))
+
+    return h5_fstream
+
+
+def h5path_from_clst_metadata(clst_metadata):
+    path = [str(v) + "/" for v in clst_metadata.values()]
+    return ''.join(path)
+
+
+def convert_dict_dens_to_h5(fhat, clst_metadata, h5_fstream):
+    """
+    WORKS
+    """
+
     fixed_size_data_keys = ["eval_points", "estimate", "bandwidth_matrix_H"]
-    f = h5py.File(output_path + dens_h5, mode="a", compression="gzip",
-                  compression_opts=9)
+    path = h5path_from_clst_metadata(clst_metadata)
 
-    # first create the group that tells us which weighting (wt) scheme it uses
-    try:
-        subgroup = f.create_group(wt)
-    except ValueError:
-        print ("ValueError was raised due to create existing group")
-        subgroup = f[wt]
+    for k in fixed_size_data_keys:
+        h5_fstream[path + k] = fhat[k]
 
-    # create projection
-    try:
-        subgroup1 = subgroup.create_group(str(phi))
-    except ValueError:
-        print ("ValueError was raised due to create existing group")
-        subgroup1 = f[wt + "/" + str(phi)]
-    try:
-        subgroup2 = subgroup1.create_group(str(xi))
-    except ValueError:
-        print ("ValueError was raised due to create existing group")
-        subgroup2 = f[wt + "/" + str(phi) + "/" + str(xi)]
-
-    # then create the names of each element as a subgroup
-    try:
-        map(subgroup2.create_group, fixed_size_data_keys)
-    except ValueError:
-        print ("ValueError was raised due to create existing subgroups")
-
-    for i, fhat in enumerate(fhat_list):
-        for fkeys in fixed_size_data_keys:
-            # the final key is the clstNo
-            key = wt + "/" + str(phi) + "/" + str(xi) + "/"  + \
-                fkeys + "/" + str(i)
-            f[key] = fhat[fkeys]
-
-    f.close()
     return
 
 
