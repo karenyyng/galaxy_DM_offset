@@ -20,10 +20,11 @@ def default_keys():
             # u'SubhaloParent',
             u'SubhaloGrNr',
             u'SubhaloStellarPhotometrics',
-            u'SubhaloStellarPhotometricsMassInRad',
+            # u'SubhaloStellarPhotometricsMassInRad',
             u'SubhaloLenType',
-            u'SubhaloMass',
-            u'SubhaloMassType']
+            # u'SubhaloMass',
+            # u'SubhaloMassType'
+            ]
 
 
 def extract_clst(f, clstNo, output=False, keys=default_keys(),

@@ -1,11 +1,14 @@
 """ various functions for inferring centroids of galaxy population
 """
 from __future__ import division
+from collections import OrderedDict
 import numpy as np
 import pandas as pd
+from get_KDE import *
 
 
-# --------- functions for computing gal-DM offsets-------------------------
+# --------- functions for preparing cuts, projections, weighting -----------
+
 def cut_reliable_galaxies(df, DM_cut=1e3, star_cut=1e2):
     """ consider all cluster galaxies with minimal cuts
     :params df: pandas dataframe contains one cluster
@@ -25,11 +28,45 @@ def cut_reliable_galaxies(df, DM_cut=1e3, star_cut=1e2):
                                    df["SubhaloLenType4"] > star_cut))
 
 
-def prep_data_with_cuts_and_proj(df, cut_method, cut_kwargs, nside_pow=None,
-                                 verbose=False, los_axis=2):
+def prep_data_with_cuts_and_wts(df, cuts, cut_methods, cut_cols, wts,
+                                verbose=False):
     """
     :param df: pandas dataframe containing all subhalos for each cluster
-    :param cut_method: function
+    :param cut_methods: function
+
+    Returns
+    -------
+    df_list : list of pandas dataframe
+    """
+    dfs_with_cuts = OrderedDict({})
+    for cut_method_name, cut_kwargs in cuts.iteritems():
+        mask = cut_methods[cut_method_name](df, **cut_kwargs)
+        if verbose:
+            print "# of subhalos after the " + \
+                  "{1} cut = {0}".format(np.sum(mask), cut_method_name)
+        # col = cut_cols[cut_method_name]
+        thisdf = df[mask].copy()
+
+        for weight, wt_func in wts.iteritems():
+            if weight != "no":
+                thisdf[weight + "_wt"] = wt_func(thisdf[weight])
+            else:
+                thisdf[weight + "_wt"] = np.ones(thisdf.shape[0])
+
+
+        # have new df for each types of cuts
+        dfs_with_cuts[cut_method_name] = thisdf.copy()
+
+    return dfs_with_cuts
+
+
+def mag_to_lum(mag):
+    return np.exp(-mag + 23.)
+
+
+def project_cluster_df(df, nside_pow=None, los_axis=2, verbose=True):
+    """
+    :param df: pandas dataframe containing all subhalos for each cluster
     :param nside_pow: (optional) integer, nside = 2 ** nside_pow
         This should be a number between [0, 30]
         this decides how many pixels of the projections will have.
@@ -37,30 +74,26 @@ def prep_data_with_cuts_and_proj(df, cut_method, cut_kwargs, nside_pow=None,
         the function computes.
     """
 
-    mask = cut_method(df, **cut_kwargs)
-    if verbose:
-        print "# of subhalos after the cut = {0}".format(np.sum(mask))
-
-    col = ["SubhaloPos{0}".format(i) for i in range(3)]
-    data = np.array(df[col][mask])
-
-    if nside_pow is not None:
-        nside = 2 ** nside_pow
-        xi_array, phi_array = angles_given_HEALpix_nsides(nside)
-
-        coords = map(lambda xi, phi: project_coords(data, xi, phi,
-                                                    los_axis=los_axis,
-                                                    radian=True),
-                     xi_array, phi_array)
-
-    return coords, xi_array, phi_array, los_axis
+#     if nside_pow is not None:
+#         nside = 2 ** nside_pow
+#
+#     coords = map(lambda xi, phi: project_coords(df, xi, phi,
+#                                                 los_axis=los_axis,
+#                                                 radian=True),
+#                  xi_array, phi_array)
+#     return coords, xi_array, phi_array
 
 
-def compute_KDE_peak_offsets(data, f, clstNo, w=None, xi=0, phi=0,
-                             los_axis=2, weight=None):
+
+# --------- functions for computing gal-DM offsets-------------------------
+def compute_KDE_peak_offsets(fhat, f, clstNo):
     """
-    :param w: floats, weight
-    :param projection: 2-tuple of floats, (theta, phi), not yet implemented
+    :param fhat: dictionary
+        with `peak_xcoords` and `peak_ycoords` obtained from
+        `do_KDE_and_get_peaks`
+    :param f: hdf5 file stream object
+        connecting to the Illustris SUBFIND catalog
+    :param clstNo: integer
 
     :return: list of [offset, offsetR200]
         offset: offset in unit of c kpc/h
@@ -72,20 +105,18 @@ def compute_KDE_peak_offsets(data, f, clstNo, w=None, xi=0, phi=0,
         can think of making this function even more general
         by having the peak inference function passed in
     """
-    fhat = do_KDE_and_get_peaks(data, w=w)
+
+    # fhat = do_KDE_and_get_peaks(data, w=w)
 
     # each cluster only have one R200C
     R200C = f["Group"]["Group_R_Crit200"][clstNo]
 
-    fhat["peaks_dens"] = get_density_weights(fhat)
-
-
     # we have sorted the density so that the highest density peak is the first
     peaks = np.array(fhat["peaks_xcoords"][0], fhat["peaks_ycoords"][0])
-    offset = np.sqrt(np.dot(peaks, peaks))
-    offsetR200 = offset / R200C
+    fhat["offset"] = np.sqrt(np.dot(peaks, peaks))
+    fhat["offsetR200"] = fhat["offset"] / R200C
 
-    return [offset, offsetR200, fhat]
+    return
 
 
 def compute_shrinking_aperture_offset(df, f, clstNo, cut_method, cut_kwargs,
@@ -141,7 +172,7 @@ def compute_shrinking_aperture_offset(df, f, clstNo, cut_method, cut_kwargs,
 
 
 # ---------- Utilities for converting dictionaries to h5 objects -------
-def convert_dict_peaks_to_df(fhat_list, metadata_list,
+def convert_dict_peaks_to_df(fhat, metadata,
                              save=False, output_path="../data/",
                              peak_h5="fhat_peak.h5"):
     """
@@ -151,44 +182,35 @@ def convert_dict_peaks_to_df(fhat_list, metadata_list,
 
     :return: df
     """
-    # check if df already exists
-    if wt is None:
-        wt = "None"
-    try:
-        old_df = pd.read_hdf(output_path + peak_h5, wt + "df")
-        append = True
-    except IOError:
-        append = False
+    # try:
+    #     old_df = pd.read_hdf(output_path + peak_h5, wt + "df")
+    #     append = True
+    # except IOError:
+    #     append = False
 
     peak_df_list = []
     peak_info_keys = ["peaks_xcoords", "peaks_ycoords", "peaks_rowIx",
                       "peaks_colIx", "peaks_dens"]
 
-    for i, fhat in enumerate(fhat_list):
-        peak_df = pd.DataFrame()
-        for key in peak_info_keys:
-            peak_df[key] = fhat[key]
-        # starts storing meta data
+    peak_df = pd.DataFrame()
+    for key in peak_info_keys:
+        peak_df[key] = fhat[key]
+    # starts storing meta data
 
+    for key, val in metadata.iteritems():
+        peak_df[key] = val
 
-        peak_df['clstNo'] = i
-        peak_df["phi"] = fhat["phi"]
-        peak_df["xi"] = fhat["xi"]
-        peak_df["los_axis"] = fhat["los_axis"]
-        peak_df["weights"] = fhat["cuts"]
-        peak_df["cuts"] = fhat["cuts"]
+    # peak_df_list.append(peak_df.copy())
 
-        peak_df_list.append(peak_df.copy())
+    # peak_df = pd.concat(peak_df_list, axis=0)
 
-    peak_df = pd.concat(peak_df_list, axis=0)
+    # if append:
+    #     peak_df = pd.concat(old_df, peak_df, axis=0)
+    #     peak_df = peak_df.drop_duplicates()
 
-    if append:
-        peak_df = pd.concat(old_df, peak_df, axis=0)
-        peak_df = peak_df.drop_duplicates()
-
-    if save:
-        peak_df.to_hdf(output_path + peak_h5, wt + "_df", complevel=9,
-                       complib="zlib")
+    # if save:
+    #     peak_df.to_hdf(output_path + peak_h5, wt + "_df", complevel=9,
+    #                    complib="zlib")
 
     return peak_df
 
@@ -465,11 +487,6 @@ def galaxies_closest_to_peak(df, list_of_coord_keys, peak_coords,
 
 # ---------- weights --------------------------------------------------
 
-
-def mag_to_lum(mag):
-    return np.exp(-mag + 23.)
-
-
 # --------- compute confidence region for each method ------------------
 
 def get_shrinking_apert_conf_reg(data_realizations):
@@ -543,7 +560,7 @@ def project_coords(coords, xi, phi, los_axis=2, radian=True):
         # to a lower dimension
         return proj_plane * np.dot(mtx, coords)
     elif coords.ndim > 1:
-        data = map(lambda d: proj_plane * np.dot(mtx, d), coords)
+        data = np.array(map(lambda d: proj_plane * np.dot(mtx, d), coords))
         return data
 
 

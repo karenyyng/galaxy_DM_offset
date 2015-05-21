@@ -189,7 +189,9 @@ def get_density_weights(fhat, ix_rkey="peaks_rowIx",
     colIx = fhat[ix_ckey]
     peak_dens = np.array(fhat["estimate"][rowIx, colIx])
 
-    return peak_dens / np.max(peak_dens)  # give relative weights
+    # give relative weights
+    fhat["peaks_dens"] = peak_dens / np.max(peak_dens)
+    return
 
 
 def py_2D_arr_to_R_matrix(x):
@@ -242,6 +244,7 @@ def do_KDE_and_get_peaks(x, w=None, dom_peak_no=1):
     res = do_KDE(x, w=w, dom_peak_no=dom_peak_no)
     fhat = convert_rfhat_to_dict(res)
     find_peaks_from_py_diff(fhat, estKey="estimate", gridKey="eval_points")
+    get_density_weights(fhat)
     return fhat
 
 
