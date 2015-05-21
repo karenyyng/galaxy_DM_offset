@@ -2,6 +2,8 @@
 Provides python wrapper around the R ks package for the KDE functions
 I try to keep a one-to-one correspondane between the R functions and the
 Python functions
+Author: Karen Ng <karenyng@ucdavis.edu>
+License: BSD
 """
 import numpy as np
 import rpy2.robjects as robjects
