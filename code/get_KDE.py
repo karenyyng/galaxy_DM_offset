@@ -153,13 +153,23 @@ def convert_rfhat_to_dict(r_fhat):
     """preserves the returned object structure with a dict
     :param r_fhat: robject of the output evaluated from ks.KDE
 
-    :stability: works but may not be correct
-    The R object has been modified
-
     under this conversion
 
-    fhat["data_x"] : np.array with shape as (obs_no, 2)
-    fhat["domPeaks"] : np.array with shape as (peak_no, 2)
+    Returns
+    ======
+    python dictionary
+
+    fhat["eval_points"] : np.array of 2 arrays
+        1st array is the 1st-coordinates of the grid
+        2nd array is the 2nd-coordinates of the grid
+
+    fhat["estimate"] : np.array
+        density estimate at the grid location specified
+        by `fhat["eval_points"]`
+
+    fhat["bandwidth_matrix_H"] : np.array
+        covariance matrix of the Gaussian kernel that is used
+        you can imagine this to specify the best kernel smoothing width
 
     :to do: convert this to a h5 object instead
     """
@@ -221,6 +231,7 @@ def do_KDE(x, w=None, dom_peak_no=1):
     """ don't want to write this for a general bandwidth selector yet
     :params x: np.array, each row should be one observation / subhalo
     :params w: np.float, weight of each row of data
+    :dom_peak_no: (DEPRECIATED)
 
     :returns list of 2 R objects:
         :R matrix of peaks: each row correspond to coordinates of one peak
@@ -241,6 +252,22 @@ def do_KDE(x, w=None, dom_peak_no=1):
 
 
 def do_KDE_and_get_peaks(x, w=None, dom_peak_no=1):
+    """ do KDE and also put the peak location information into fhat
+    :params x: np.array, each row should be one observation / subhalo
+    :params w: np.float, weight of each row of data
+    :dom_peak_no: (DEPRECIATED)
+
+    :return: python dictionary - fhat
+    :keys bandwidth_matrix_H: covariance matrix
+    :keys peaks_ycoords: np array of 2nd coordinates of the found peaks
+    :keys peaks_xcoords: np array of 1st coordinates of the found peaks
+    :keys peaks_rowIx: np array
+        of index of the 1st coordinates of the found peaks from
+        fhat["estimate"] or fhat["eval_points"][0]
+    :keys peaks_rowIx: np array
+        of index of the 2nd coordinates of the found peaks from
+        fhat["estimate"] or fhat["eval_points"][1]
+    """
     res = do_KDE(x, w=w, dom_peak_no=dom_peak_no)
     fhat = convert_rfhat_to_dict(res)
     find_peaks_from_py_diff(fhat, estKey="estimate", gridKey="eval_points")
@@ -272,10 +299,6 @@ def TwoDtestCase1(samp_no=5e2, cwt=1. / 11., w=None, H=None):
         fhat = func(samp_no, cwt)
 
     return do_KDE_and_get_peaks(fhat)
-
-
-def check_KDE_peak_against_bandwidth_matrix():
-    return
 
 
 def sort_peaks_with_decreasing_density(fhat, rowIx, colIx):
