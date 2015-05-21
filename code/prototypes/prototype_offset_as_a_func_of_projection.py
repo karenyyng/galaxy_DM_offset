@@ -5,7 +5,7 @@ import pandas as pd
 import os
 
 dataPath = "../../data/"
-StoreFile = "test_framework.h5"
+StoreFile = "test_peak_df.h5"
 if os.path.isfile(dataPath + StoreFile):
     os.remove(dataPath + StoreFile)
 store = pd.HDFStore(dataPath + StoreFile)
@@ -30,7 +30,7 @@ pos_cols = ["SubhaloPos{0}".format(i) for i in range(3)]
 metadata = OrderedDict({})
 
 # no. of clsters
-metadata["clstNo"] = [4]  # , 5]
+metadata["clstNo"] = range(20)  # range(20)  # [4]  # , 5]
 
 # cuts
 cut_kwargs = {"DM_cut": 1e3, "star_cut": 5e2}
@@ -42,7 +42,7 @@ metadata["cuts"] = {"min": cut_kwargs}
 metadata["weights"] = OrderedDict({# "no": None,
                                    "i_band": getg.mag_to_lum})
 # projections
-nside = 16
+nside = 8
 metadata["los_axis"] = [2]  # use z-axis as los axis
 # nsides of HEALpix are powers of 2
 metadata["xi"], metadata["phi"] = getg.angles_given_HEALpix_nsides(nside)
@@ -59,6 +59,8 @@ h5_fstream = getg.construct_h5_file_for_saving_fhat(metadata, dataPath,
 # ============== prepare data based on the metadata ===========
 clst_metadata = OrderedDict({})
 for clstNo in metadata["clstNo"]:
+    print ("processing clst {0} out of {1}".format(clstNo,
+                                                   metadata["clstNo"][-1]))
     peak_df = pd.DataFrame()
     clst_metadata["clstNo"] = clstNo
     df = ext_cat.extract_clst(original_f, clstNo)
