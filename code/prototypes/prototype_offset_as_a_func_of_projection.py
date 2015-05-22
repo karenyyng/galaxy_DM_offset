@@ -30,7 +30,7 @@ pos_cols = ["SubhaloPos{0}".format(i) for i in range(3)]
 metadata = OrderedDict({})
 
 # no. of clsters
-metadata["clstNo"] = range(20)  # range(20)  # [4]  # , 5]
+metadata["clstNo"] = [13]  # range(20)  # range(20)  # [4]  # , 5]
 
 # cuts
 cut_kwargs = {"DM_cut": 1e3, "star_cut": 5e2}
@@ -39,12 +39,14 @@ cut_cols = {"min": pos_cols}
 metadata["cuts"] = {"min": cut_kwargs}
 
 # weights
-metadata["weights"] = OrderedDict({# "no": None,
-                                   "i_band": getg.mag_to_lum})
+metadata["weights"] = OrderedDict({
+    # "no": None,
+    "i_band": getg.mag_to_lum
+    })
+
 # projections
-nside = 8
+nside = 16  # nsides of HEALpix are powers of 2
 metadata["los_axis"] = [2]  # use z-axis as los axis
-# nsides of HEALpix are powers of 2
 metadata["xi"], metadata["phi"] = getg.angles_given_HEALpix_nsides(nside)
 
 # ============== set up output file structure  ===========
@@ -59,8 +61,8 @@ h5_fstream = getg.construct_h5_file_for_saving_fhat(metadata, dataPath,
 # ============== prepare data based on the metadata ===========
 clst_metadata = OrderedDict({})
 for clstNo in metadata["clstNo"]:
-    print ("processing clst {0} out of {1}".format(clstNo,
-                                                   metadata["clstNo"][-1]))
+    print ("processing clst {0} ".format(clstNo) +
+           "out of {0}".format(len(metadata["clstNo"][-1])))
     peak_df = pd.DataFrame()
     clst_metadata["clstNo"] = clstNo
     df = ext_cat.extract_clst(original_f, clstNo)

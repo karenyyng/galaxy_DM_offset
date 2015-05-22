@@ -112,7 +112,6 @@ def compute_KDE_R200Coffsets(offset, f, clstNo):
     return offset / R200C
 
 
-
 def compute_shrinking_aperture_offset(df, f, clstNo, cut_method, cut_kwargs,
                                       w=None, verbose=True,
                                       col=["SubhaloPos0", "SubhaloPos1"],
@@ -199,34 +198,65 @@ def construct_h5_file_for_saving_fhat(metadata, output_path="../../data/",
                            compression_opts=9)
 
     # would implement this recursively if the data structure were more regular
-    for clstNo in metadata["clstNo"]:
-        lvl1 = h5_fstream.create_group(str(clstNo))
+    # for clstNo in metadata["clstNo"]:
+    #     lvl1 = h5_fstream.create_group(str(clstNo))
 
-        for cuts in metadata["cuts"].keys():
-            lvl2 = lvl1.create_group(cuts)
+    #     for cuts in metadata["cuts"].keys():
+    #         lvl2 = lvl1.create_group(cuts)
 
-            for weights in metadata["weights"].keys():
-                lvl3 = lvl2.create_group(weights)
+    #         for weights in metadata["weights"].keys():
+    #             lvl3 = lvl2.create_group(weights)
 
-                for los_axis in metadata["los_axis"]:
-                    lvl4 = lvl3.create_group(str(los_axis))
+    #             for los_axis in metadata["los_axis"]:
+    #                 lvl4 = lvl3.create_group(str(los_axis))
 
-                    for xi in np.unique(metadata["xi"]):
-                        try:
-                            lvl5 = lvl4.create_group(str(xi))
-                        except ValueError:
-                            print(
-                                "ValueError raised due to creating existing groups")
+    #                 for xi in np.unique(metadata["xi"]):
+    #                     try:
+    #                         lvl5 = lvl4.create_group(str(xi))
+    #                     except ValueError:
+    #                         print(
+    #                             "ValueError raised due to creating existing groups")
 
-                        for phi in np.unique(metadata["phi"]):
-                            try:
-                                lvl6 = lvl5.create_group(str(phi))
-                            except ValueError:
-                                print(
-                                    "ValueError raised due to creating existing groups")
+    #                     for phi in np.unique(metadata["phi"]):
+    #                         try:
+    #                             lvl6 = lvl5.create_group(str(phi))
+    #                         except ValueError:
+    #                             print(
+    #                                 "ValueError raised due to creating existing groups")
 
 
     return h5_fstream
+
+
+def metakeys():
+    return ["clstNo", "cut", "weights", "los_axis", "xi", "phi"]
+
+
+def retrieve_fhat_from_gp(gp_keys, gp_vals, h5_fhat_fstream):
+    """
+    :param gp_val: pandas dataframes containing peak info
+    :param gp_keys: groupby keys from a dictionary
+    :param h5_fhat_fstream: hdf5 file stream
+        to the data output with projections, cuts and weights
+
+    :returns:
+        a dictionary of fhat objects
+    :example
+        >>>fhat_dict = {gp_keys:
+                        getg.retrieve_fhat_from_gp(gp_keys, gp_vals, h5_fstream)
+                        for gp_keys, gp_vals in groups.iteritems()}
+    """
+    path = [str(v) + "/" for v in gp_keys]
+    path = ''.join(path)
+
+    fhat_keys = ["estimate", "bandwidth_matrix_H", "eval_points"]
+    fhat = {key: h5_fhat_fstream[path + key][...] for key in fhat_keys}
+
+    peak_keys = ["peaks_dens", "peaks_xcoords", "peaks_ycoords"]
+    for k in peak_keys:
+        fhat[k] = gp_vals[k]
+
+    return fhat
 
 
 def h5path_from_clst_metadata(clst_metadata):

@@ -2,7 +2,7 @@
 Author: Karen Ng <karenyng@ucdavis.edu>
 License: BSD
 """
-from __future__ import division
+from __future__ import division, print_function
 import matplotlib.pyplot as plt
 # from matplotlib.mlab import bivariate_normal
 import numpy as np
@@ -32,8 +32,8 @@ def plot_color_mag_diag(df, bluer_band, redder_band, band_limit,
     mask_i = df[redder_band] < bcg_i + band_limit
 
     if verbose:
-        print "subhalos need at least {0} DM".format(subhalo_len_lim) + \
-            " particles to be plotted"
+        print("subhalos need at least {0} DM".format(subhalo_len_lim) +
+              " particles to be plotted")
     # examine number of DM particles
     mask_ii = df["SubhaloLenType1"] > subhalo_len_lim
 
@@ -252,9 +252,10 @@ def plot_bandwidth_matrix(mtx, up_xlim, up_ylim, low_xlim, low_ylim,
     muy = low_ylim + .7 * width
 
     if debug:
-        print "eigval {0} and eigvec are {1}".format(eigval, eigvec)
-        print "matrix is {0}".format(mtx)
-        print "width: {0}, height: {1}, angle {2}".format(width, height, angle)
+        print( "eigval {0} and eigvec are {1}".format(eigval, eigvec))
+        print( "matrix is {0}".format(mtx))
+        print( "width: {0}, height: {1}, angle {2}".format(width, height,
+                                                           angle))
     ell = Ellipse(xy=np.array([mux, muy]), width=width, height=height,
                   angle=angle, color="m", edgecolor='none')
     ax = plt.gca()
