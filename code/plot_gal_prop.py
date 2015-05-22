@@ -129,7 +129,7 @@ def plot_cf_contour(dens, x, y, lvls=[68, 95], show=False, clabel=False,
     return lvl_contours
 
 
-def plot_KDE_peaks(fhat, lvls=range(2, 100, 10), allPeaks=False,
+def plot_KDE_peaks(fhat, lvls=range(2, 100, 10), allPeaks=True,
                    plotDataPoints=False, save=False, R200C=None,
                    fileName="KDE_plot_cluster", clstNo=None,
                    clabel=False, showData=False, xlabel="x (kpc / h)",
@@ -177,7 +177,8 @@ def plot_KDE_peaks(fhat, lvls=range(2, 100, 10), allPeaks=False,
 
     ax.set_title("Clst {0}: ".format(clstNo) +
                  "No of peaks found = {0}\n".format(len(fhat["peaks_dens"])) +
-                 "Total peak dens = {0:.3g}".format(np.sum(fhat["peaks_dens"])))
+                 "Total peak dens = {0:.3g}".format(np.sum(fhat["peaks_dens"])),
+                 size=15)
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
     # ax.set_xticklabels(ax.get_xticklabels(), rotation=45)
