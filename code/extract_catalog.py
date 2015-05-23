@@ -1,9 +1,9 @@
-"""
-For extracting data from raw halo FoF / subhalo catalog to catalog of clusters
+"""Extract data from raw halo FoF / subhalo catalog to catalog of clusters.
 for the Illustris-1 simulation
 Author: Karen Ng
 License: BSD
 """
+
 import sys
 sys.path.append("../IEnv/lib/python2.7/site-packages/")  # virtualenv path
 import numpy as np
@@ -50,7 +50,6 @@ def extract_clst(f, clstNo, output=False, keys=default_keys(),
             print "outputting file :" + outputFile
             print "with key name as df"
         clst_df.to_hdf(outputFile, "df")
-
 
     return clst_df
 
@@ -178,6 +177,24 @@ def add_info(h5, info, h5_key="df", h5_subkey="info"):
 
     return None
 
+
+def check_particle_parent_clst(particle_halo_id, clsts=129,
+                               start_id=0, end_id=8e7):
+    loc = []
+    count = 0
+    clst_list = range(1, clsts)
+    clst_to_match = clst_list.pop(0)
+    for i in particle_halo_id[start_id:end_id]:
+        if int(i) != clst_to_match:
+            # print("i = ", i)
+            # print("clst_to_match=", clst_to_match)
+            loc.append(count)
+            if clst_list:
+                clst_to_match = clst_list.pop(0)
+            else:
+                return loc
+        count += 1
+    return loc
 
 # -------------docstrings --------------------------------------
 extract_clst.__doc__ = \
