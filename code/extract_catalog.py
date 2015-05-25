@@ -119,7 +119,8 @@ def fix_clst_cat(f, clstNo, keys=default_keys()):
 
 
 def wrap_and_center_coord(coords, edge_constraint=1e4,
-                          verbose=False, center_coord=None):
+                          verbose=False, center_coord=None,
+                          wrap_criteria=7.5e4):
     """ fixing the periodic boundary conditions per cluster
     wraps automatically at 75 Mpc / h then center coord at most bound particle
     The cluster should not be 10 Mpc within the edge
@@ -140,14 +141,15 @@ def wrap_and_center_coord(coords, edge_constraint=1e4,
 
     # need the - 7.4e4 part inside np.abs() since some might be closer
     # to the larger end of the box
-    if np.all(np.abs(coords % 7.5e4 - 7.5e4) > edge_constraint):
+    #if np.all(np.abs(coords % 7.5e4 - 7.5e4) > edge_constraint):
+    if np.all(np.abs(coords % wrap_criteria - wrap_criteria) > edge_constraint):
         pass
     else:
         mask = coords > edge_constraint
         if verbose:
             print "close to box edge, needs wrapping"
             print "before masking ", coords[mask]
-        coords[mask] = coords[mask] - 7.5e4
+        coords[mask] = coords[mask] - wrap_criteria
         if verbose:
             print "after masking ", coords[mask]
 
@@ -178,8 +180,79 @@ def add_info(h5, info, h5_key="df", h5_subkey="info"):
     return None
 
 
+# ----------helper functions for getting DM particle data --------------------
+def get_DM_particles(clsts, partDMh5, h5part_coord_key="PartType1_Coordinates",
+                     partDMhaloIxLoc_h5file="DM_particles_clst_loc.h5",
+                     dataPath="../data/",verbose=False):
+    """
+    Parameters
+    ----------
+    clsts : list of integer(s), first clst has an ID of 0
+        indicates which cluster(s) you would like to retrieve
+    partDMh5 : hdf5 files stream
+        this connects to the hdf5 file that contains all DM particle data
+    h5part_coord_key : str
+        this is the key that contains coordinate information
+    partDMhaloIxLoc_h5file : str
+        file name of the hdf5 file that contains the location of index of the
+        last DM particle of each halo
+    dataPath : str
+        where the data files are stored and is appended before file names
+
+    Returns
+    ------
+    dictionary
+        key : clst(s) id
+        value : numpy array
+            with the coordinates of the particles of that
+            particular clst.
+        * Coordinates are first centered,
+        * then the min. coordinates subtract to make sure all coordinates are
+        positive so we can make histograms
+    """
+    # make sure we do not write to the file by using read-only mode
+    part_halos = h5py.File(dataPath + partDMhaloIxLoc_h5file, "r")
+    haloEndIx = [0] + list(part_halos["loc"][...])
+
+    # extract coordinates
+    coords = {clstNo: partDMh5[h5part_coord_key][:, haloEndIx[clstNo]:
+                                                 haloEndIx[clstNo + 1]]
+              for clstNo in clsts}
+
+    # wrap and center coordinates then put it in a dictionary
+    coords = {clstNo: {"coords":
+                       np.array(map(lambda x:
+                                    wrap_and_center_coord(x,
+                                                          edge_constraint=1e5,
+                                                          wrap_criteria=
+                                                          10.65e4,
+                                                          verbose=verbose), crd,
+                                    ))}
+              for clstNo, crd in coords.iteritems()}
+
+    for clstNo, cl_dict in coords.iteritems():
+        cl_dict["min_coords"] = np.min(cl_dict["coords"], axis=1).reshape(
+            cl_dict["coords"].shape[0], 1)
+        cl_dict["coords"] = (cl_dict["coords"] -
+                             cl_dict["min_coords"]).transpose()
+
+    return coords
+
+
 def check_particle_parent_clst(particle_halo_id, clsts=129,
                                start_id=0, end_id=8e7):
+    """
+    :param particle_halo_id: hdf5 fstream array
+        contains particle parent halo id
+    :param clsts: integer
+        what clusters you would like to get the particle ID location
+    :param start_id: integer
+        which index of the `particle_halo_id` array  you would like to limit
+        the search range to
+    :param start_id: integer
+        which index of the `particle_halo_id` array you would like to limit
+        the search range to
+    """
     loc = []
     count = 0
     clst_list = range(1, clsts)
@@ -195,6 +268,8 @@ def check_particle_parent_clst(particle_halo_id, clsts=129,
                 return loc
         count += 1
     return loc
+
+
 
 # -------------docstrings --------------------------------------
 extract_clst.__doc__ = \

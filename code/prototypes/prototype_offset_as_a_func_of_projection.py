@@ -1,11 +1,12 @@
-""" prototype script for final run """
+"""Prototype script for final run."""
 from __future__ import (print_function,
                         division, absolute_import)
 import pandas as pd
 import os
 
 dataPath = "../../data/"
-StoreFile = "test_peak_df.h5"
+output_fhat_path = "test_fhat_129.h5"
+StoreFile = "test_peak_df_129.h5"
 if os.path.isfile(dataPath + StoreFile):
     os.remove(dataPath + StoreFile)
 store = pd.HDFStore(dataPath + StoreFile)
@@ -22,7 +23,8 @@ from collections import OrderedDict
 verbose = True
 import h5py
 original_f = h5py.File(dataPath +
-                       "Illustris-1_fof_subhalo_myCompleteHaloCatalog_00135.hdf5")
+                       "Illustris-1_fof_subhalo_myCompleteHaloCatalog_00135" +
+                       ".hdf5")
 
 # ================ make all decisions ===========================
 
@@ -30,7 +32,7 @@ pos_cols = ["SubhaloPos{0}".format(i) for i in range(3)]
 metadata = OrderedDict({})
 
 # no. of clsters
-metadata["clstNo"] = [13]  # range(20)  # range(20)  # [4]  # , 5]
+metadata["clstNo"] = range(129)  # range(20)  # range(20)  # [4]  # , 5]
 
 # cuts
 cut_kwargs = {"DM_cut": 1e3, "star_cut": 5e2}
@@ -45,14 +47,13 @@ metadata["weights"] = OrderedDict({
     })
 
 # projections
-nside = 16  # nsides of HEALpix are powers of 2
+nside = 16  # nsides of HEALpix are powers of 2, pix for 16 nsides = 3072 / 2
 metadata["los_axis"] = [2]  # use z-axis as los axis
 metadata["xi"], metadata["phi"] = getg.angles_given_HEALpix_nsides(nside)
 
 # ============== set up output file structure  ===========
 # check_metadata against illegal types
 # create HDF5 file structure first!
-output_fhat_path = "test_fhat.h5"
 if os.path.isfile(dataPath + output_fhat_path):
     os.remove(dataPath + output_fhat_path)
 h5_fstream = getg.construct_h5_file_for_saving_fhat(metadata, dataPath,
@@ -62,7 +63,7 @@ h5_fstream = getg.construct_h5_file_for_saving_fhat(metadata, dataPath,
 clst_metadata = OrderedDict({})
 for clstNo in metadata["clstNo"]:
     print ("processing clst {0} ".format(clstNo) +
-           "out of {0}".format(len(metadata["clstNo"][-1])))
+           "out of {0}".format(len(metadata["clstNo"])))
     peak_df = pd.DataFrame()
     clst_metadata["clstNo"] = clstNo
     df = ext_cat.extract_clst(original_f, clstNo)

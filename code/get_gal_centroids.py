@@ -64,6 +64,9 @@ def mag_to_lum(mag):
     return np.exp(-mag + 23.)
 
 
+def convert_MpcOverh_to_Mpc():
+    return
+
 # --------- functions for computing gal-DM offsets-------------------------
 def compute_KDE_offsets(peak_xcoords, peak_ycoords):
     """
@@ -500,7 +503,6 @@ def galaxies_closest_to_peak(df, list_of_coord_keys, peak_coords,
     # we use Euclidean distance for our query, i.e. p=2
     return tree.query(peak_coords, k=k_nearest_neighbor, p=2)
 
-# ---------- weights --------------------------------------------------
 
 # --------- compute confidence region for each method ------------------
 
