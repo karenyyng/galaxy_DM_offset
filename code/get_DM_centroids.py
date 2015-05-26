@@ -2,6 +2,7 @@
 from __future__ import (print_function, division)
 import numpy as np
 import matplotlib.pyplot as plt
+import get_KDE
 
 
 def make_histogram_with_2kpc_resolution(data, coord_key="coords",
@@ -39,7 +40,7 @@ def make_histogram_with_2kpc_resolution(data, coord_key="coords",
     fhat["estimate"], edges1, edges2, image = \
         plt.hist2d(data[coord_key][:, spatial_axis[0]],
                    data[coord_key][:, spatial_axis[1]],
-                   bins=bins[spatial_axis])
+                   bins=bins[spatial_axis], cmap=plt.cm.BrBG)
 
     edges = [edges1, edges2]
     # compute center of histogram bins
@@ -48,6 +49,9 @@ def make_histogram_with_2kpc_resolution(data, coord_key="coords",
     fhat["eval_points"] = np.array([0.5 * (edges[i][1:] + edges[i][:-1]) +
                                     data["min_coords"][spatial_axis[i]]
                                     for i in range(2)])
+
+    get_KDE.find_peaks_from_py_diff(fhat)
+    get_KDE.get_density_weights(fhat)
 
     if close_plot:
         plt.close()
