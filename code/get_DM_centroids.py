@@ -3,6 +3,7 @@ from __future__ import (print_function, division)
 import numpy as np
 import matplotlib.pyplot as plt
 import get_KDE
+from scipy.spatial import KDTree
 
 
 def make_histogram_with_2kpc_resolution(data, coord_key="coords",
@@ -59,3 +60,56 @@ def make_histogram_with_2kpc_resolution(data, coord_key="coords",
         plt.show()
 
     return fhat
+
+
+def match_DM_peaks_with_gal_peaks(fhat, fhat_stars, threshold=0.3,
+                                  convert_kpc_over_h_to_kpc=True,
+                                  verbose=True):
+    """
+    Parameters
+    ----------
+    fhat : dictionary
+        contains all the peak information of the DM density
+        this dict. is the output from `make_histogram_with_2kpc_resolution`
+    fhat_stars : dictionary
+        contains all the peak information of the galaxies
+        (weighted / unweighted).
+        This dict. is the output of `get_gal_centroids.do_KDE_and_get_peak()`
+    threshold : float
+        the DM peak density threshold for peaks to be considered in the
+        matching process.
+    convert_kpc_over_h_to_kpc : bool
+        whether to convert the gal fhat coordinates from kpc / h to kpc
+    verbose : bool
+        print info or not
+
+    Return
+    ------
+    dist : numpy array of floats
+        distance in kpc of the matched object from the gal peak
+    match : numpy array of integers
+        index of the matched object in the masked DM peaks dictionary
+        corresponding to the closest match to the gal peak.
+        e.g. [3, 1, 2, 4]
+        would mean the 3rd DM peak matches to the 1st gal peak
+        1st DM peak matches to the 2nd gal peak etc.
+
+    """
+    # only consider peaks over a certain density threshold
+    peaks_mask = fhat["peaks_dens"] > threshold
+    DMpeakCoords = np.array([fhat["peaks_xcoords"][peaks_mask],
+                            fhat["peaks_ycoords"][peaks_mask]]).transpose()
+    tree = KDTree(DMpeakCoords)
+
+    galpeakCoords = np.array([fhat_stars["peaks_xcoords"],
+                              fhat_stars["peaks_ycoords"]]).transpose()
+
+    if verbose:
+        print("Converting subhalo distance units from kpc / h to kpc")
+
+    if convert_kpc_over_h_to_kpc:
+        galpeakCoords *= 106.5 / 75.
+
+    dist, match = tree.query(galpeakCoords)
+
+    return dist, match
