@@ -64,8 +64,9 @@ def mag_to_lum(mag):
     return np.exp(-mag + 23.)
 
 
-def convert_MpcOverh_to_Mpc():
-    return
+def convert_Mpc_over_h_to_Mpc(coords):
+    return coords * 106.5 / 75.
+
 
 # --------- functions for computing gal-DM offsets-------------------------
 def compute_KDE_offsets(peak_xcoords, peak_ycoords):
@@ -614,7 +615,9 @@ def angles_given_HEALpix_nsides(nside):
     return xi, phi
 
 
-# --------- meta data handling -----------------------------------------
+
+
+# --------- depreciated R conversion functions ------------------------------
 
 # def convert_R_peak_ix_to_py_peaks(fhat, ix_key="peak_coords_ix",
 #                                   pt_key="eval_points"):

@@ -17,6 +17,12 @@ robjects.r('source("ks_KDE.r")')
 # --------- functions for computing gal-DM offsets-------------------------
 def find_peaks_from_py_diff(fhat, estKey="estimate", gridKey="eval_points"):
     """
+    :param fhat: python dictionary
+        :key estKey: value corresponds to 2D numpy array
+            gives density estimate
+        :key gridKey: value corresponds to 2D numpy array
+            each array contains spatial coordinate in the following form
+            i.e. [[x1, x2, ..., xn], [y1, y2, ..., yn]]
     :note: side effects for fhat, fhat is passed by reference
     """
     est = fhat[estKey]
@@ -35,11 +41,11 @@ def find_peaks_from_py_diff(fhat, estKey="estimate", gridKey="eval_points"):
 
     # diff consecutive rows
     rowGrad1 = np.diff(fhat[estKey], axis=0)
-    rowGrad1 = np.vstack((rowGrad1, np.zeros(est.shape[0]).transpose()))
+    rowGrad1 = np.vstack((rowGrad1, np.zeros(est.shape[1]).transpose()))
 
     # diff the consecutive row in the reverse direction
     rowGrad2 = np.diff(est[::-1], axis=0)
-    rowGrad2 = np.vstack((rowGrad2, np.zeros(est.shape[0]).transpose()))
+    rowGrad2 = np.vstack((rowGrad2, np.zeros(est.shape[1]).transpose()))
     rowGrad2 = rowGrad2[::-1]
 
     rowMask1 = np.logical_and(rowGrad1 < 0, rowGrad2 < 0)
