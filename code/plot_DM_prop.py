@@ -1,8 +1,10 @@
+from __future__ import (division, print_function)
 import matplotlib.pyplot as plt
 import numpy as np
 
 
-def plot_DM_fhat(fhat, fhat_stars, clstNo, threshold=0.3):
+def plot_DM_fhat(fhat, fhat_stars, clstNo, threshold=0.3,
+                 convert_kpc_over_h_to_kpc=True):
     peaks_mask = fhat["peaks_dens"] > threshold
 
     if "log_est" not in fhat.keys():
@@ -21,10 +23,12 @@ def plot_DM_fhat(fhat, fhat_stars, clstNo, threshold=0.3):
              ms=25, label="DM peaks")
 
     # plot I-band luminosity peaks
-    plt.plot(fhat_stars["peaks_xcoords"],
-             fhat_stars["peaks_ycoords"],
-             'o', color='red', fillstyle="none", mew=3, ms=25,
-             label="I band luminosity peaks")
+    if convert_kpc_over_h_to_kpc:
+        print("Converting unit of kpc / h to kpc for galaxy data")
+        plt.plot(fhat_stars["peaks_xcoords"] * 106.5 / 75.,
+                fhat_stars["peaks_ycoords"] * 106.5 / 75.,
+                'o', color='red', fillstyle="none", mew=3, ms=25,
+                label="I band luminosity peaks")
 
     plt.title('Cluster {0}: DM peak density threshold = {1}'.format(clstNo,
                                                                     threshold),

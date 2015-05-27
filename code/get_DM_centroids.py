@@ -87,13 +87,14 @@ def match_DM_peaks_with_gal_peaks(fhat, fhat_stars, threshold=0.3,
     ------
     dist : numpy array of floats
         distance in kpc of the matched object from the gal peak
+        len(dist) = len(fhat_stars["peaks_dens"])
     match : numpy array of integers
         index of the matched object in the masked DM peaks dictionary
         corresponding to the closest match to the gal peak.
         e.g. [3, 1, 2, 4]
         would mean the 3rd DM peak matches to the 1st gal peak
         1st DM peak matches to the 2nd gal peak etc.
-
+        len(match) = len(fhat_stars["peaks_dens"])
     """
     # only consider peaks over a certain density threshold
     peaks_mask = fhat["peaks_dens"] > threshold
@@ -113,3 +114,26 @@ def match_DM_peaks_with_gal_peaks(fhat, fhat_stars, threshold=0.3,
     dist, match = tree.query(galpeakCoords)
 
     return dist, match
+
+
+# ------------ unstable but may be used if all else fails -------------------
+
+def get_dens_and_grid(x, y, bw='normal_reference',
+                      gridsize=100, cut=4,
+                      clip=[-np.inf, np.inf], n_jobs=10):
+    """wrapper around statsmodel and seaborn function for inferring 2D density
+    :note: unstable:
+    """
+    from seaborn.distributions import _kde_support
+    import statsmodels.nonparametric.kernel_density as KDE
+    KDEMultivariate = KDE.KDEMultivariate
+
+    kde = KDEMultivariate(np.array([x, y]), var_type='cc', bw=bw)
+    kde.n_jobs = n_jobs
+
+    x_support = _kde_support(x, kde.bw[0], gridsize, cut, clip)
+    y_support = _kde_support(y, kde.bw[1], gridsize, cut, clip)
+    xx, yy = np.meshgrid(x_support, y_support)
+
+    z = kde.pdf([xx.ravel(), yy.ravel()]).reshape(xx.shape)
+    return xx, yy, z
