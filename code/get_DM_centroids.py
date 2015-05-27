@@ -64,7 +64,9 @@ def make_histogram_with_2kpc_resolution(data, coord_key="coords",
 
 def match_DM_peaks_with_gal_peaks(fhat, fhat_stars, threshold=0.3,
                                   convert_kpc_over_h_to_kpc=True,
-                                  verbose=True):
+                                  verbose=True, k_neighbors=1,
+                                  distance_upper_bound=100,
+                                  p_norm=2):
     """
     Parameters
     ----------
@@ -80,6 +82,13 @@ def match_DM_peaks_with_gal_peaks(fhat, fhat_stars, threshold=0.3,
         matching process.
     convert_kpc_over_h_to_kpc : bool
         whether to convert the gal fhat coordinates from kpc / h to kpc
+    k_neighbors : int
+        number of neighbors per query entry to return
+    distance_upper_bound : float
+        in kpc, what is the upper bound to return, inf is returned if distance
+        of nearest neighbor is outside the bound
+    p_norm : integer
+        what norm to use. 1-Manhattan distance, 2-Euclidean norm
     verbose : bool
         print info or not
 
@@ -111,10 +120,15 @@ def match_DM_peaks_with_gal_peaks(fhat, fhat_stars, threshold=0.3,
     if convert_kpc_over_h_to_kpc:
         galpeakCoords *= 106.5 / 75.
 
-    dist, match = tree.query(galpeakCoords)
+    dist, match = tree.query(galpeakCoords, p=p_norm,
+                             distance_upper_bound=distance_upper_bound,
+                             k=k_neighbors)
 
     return dist, match
 
+
+def create_cut_out_regions_for_KDE(fhat, R500C):
+    return
 
 # ------------ unstable but may be used if all else fails -------------------
 

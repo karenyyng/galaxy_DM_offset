@@ -487,6 +487,15 @@ def get_BCG_offset(df, spat_key1="SubhaloPos0", spat_key2="SubhaloPos1",
     return compute_euclidean_dist(BCG_offset)
 
 
+def get_gal_coords(df, DM_cut=1e3, star_cut=1e2, coordkey0="SubhaloPos1",
+                   coordkey1="SubhaloPos1"):
+    # from scipy.spatial import KDTree
+
+    df = df[cut_reliable_galaxies(df, DM_cut, star_cut)]
+    coords = np.array(df[[coordkey0, coordkey1]])
+
+    return coords
+
 def galaxies_closest_to_peak(df, list_of_coord_keys, peak_coords,
                              k_nearest_neighbor=None):
     from scipy.spatial import KDTree
