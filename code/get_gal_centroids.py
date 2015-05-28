@@ -40,15 +40,18 @@ def prep_data_with_cuts_and_wts(df, cuts, cut_methods, cut_cols, wts,
     """
     dfs_with_cuts = OrderedDict({})
     for cut_method_name, cut_kwargs in cuts.iteritems():
-        mask = cut_methods[cut_method_name](df, **cut_kwargs)
-        if verbose:
-            print "# of subhalos after the " + \
-                  "{1} cut = {0}".format(np.sum(mask), cut_method_name)
-        # col = cut_cols[cut_method_name]
-        thisdf = df[mask].copy()
+        if cut_kwargs:  # skip if cut_kwargs is None
+            mask = cut_methods[cut_method_name](df, **cut_kwargs)
+            if verbose:
+                print "# of subhalos after the " + \
+                    "{1} cut = {0}".format(np.sum(mask), cut_method_name)
+            # col = cut_cols[cut_method_name]
+            thisdf = df[mask].copy()
+        else:
+            thisdf = df
 
         for weight, wt_func in wts.iteritems():
-            if weight != "no":
+            if wt_func:  # if wt_func is not None
                 thisdf[weight + "_wt"] = wt_func(thisdf[weight])
             else:
                 thisdf[weight + "_wt"] = np.ones(thisdf.shape[0])
@@ -288,6 +291,9 @@ def find_3D_peaks():
     return
 
 
+def get_subhalo_mass(df):
+    return np.array(df)
+
 # -----------other centroid methods ------------------------------------
 def shrinking_apert(data, center_coord=None, r0=None, debug=False, w=None):
     """
@@ -495,6 +501,7 @@ def get_gal_coords(df, DM_cut=1e3, star_cut=1e2, coordkey0="SubhaloPos1",
     coords = np.array(df[[coordkey0, coordkey1]])
 
     return coords
+
 
 def galaxies_closest_to_peak(df, list_of_coord_keys, peak_coords,
                              k_nearest_neighbor=None):

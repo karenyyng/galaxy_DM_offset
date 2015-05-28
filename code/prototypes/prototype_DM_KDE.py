@@ -5,8 +5,8 @@ import pandas as pd
 import os
 
 dataPath = "../../data/"
-output_fhat_path = "test_fhat_129.h5"
-StoreFile = "test_peaks_df_129.h5"
+output_fhat_path = "test_DM_KDE_fhat_129.h5"
+StoreFile = "test_DM_peak_129.h5"
 if os.path.isfile(dataPath + StoreFile):
     os.remove(dataPath + StoreFile)
 store = pd.HDFStore(dataPath + StoreFile)
@@ -32,24 +32,25 @@ pos_cols = ["SubhaloPos{0}".format(i) for i in range(3)]
 metadata = OrderedDict({})
 
 # no. of clsters
-metadata["clstNo"] = range(129)  # range(20)  # range(20)  # [4]  # , 5]
+metadata["clstNo"] = [0]  # range(129)  # range(20)  # range(20)  # [4]  # , 5]
 
 # cuts
 cut_kwargs = {"DM_cut": 1e3, "star_cut": 5e2}
-cut_methods = {"min": getg.cut_reliable_galaxies}
-cut_cols = {"min": pos_cols}
-metadata["cuts"] = {"min": cut_kwargs}
+cut_methods = {"no": None}
+cut_cols = {"no": None}
+metadata["cuts"] = {"no": None}
 
 # weights
 metadata["weights"] = OrderedDict({
     # "no": None,
-    "i_band": getg.mag_to_lum
+    # "i_band": getg.mag_to_lum
+    "SubhaloMass": getg.get_subhalo_mass
     })
 
 # projections
 nside = 16  # nsides of HEALpix are powers of 2, pix for 16 nsides = 3072 / 2
 metadata["los_axis"] = [2]  # use z-axis as los axis
-metadata["xi"], metadata["phi"] = getg.angles_given_HEALpix_nsides(nside)
+metadata["xi"], metadata["phi"] = ([0], [0])  # getg.angles_given_HEALpix_nsides(nside)
 
 # ============== set up output file structure  ===========
 # check_metadata against illegal types

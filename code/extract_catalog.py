@@ -22,7 +22,7 @@ def default_keys():
             u'SubhaloStellarPhotometrics',
             # u'SubhaloStellarPhotometricsMassInRad',
             u'SubhaloLenType',
-            # u'SubhaloMass',
+            u'SubhaloMass',
             # u'SubhaloMassType'
             ]
 
