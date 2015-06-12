@@ -29,7 +29,7 @@ def cut_reliable_galaxies(df, DM_cut=1e3, star_cut=1e2):
 
 
 def prep_data_with_cuts_and_wts(df, cuts, cut_methods, cut_cols, wts,
-                                verbose=False):
+                                verbose=True):
     """
     :param df: pandas dataframe containing all subhalos for each cluster
     :param cut_methods: function
@@ -40,14 +40,14 @@ def prep_data_with_cuts_and_wts(df, cuts, cut_methods, cut_cols, wts,
     """
     dfs_with_cuts = OrderedDict({})
     for cut_method_name, cut_kwargs in cuts.iteritems():
-        if cut_kwargs:  # skip if cut_kwargs is None
+        if cut_kwargs is not None:  # skip if cut_kwargs is None
             mask = cut_methods[cut_method_name](df, **cut_kwargs)
-            if verbose:
-                print "# of subhalos after the " + \
-                    "{1} cut = {0}".format(np.sum(mask), cut_method_name)
+            print "# of subhalos after the " + \
+                "{1} cut = {0}".format(np.sum(mask), cut_method_name)
             # col = cut_cols[cut_method_name]
-            thisdf = df[mask].copy()
+            thisdf = df[mask].copy()  # avoid funny behavior by hard copying
         else:
+            print "there is no cut. # of subhalos = {}".format(df.shape[0])
             thisdf = df
 
         for weight, wt_func in wts.iteritems():

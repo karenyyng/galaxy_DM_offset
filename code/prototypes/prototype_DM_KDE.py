@@ -32,12 +32,12 @@ pos_cols = ["SubhaloPos{0}".format(i) for i in range(3)]
 metadata = OrderedDict({})
 
 # no. of clsters
-metadata["clstNo"] = [0]  # range(129)  # range(20)  # range(20)  # [4]  # , 5]
+metadata["clstNo"] = range(129)  # range(129)  # range(20)  # [4]  # [5]
 
 # cuts
-cut_kwargs = {"DM_cut": 1e3, "star_cut": 5e2}
+cut_kwargs = {"DM_cut": 1e3}
 cut_methods = {"no": None}
-cut_cols = {"no": None}
+cut_cols = {"no": pos_cols}
 metadata["cuts"] = {"no": None}
 
 # weights
@@ -60,6 +60,7 @@ if os.path.isfile(dataPath + output_fhat_path):
 h5_fstream = getg.construct_h5_file_for_saving_fhat(metadata, dataPath,
                                                     output_fhat_path)
 
+print ("no of clusters to process : {}".format(len(metadata["clstNo"])))
 # ============== prepare data based on the metadata ===========
 clst_metadata = OrderedDict({})
 for clstNo in metadata["clstNo"]:

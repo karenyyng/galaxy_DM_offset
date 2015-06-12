@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import get_KDE
 from scipy.spatial import KDTree
 
+from scipy import ndimage
 
 def make_histogram_with_2kpc_resolution(data, coord_key="coords",
                                         spatial_axis=range(2),
@@ -151,3 +152,16 @@ def get_dens_and_grid(x, y, bw='normal_reference',
 
     z = kde.pdf([xx.ravel(), yy.ravel()]).reshape(xx.shape)
     return xx, yy, z
+
+
+def infer_threshold(total_peak_dens, fhat, threshold=0.9):
+    peaks_mask = fhat["peaks_dens"] > threshold
+    while(np.sum(fhat["peaks_dens"][peaks_mask]) < total_peak_dens):
+        threshold -= .05
+        peaks_mask = fhat["peaks_dens"] > threshold
+    return threshold, np.sum(fhat["peaks_dens"][peaks_mask])
+
+def smooth_histograms(fhat):
+    smoothed = ndimage.filters.gaussian_filter(fhat["estimate"], sigma=3)
+
+    return

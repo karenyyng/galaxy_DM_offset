@@ -19,15 +19,15 @@ def plot_DM_fhat(fhat, fhat_stars, clstNo, threshold=0.3,
     ixes = np.arange(0, len(fhat["peaks_xcoords"]), 1)[peaks_mask]
     # plot DM peaks
     plt.plot(fhat["peaks_xcoords"][ixes], fhat["peaks_ycoords"][ixes],
-             "o", color='cyan', fillstyle="none", mew=1.5,
-             ms=25, label="DM peaks")
+             "o", color='cyan', fillstyle="none", mew=3,
+             ms=35, label="DM peaks")
 
     # plot I-band luminosity peaks
     if convert_kpc_over_h_to_kpc:
         print("Converting unit of kpc / h to kpc for galaxy data")
         plt.plot(fhat_stars["peaks_xcoords"] * 106.5 / 75.,
                 fhat_stars["peaks_ycoords"] * 106.5 / 75.,
-                'o', color='red', fillstyle="none", mew=3, ms=25,
+                'o', color='red', fillstyle="none", mew=3, ms=35,
                 label="I band luminosity peaks")
 
     plt.title('Cluster {0}: DM peak density threshold = {1}'.format(clstNo,
