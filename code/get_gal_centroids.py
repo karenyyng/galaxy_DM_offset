@@ -171,6 +171,7 @@ def compute_shrinking_aperture_offset(df, f, clstNo, cut_method, cut_kwargs,
             "Haven't generalized to compute offset for ndim > 2")
 
 
+
 # ---------- Utilities for converting dictionaries to h5 objects -------
 def convert_dict_peaks_to_df(fhat, metadata,
                              save=False, output_path="../data/",
@@ -236,7 +237,15 @@ def construct_h5_file_for_saving_fhat(metadata, output_path="../../data/",
 
 
 def metakeys():
+    """keys with which our h5 files are organized"""
     return ["clstNo", "cut", "weights", "los_axis", "xi", "phi"]
+
+
+def metadata_from_h5_key_path(h5_key_path):
+    from collections import OrderedDict
+    keys = ["clstNo", "cut", "weights", "los_axis", "xi", "phi"]
+    val = h5_key_path.split("/")
+    return OrderedDict({k: val[i] for i, k in enumerate(keys)})
 
 
 def retrieve_fhat_from_gp(gp_keys, gp_vals, h5_fhat_fstream):

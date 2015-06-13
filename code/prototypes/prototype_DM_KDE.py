@@ -3,10 +3,12 @@ from __future__ import (print_function,
                         division, absolute_import)
 import pandas as pd
 import os
+import datetime
 
+timestamp = str(datetime.datetime.now())[:-7]
 dataPath = "../../data/"
-output_fhat_path = "test_DM_KDE_fhat_129.h5"
-StoreFile = "test_DM_peak_129.h5"
+output_fhat_path = "test_DM_KDE_fhat_129_" + timestamp + ".h5"
+StoreFile = "test_DM_peak_129_" + timestamp + ".h5"
 if os.path.isfile(dataPath + StoreFile):
     os.remove(dataPath + StoreFile)
 store = pd.HDFStore(dataPath + StoreFile)
@@ -26,6 +28,8 @@ original_f = h5py.File(dataPath +
                        "Illustris-1_fof_subhalo_myCompleteHaloCatalog_00135" +
                        ".hdf5")
 
+print ("Writing out to data to {0} and \n".format(output_fhat_path) +
+       "{0}".format(StoreFile))
 # ================ make all decisions ===========================
 
 pos_cols = ["SubhaloPos{0}".format(i) for i in range(3)]

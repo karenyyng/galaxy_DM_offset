@@ -135,7 +135,7 @@ def plot_KDE_peaks(fhat, lvls=range(2, 100, 10), allPeaks=True,
                    clabel=False, showData=False, xlabel="x (kpc / h)",
                    ylabel="y (kpc / h)", showDomPeak=True,
                    fileDir="../plots/", fill=False, showContour=True,
-                   ax=None, fig=None):
+                   ax=None, fig=None, xlabel_rotate_angle=45):
     """make a plot of the fhat along with other important info
     :param fhat:
     """
@@ -181,7 +181,9 @@ def plot_KDE_peaks(fhat, lvls=range(2, 100, 10), allPeaks=True,
                  size=15)
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
-    # ax.set_xticklabels(ax.get_xticklabels(), rotation=45)
+    # rotate tick label
+    map(lambda x: x.set_rotation(xlabel_rotate_angle), ax.get_xticklabels())
+
 
     if R200C is not None:
         R200_circl = plt.Circle((0, 0), radius=R200C, color='k', lw=2,

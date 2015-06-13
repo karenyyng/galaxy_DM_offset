@@ -161,6 +161,7 @@ def infer_threshold(total_peak_dens, fhat, threshold=0.9):
         peaks_mask = fhat["peaks_dens"] > threshold
     return threshold, np.sum(fhat["peaks_dens"][peaks_mask])
 
+
 def smooth_histograms(fhat):
     smoothed = ndimage.filters.gaussian_filter(fhat["estimate"], sigma=3)
 
