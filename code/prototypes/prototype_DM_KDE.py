@@ -80,38 +80,38 @@ for clstNo in metadata["clstNo"]:
                                          metadata["weights"],
                                          verbose)
 
-    for cut, thisdf in dfs_with_cuts.iteritems():
-        clst_metadata["cut"] = cut
+    # for cut, thisdf in dfs_with_cuts.iteritems():
+    #     clst_metadata["cut"] = cut
 
-        for wt_key in metadata["weights"]:
-            clst_metadata["weights"] = wt_key
-            weights = thisdf[wt_key + "_wt"]
+    #     for wt_key in metadata["weights"]:
+    #         clst_metadata["weights"] = wt_key
+    #         weights = thisdf[wt_key + "_wt"]
 
-            for los_axis in metadata["los_axis"]:
-                clst_metadata["los_axis"] = los_axis
+    #         for los_axis in metadata["los_axis"]:
+    #             clst_metadata["los_axis"] = los_axis
 
-                for i in range(len(metadata["xi"])):
-                    clst_metadata["xi"] = metadata["xi"][i]
-                    clst_metadata["phi"] = metadata["phi"][i]
+    #             for i in range(len(metadata["xi"])):
+    #                 clst_metadata["xi"] = metadata["xi"][i]
+    #                 clst_metadata["phi"] = metadata["phi"][i]
 
-                    data = getg.project_coords(np.array(thisdf[pos_cols]),
-                                               clst_metadata["xi"],
-                                               clst_metadata["phi"],
-                                               los_axis=metadata["los_axis"])
+    #                 data = getg.project_coords(np.array(thisdf[pos_cols]),
+    #                                            clst_metadata["xi"],
+    #                                            clst_metadata["phi"],
+    #                                            los_axis=metadata["los_axis"])
 
-                    col = np.arange(data.shape[1]) != metadata["los_axis"]
-                    data = data[:, col]
+    #                 col = np.arange(data.shape[1]) != metadata["los_axis"]
+    #                 data = data[:, col]
 
-                    fhat = KDE.do_KDE_and_get_peaks(data, weights)
-                    # this is not needed since the offset will be computed
-                    # w.r.t. dark matter peak instead
-                    # getg.compute_KDE_peak_offsets(fhat, original_f,
-                    #                               clst_metadata["clstNo"])
-                    peak_df = \
-                        getg.convert_dict_peaks_to_df(fhat, clst_metadata)
-                    store.append("peak_df", peak_df)
+    #                 fhat = KDE.do_KDE_and_get_peaks(data, weights)
+    #                 # this is not needed since the offset will be computed
+    #                 # w.r.t. dark matter peak instead
+    #                 # getg.compute_KDE_peak_offsets(fhat, original_f,
+    #                 #                               clst_metadata["clstNo"])
+    #                 peak_df = \
+    #                     getg.convert_dict_peaks_to_df(fhat, clst_metadata)
+    #                 store.append("peak_df", peak_df)
 
-                    getg.convert_dict_dens_to_h5(fhat, clst_metadata,
-                                                 h5_fstream)
+    #                 getg.convert_dict_dens_to_h5(fhat, clst_metadata,
+    #                                              h5_fstream)
 
 store.close()
