@@ -8,5 +8,5 @@ Illustris data
 
 # diagnostics of whether your installation works
 ```
-$Rscript ks_KDE.r  # checks if R and R packages was installed properly
+$ Rscript ks_KDE.r  # checks if R and R packages was installed properly
 ```
