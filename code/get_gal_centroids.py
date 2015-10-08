@@ -617,7 +617,7 @@ def same_projection(phi1, xi1, phi2, xi2):
 
 def angles_given_HEALpix_nsides(nside):
     """
-    :param nside: integer, must be powers of 2
+    :param nside: integer, this integer must be a power of 2, int_val = 2 ** n
     :returns: tuple of two arrays, each array corresponds to xi and phi values
         values are in radians
 
