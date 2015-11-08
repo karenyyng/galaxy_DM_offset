@@ -191,7 +191,7 @@ def apply_peak_num_threshold(gal_peak_dens_list, fhat,
     threshold : float, starting threshold of the iterative process of finding
     a good threshold
     """
-    sig_gal_peaks = find_num_of_significant_peaks(gal_peak_dens_list)
+    sig_gal_peaks = find_num_of_significant_peaks(gal_peak_dens_list, 0.2)
 
     if sig_gal_peaks >= 3:
         acceptance = multiple_of_candidate_peaks * sig_gal_peaks
