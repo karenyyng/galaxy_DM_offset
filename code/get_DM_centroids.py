@@ -7,6 +7,7 @@ from scipy.spatial import KDTree
 
 from scipy import ndimage
 
+
 def make_histogram_with_2kpc_resolution(data, coord_key="coords",
                                         spatial_axis=range(2),
                                         close_plot=True):
@@ -133,6 +134,7 @@ def create_cut_out_regions_for_KDE(fhat, R500C):
 
 # ------------ unstable but may be used if all else fails -------------------
 
+
 def get_dens_and_grid(x, y, bw='normal_reference',
                       gridsize=100, cut=4,
                       clip=[-np.inf, np.inf], n_jobs=10):
@@ -154,7 +156,19 @@ def get_dens_and_grid(x, y, bw='normal_reference',
     return xx, yy, z
 
 
-def infer_threshold(total_peak_dens, fhat, threshold=0.9):
+def infer_stat_significant_threshold(sigma_no, fhat):
+    """
+    :sigma_no: float, how many sigma to use as the threshold
+    :returns: threshold number for the density
+    """
+    return
+
+
+def apply_density_threshold(total_peak_dens, fhat, threshold=0.9):
+    """
+    Make sure that the summed density of the DM peaks match the
+    summed density of the galaxy KDE peaks.
+    """
     peaks_mask = fhat["peaks_dens"] > threshold
     while(np.sum(fhat["peaks_dens"][peaks_mask]) < total_peak_dens):
         threshold -= .05
@@ -162,7 +176,51 @@ def infer_threshold(total_peak_dens, fhat, threshold=0.9):
     return threshold, np.sum(fhat["peaks_dens"][peaks_mask])
 
 
-def smooth_histograms(fhat):
-    smoothed = ndimage.filters.gaussian_filter(fhat["estimate"], sigma=3)
+def find_num_of_significant_peaks(peak_dens_list, threshold=0.5):
+    return np.sum(peak_dens_list > threshold)
 
-    return
+
+def apply_peak_num_threshold(gal_peak_dens_list, fhat,
+                             multiple_of_candidate_peaks=2):
+    """
+    Parameters
+    -----------
+    gal_peak_dens_list : list of floats of relative the KDE peak dens to the
+                         densest peak
+    fhat : output from `make_histogram_with_2kpc_resolution`
+    threshold : float, starting threshold of the iterative process of finding
+    a good threshold
+    """
+    sig_gal_peaks = find_num_of_significant_peaks(gal_peak_dens_list)
+
+    if sig_gal_peaks >= 3:
+        acceptance = multiple_of_candidate_peaks * sig_gal_peaks
+    else:
+        acceptance = multiple_of_candidate_peaks * (sig_gal_peaks + 1)
+
+    good_threshold = 0.99
+
+    # Guard against infinite loops.
+    if (len(fhat["peaks_dens"]) < acceptance):
+       raise ValueError(
+           "There are not enough DM peaks to be considered.\n" +
+           "len(fhat['peaks_dens'][fhat['peaks_dens'] > good_threshold]]) " +
+           " < acceptance"
+           )
+
+    while (np.sum(fhat["peaks_dens"][fhat["peaks_dens"] > good_threshold]) <
+           acceptance):
+        good_threshold -= 0.01
+
+        if good_threshold < 0.01:
+            raise ValueError(
+                "There is no good threshold for the input DM peaks.\n"
+                )
+
+    return good_threshold, sig_gal_peaks
+
+
+# def smooth_histograms(fhat):
+#     smoothed = ndimage.filters.gaussian_filter(fhat["estimate"], sigma=3)
+#
+#     return

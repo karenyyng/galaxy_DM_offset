@@ -89,12 +89,16 @@ def compute_KDE_offsets(peak_xcoords, peak_ycoords):
     """
 
     # we have sorted the density so that the highest density peak is the first
+    # entry in the peak_*coords array
+
+    # need the array version of the computation
     if (type(peak_xcoords) == np.ndarray and
         type(peak_ycoords == np.ndarray)) or \
         (type(peak_xcoords) == pd.core.series.Series and
             type(peak_ycoords) == pd.core.series.Series):
         peaks = np.array([peak_xcoords, peak_ycoords]).transpose()
     elif type(peak_xcoords) == float and type(peak_ycoords) == float:
+        # and the non-array version of the computation
         peaks = np.array([peak_xcoords, peak_ycoords])
 
     return compute_euclidean_dist(peaks)
@@ -170,6 +174,35 @@ def compute_shrinking_aperture_offset(df, f, clstNo, cut_method, cut_kwargs,
         raise NotImplementedError(
             "Haven't generalized to compute offset for ndim > 2")
 
+
+def find_gal_peak_ixes_in_DM_fhat(star_peaks_xcoord, star_peaks_ycoord, fhat):
+    """
+    Uncomment the following to check the type before running!
+    assert type(star_peaks_xcoord) == np.float64, \
+        "`star_peaks_xcoord` needs to be of type `np.float64`."
+
+    assert type(star_peaks_ycoord) == np.float64, \
+        "`star_peaks_ycoord` needs to be of type `np.float64`."
+
+    assert type(fhat["eval_points"][0]) == np.ndarray, \
+        "`fhat['eval_points'][0]` needs to be of type `np.ndarray`."
+
+    assert type(fhat["eval_points"][1]) == np.ndarray, \
+        "`fhat['eval_points'][1]` needs to be of type `np.ndarray`."
+
+    The resulting indices will introduce an uncertainty of ~2 kpc
+    due to the bin size of fhat["eval_points"]
+    """
+
+    x_ix = 0
+    while (fhat["eval_points"][0][x_ix] < star_peaks_xcoord):
+        x_ix += 1
+
+    y_ix = 0
+    while (fhat["eval_points"][1][y_ix] < star_peaks_ycoord):
+        y_ix += 1
+
+    return x_ix, y_ix
 
 
 # ---------- Utilities for converting dictionaries to h5 objects -------

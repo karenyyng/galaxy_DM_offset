@@ -208,7 +208,8 @@ def get_density_weights(fhat, ix_rkey="peaks_rowIx",
     peak_dens = np.array(fhat["estimate"][rowIx, colIx])
 
     # give relative weights
-    fhat["peaks_dens"] = peak_dens / np.max(peak_dens)
+    fhat["max_peak_dens"] = np.max(peak_dens)
+    fhat["peaks_dens"] = peak_dens / fhat["max_peak_dens"]
     return
 
 
