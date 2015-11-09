@@ -41,7 +41,7 @@ def compute_distance_between_DM_and_gal_peaks(fhat_star, fhat):
     star_peak_coords = np.array([fhat_star["peaks_xcoords"][:gal_peak_no],
                                  fhat_star["peaks_ycoords"][:gal_peak_no]]
                                 ).transpose()
-    # convert kpc / h from stellar peak coords to kpc
+    # Convert kpc / h from stellar peak coords to kpc
     star_peak_coords *= 106.5 / 75.
 
     # We use Euclidean distance for our query, i.e. p=2.
