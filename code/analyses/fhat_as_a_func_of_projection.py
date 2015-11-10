@@ -33,7 +33,7 @@ pos_cols = ["SubhaloPos{0}".format(i) for i in range(3)]
 metadata = OrderedDict({})
 
 # no. of clsters
-metadata["clstNo"] = range(129)  # range(20)  # range(20)  # [4]  # , 5]
+metadata["clstNo"] = range(129)
 
 # cuts
 cut_kwargs = {"DM_cut": 1e3, "star_cut": 5e2}

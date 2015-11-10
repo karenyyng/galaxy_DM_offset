@@ -8,19 +8,24 @@ sys.path.append("../")
 import get_DM_centroids as getDM
 
 
-def compute_distance_between_DM_and_gal_peaks(fhat_star, fhat):
+def compute_distance_between_DM_and_gal_peaks(
+        fhat_star, fhat, fhat_star_to_DM_coord_conversion=106.5 / 75.):
     """
     Parameters
     ===========
     fhat_star: one of the fhat_stars from `get_KDE`
+        coordinates from fhat_star is in kpc / h,
+        convert this to kpc by multiplying fhat_star_coordinates * 106.5 / 75.
     fhat: fhat output from `getDM.make_histogram_with_2kpc_resolution`
 
     Returns
     =======
     (dist, ixes) : a tuple of two arrays
-        dist: np.array, the distance between the fhat_star peaks and the fhat peaks
-        ixes: np.array, the index in fhat that corresponds to the closest match for
-            fhat_star peaks
+        dist: np.array,
+        the distance between the fhat_star peaks and the fhat peaks
+        ixes: np.array,
+        the index in fhat that corresponds to the closest match
+        for fhat_star peaks
     DM_peak_no: int, number of significant DM peaks that were considered when
                 finding the nearest neighbor
     gal_peak_no: int, number of significant gal peaks, i.e. peak_dens > 0.5
@@ -42,8 +47,11 @@ def compute_distance_between_DM_and_gal_peaks(fhat_star, fhat):
                                  fhat_star["peaks_ycoords"][:gal_peak_no]]
                                 ).transpose()
     # Convert kpc / h from stellar peak coords to kpc
-    star_peak_coords *= 106.5 / 75.
+    star_peak_coords *= fhat_star_to_DM_coord_conversion
 
     # We use Euclidean distance for our query, i.e. p=2.
     return tree.query(star_peak_coords, k=1, p=2), gal_peak_no, DM_peak_no
+
+
+
 
