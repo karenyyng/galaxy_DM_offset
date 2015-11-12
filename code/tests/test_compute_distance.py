@@ -5,8 +5,8 @@ import numpy as np
 
 
 def test_compute_distance_between_DM_and_gal_peaks():
-    fhat_stars = {"peaks_xcoords": np.array([0.1, 1., 10.]),
-                  "peaks_ycoords": np.array([0.5, 5.,  5.]),
+    fhat_stars = {"peaks_xcoords": np.array([0.1, 1., 10.]) * 75. / 106.5,
+                  "peaks_ycoords": np.array([0.5, 5.,  5.]) * 75. / 106.5,
                   "peaks_dens": np.array([1., .1, .2])
                   }
     fhat = {"peaks_xcoords": np.array([1.1, 1., 10., 3., 20, 16, 2]),

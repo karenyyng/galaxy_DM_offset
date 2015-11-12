@@ -9,13 +9,13 @@ import get_DM_centroids as getDM
 
 
 def compute_distance_between_DM_and_gal_peaks(
-        fhat_star, fhat, fhat_star_to_DM_coord_conversion=106.5 / 75.):
+        fhat_star, fhat, fhat_star_to_DM_coord_conversion=1. / 0.704):
     """
     Parameters
     ===========
     fhat_star: one of the fhat_stars from `get_KDE`
         coordinates from fhat_star is in kpc / h,
-        convert this to kpc by multiplying fhat_star_coordinates * 106.5 / 75.
+        convert this to kpc by multiplying fhat_star_coordinates 
     fhat: fhat output from `getDM.make_histogram_with_2kpc_resolution`
 
     Returns
@@ -40,7 +40,7 @@ def compute_distance_between_DM_and_gal_peaks(
 
     valid_DM_peak_coords = np.array([fhat["peaks_xcoords"][:DM_peak_no],
                                      fhat["peaks_ycoords"][:DM_peak_no]]
-                                   ).transpose()
+                                    ).transpose()
     tree = KDTree(valid_DM_peak_coords)
 
     star_peak_coords = np.array([fhat_star["peaks_xcoords"][:gal_peak_no],
@@ -49,9 +49,12 @@ def compute_distance_between_DM_and_gal_peaks(
     # Convert kpc / h from stellar peak coords to kpc
     star_peak_coords *= fhat_star_to_DM_coord_conversion
 
+    (dist, DM_ixes) = tree.query(star_peak_coords, k=1, p=2)
+    fhat_star["dist"] = dist
+    fhat_star["DM_ixes"] = DM_ixes
+    fhat_star["gal_peak_no"] = gal_peak_no
+    fhat_star["DM_peak_no"] = DM_peak_no
+
     # We use Euclidean distance for our query, i.e. p=2.
-    return tree.query(star_peak_coords, k=1, p=2), gal_peak_no, DM_peak_no
-
-
-
-
+    return (fhat_star["dist"], fhat_star["DM_ixes"]), fhat_star["gal_peak_no"],\
+        fhat_star["DM_peak_no"]

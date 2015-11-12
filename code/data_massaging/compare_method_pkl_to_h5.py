@@ -13,6 +13,12 @@ data = ["dumb", "gauss", "bimodal"]
 methods = ["cent", "KDE", "shrink"]
 
 def fhats_to_h5():
+    """
+    needs refactoring
+    should grab the keys of fhat from the pickle files,
+    then recursively iterate through keys at each level to write out to h5 file 
+    stream
+    """
     for size in data_size:
         try:
             gp = f.create_group(str(size))

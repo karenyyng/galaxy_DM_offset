@@ -122,7 +122,7 @@ def wrap_and_center_coord(coords, edge_constraint=1e4,
                           verbose=False, center_coord=None,
                           wrap_criteria=7.5e4):
     """ fixing the periodic boundary conditions per cluster
-    wraps automatically at 75 Mpc / h then center coord at most bound particle
+    wraps automatically at 75 Mpc / h for stars then center coord at most bound particle
     The cluster should not be 10 Mpc within the edge
 
     :note: this meant to be applied to each spatial dimension
@@ -134,20 +134,22 @@ def wrap_and_center_coord(coords, edge_constraint=1e4,
 
     :stability: passed test
 
-    UNITS?!
+    Units = kpc / h
     """
 
     coords = np.array(coords)
 
-    # need the - 7.4e4 part inside np.abs() since some might be closer
+    # need the - wrap_criteria part inside np.abs() since some might be closer
     # to the larger end of the box
-    #if np.all(np.abs(coords % 7.5e4 - 7.5e4) > edge_constraint):
-    if np.all(np.abs(coords % wrap_criteria - wrap_criteria) > edge_constraint):
+    #if np.all(np.abs(coords % wrap_criteria - wrap_criteria) > edge_constraint):
+    not_close_to_edge = \
+        np.abs(coords % wrap_criteria - wrap_criteria) > edge_constraint
+    if np.all(not_close_to_edge):
         pass
     else:
         mask = coords > edge_constraint
         if verbose:
-            print "close to box edge, needs wrapping"
+            print "Close to box edge, needs wrapping"
             print "before masking ", coords[mask]
         coords[mask] = coords[mask] - wrap_criteria
         if verbose:
@@ -196,7 +198,7 @@ def get_DM_particles(clsts, partDMh5, h5part_coord_key="PartType1_Coordinates",
     partDMhaloIxLoc_h5file : str
         file name of the hdf5 file that contains the location of index of the
         last DM particle of each halo
-    dataPath : str
+    dataPath : str (optional)
         where the data files are stored and is appended before file names
 
     Returns
@@ -213,10 +215,11 @@ def get_DM_particles(clsts, partDMh5, h5part_coord_key="PartType1_Coordinates",
     # make sure we do not write to the file by using read-only mode
     part_halos = h5py.File(dataPath + partDMhaloIxLoc_h5file, "r")
 
-    # add 0 as first element list so we can specify the range of location
+    # add 0 as first element of list so we can specify the range of location
     # with the syntax below correctly
+    # we retrieve the end indices of all the particles within a cluster
     haloEndIx = [0] + list(part_halos["loc"][...])
-    # extract coordinates
+    # extract coordinates from relevant parts of the h5 file
     coords = {clstNo: partDMh5[h5part_coord_key][:, haloEndIx[clstNo]:
                                                  haloEndIx[clstNo + 1]]
               for clstNo in clsts}
@@ -227,7 +230,7 @@ def get_DM_particles(clsts, partDMh5, h5part_coord_key="PartType1_Coordinates",
                                     wrap_and_center_coord(x,
                                                           edge_constraint=1e4,
                                                           wrap_criteria=
-                                                          10.65e4,
+                                                          7.5e4 / 0.704,
                                                           verbose=verbose), crd,
                                     ))}
               for clstNo, crd in coords.iteritems()}
@@ -237,8 +240,10 @@ def get_DM_particles(clsts, partDMh5, h5part_coord_key="PartType1_Coordinates",
     # so we can shift all coordinates to original frame for the correct cluster
     # later on
     for clstNo, cl_dict in coords.iteritems():
-        cl_dict["min_coords"] = np.min(cl_dict["coords"], axis=1).reshape(
-            cl_dict["coords"].shape[0], 1)
+        cl_dict["min_coords"] = \
+            np.min(cl_dict["coords"], axis=1)\
+              .reshape(cl_dict["coords"].shape[0], 1)
+
         cl_dict["coords"] = (cl_dict["coords"] -
                              cl_dict["min_coords"]).transpose()
 

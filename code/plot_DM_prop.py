@@ -38,9 +38,11 @@ def plot_DM_fhat(fhat, fhat_stars, clstNo, threshold=0.3,
     # Peaks with density > 0.5 density of densest peak are in red.
     # Peaks with density < 0.5 density of densest peak are in pink.
     if convert_kpc_over_h_to_kpc:
-        print("Converting unit of kpc / h to kpc for galaxy data")
-        plt.plot(fhat_stars["peaks_xcoords"][:sign_gal_peak_no] * 106.5 / 75.,
-                 fhat_stars["peaks_ycoords"][:sign_gal_peak_no] * 106.5 / 75.,
+        unit_conversion = 1. / .704
+        print("Converting unit of kpc / h to kpc for galaxy data using ")
+        print (unit_conversion)
+        plt.plot(fhat_stars["peaks_xcoords"][:sign_gal_peak_no] * unit_conversion,
+                 fhat_stars["peaks_ycoords"][:sign_gal_peak_no] * unit_conversion,
                  'o', color='m', fillstyle="none", mew=3, ms=35,
                  label="significant I band luminosity peaks")
 
