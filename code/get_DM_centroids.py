@@ -5,10 +5,9 @@ import matplotlib.pyplot as plt
 import get_KDE
 from scipy.spatial import KDTree
 
-from scipy import ndimage
 
-
-def make_histogram_with_2kpc_resolution(data, coord_key="coords",
+def make_histogram_with_some_resolution(data, resolution=2.0,
+                                        coord_key="coords",
                                         spatial_axis=range(2),
                                         close_plot=True):
     """this function makes histogram and returns appropriate format
@@ -36,7 +35,7 @@ def make_histogram_with_2kpc_resolution(data, coord_key="coords",
 
     """
     # compute bin numbers for each spatial dimension with 2 kpc resolution
-    bins = np.array(map(lambda d: int((int(np.max(d)) / 2.)),
+    bins = np.array(map(lambda d: int((int(np.max(d)) / resolution)),
                     data[coord_key].transpose()))
 
     fhat = {}
@@ -74,7 +73,7 @@ def match_DM_peaks_with_gal_peaks(fhat, fhat_stars, threshold=0.3,
     ----------
     fhat : dictionary
         contains all the peak information of the DM density
-        this dict. is the output from `make_histogram_with_2kpc_resolution`
+        this dict. is the output from `make_histogram_with_some_resolution`
     fhat_stars : dictionary
         contains all the peak information of the galaxies
         (weighted / unweighted).
@@ -132,8 +131,25 @@ def match_DM_peaks_with_gal_peaks(fhat, fhat_stars, threshold=0.3,
 def create_cut_out_regions_for_KDE(fhat, R500C):
     return
 
-# ------------ unstable but may be used if all else fails -------------------
 
+def downsample_histogram_then_smooth(coord_dict, bandwidth=30.*4.45,
+                                     bin_width_as_multiple_of_bandwidth=0.5,
+                                     downsample_percentage=1.0):
+    """This function downsamples the number of particles
+    Parameters
+    ==========
+    :coord_dict:
+    :bandwidth: TODO
+    :bin_width_as_multiple_of_bandwidth: TODO
+    :downsample_percentage:
+
+    :returns: TODO
+    """
+
+
+    return
+
+# -stuff below this line are unstable but may be used if all else fails -----
 
 def get_dens_and_grid(x, y, bw='normal_reference',
                       gridsize=100, cut=4,
@@ -187,7 +203,7 @@ def apply_peak_num_threshold(gal_peak_dens_list, fhat,
     -----------
     gal_peak_dens_list : list of floats of relative the KDE peak dens to the
                          densest peak
-    fhat : output from `make_histogram_with_2kpc_resolution`
+    fhat : output from `make_histogram_with_some_resolution`
     threshold : float, starting threshold of the iterative process of finding
     a good threshold
     """

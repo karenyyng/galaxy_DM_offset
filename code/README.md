@@ -1,3 +1,10 @@
+# Usage info for `get_KDE.py` and `ks_KDE.r`
+You will have to make a soft link to `ks_KDE.r` to a particular subdirectory 
+if you want to work in a subdirectory of this directory.
+```
+$ ln -s ../ks_KDE.r .
+```
+
 # File organization 
 * python modules are placed at this directory
 * `analyses` contains scripts / notebooks that generate plots for paper

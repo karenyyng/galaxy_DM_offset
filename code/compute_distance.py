@@ -15,8 +15,8 @@ def compute_distance_between_DM_and_gal_peaks(
     ===========
     fhat_star: one of the fhat_stars from `get_KDE`
         coordinates from fhat_star is in kpc / h,
-        convert this to kpc by multiplying fhat_star_coordinates 
-    fhat: fhat output from `getDM.make_histogram_with_2kpc_resolution`
+        convert this to kpc by multiplying fhat_star_coordinates
+    fhat: fhat output from `getDM.make_histogram_with_some_resolution`
 
     Returns
     =======

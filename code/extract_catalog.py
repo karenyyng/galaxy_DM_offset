@@ -156,7 +156,6 @@ def wrap_and_center_coord(coords, edge_constraint=1e4,
             print "after masking ", coords[mask]
 
     # needs to center coords - center on the most bound particle coords[0]
-    # return coords - median(coords)
     if center_coord is None:
         return coords - coords[0]
     else:
@@ -186,7 +185,9 @@ def add_info(h5, info, h5_key="df", h5_subkey="info"):
 def get_DM_particles(clsts, partDMh5, h5part_coord_key="PartType1_Coordinates",
                      partDMhaloIxLoc_h5file="DM_particles_clst_loc.h5",
                      dataPath="../data/",verbose=False):
-    """
+    """This reads particle data from the h5 file stream, wraps and
+
+    the coordinates of the particles.
     Parameters
     ----------
     clsts : list of integer(s), first clst has an ID of 0
@@ -209,8 +210,8 @@ def get_DM_particles(clsts, partDMh5, h5part_coord_key="PartType1_Coordinates",
             with the coordinates of the particles of that
             particular clst.
         * Coordinates are first centered,
-        * then the min. coordinates subtract to make sure all coordinates are
-        positive so we can make histograms
+        * then the min. coordinates are subtracted to make sure all coordinates are
+        positive so we can make histograms with matplotlib
     """
     # make sure we do not write to the file by using read-only mode
     part_halos = h5py.File(dataPath + partDMhaloIxLoc_h5file, "r")
