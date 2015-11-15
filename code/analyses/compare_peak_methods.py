@@ -793,8 +793,7 @@ def plot_dumbbell_zoomed_contour(
     #          fontsize=15)
 
     return contours
-# ------------previous drafts --------------
-
+# ------------previous drafts ----------------------------------
 
 def plot_compare_one_big_one_small_gaussian(bimodal_data,
         KDE_peak_dens1, shrink_peak_dens1, cent_peak_dens1,

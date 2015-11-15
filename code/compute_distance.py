@@ -58,3 +58,18 @@ def compute_distance_between_DM_and_gal_peaks(
     # We use Euclidean distance for our query, i.e. p=2.
     return (fhat_star["dist"], fhat_star["DM_ixes"]), fhat_star["gal_peak_no"],\
         fhat_star["DM_peak_no"]
+
+
+def compute_euclidean_dist(data):
+    """
+    :param data: numpy array
+    :return: numpy array
+    """
+    if type(data) is not np.ndarray:
+        data = np.array(data)
+
+    if data.ndim > 1:
+        return np.array([np.sqrt(np.dot(data[i], data[i])) for i in
+                        range(data.shape[0])])
+    else:
+        return np.sqrt(np.dot(data, data))

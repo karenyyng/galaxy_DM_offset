@@ -5,6 +5,7 @@ from collections import OrderedDict
 import numpy as np
 import pandas as pd
 from get_KDE import *
+from compute_distance import compute_euclidean_dist
 
 
 # --------- functions for preparing cuts, projections, weighting -----------
@@ -439,19 +440,6 @@ def normalize_data(data):
     return data / normalization, normalization
 
 
-def compute_euclidean_dist(data):
-    """
-    :param data: numpy array
-    :return: numpy array
-    """
-    if type(data) is not np.ndarray:
-        data = np.array(data)
-
-    if data.ndim > 1:
-        return np.array([np.sqrt(np.dot(data[i], data[i])) for i in
-                        range(data.shape[0])])
-    else:
-        return np.sqrt(np.dot(data, data))
 
 
 def compute_weighted_centroids(x, w=None):

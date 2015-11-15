@@ -7,7 +7,9 @@ import compute_distance as get_dist
 
 
 def plot_DM_fhat(fhat, fhat_stars, clstNo, threshold=0.3,
-                 convert_kpc_over_h_to_kpc=True, fontsize=25):
+                 convert_kpc_over_h_to_kpc=True, fontsize=25,
+                 unit_conversion = 1. / .704
+                 ):
 
     if "log_est" not in fhat.keys():
         fhat["log_est"] = np.log(fhat["estimate"])
@@ -38,7 +40,6 @@ def plot_DM_fhat(fhat, fhat_stars, clstNo, threshold=0.3,
     # Peaks with density > 0.5 density of densest peak are in red.
     # Peaks with density < 0.5 density of densest peak are in pink.
     if convert_kpc_over_h_to_kpc:
-        unit_conversion = 1. / .704
         print("Converting unit of kpc / h to kpc for galaxy data using ")
         print (unit_conversion)
         plt.plot(fhat_stars["peaks_xcoords"][:sign_gal_peak_no] * unit_conversion,
@@ -53,6 +54,7 @@ def plot_DM_fhat(fhat, fhat_stars, clstNo, threshold=0.3,
 
     # Make ticks bigger
     plt.tick_params(axis='both', which='both', labelsize=fontsize)
+    plt.xticks(rotation=45)
 
     lgd = plt.legend(loc='best', fontsize=fontsize, frameon=1)
     frame = lgd.get_frame()

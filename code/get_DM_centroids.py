@@ -128,10 +128,6 @@ def match_DM_peaks_with_gal_peaks(fhat, fhat_stars, threshold=0.3,
     return dist, match
 
 
-def create_cut_out_regions_for_KDE(fhat, R500C):
-    return
-
-
 def downsample_histogram_then_smooth(coord_dict, bandwidth=30.*4.45,
                                      bin_width_as_multiple_of_bandwidth=0.5,
                                      downsample_percentage=1.0):
