@@ -6,8 +6,8 @@ import pandas as pd
 import os
 
 dataPath = "../../data/"
-output_fhat_path = "test_fhat_129.h5"
-StoreFile = "test_peaks_df_129.h5"
+output_fhat_path = "test_stars_fhat_129.h5"
+StoreFile = "test_stars_peaks_df_129.h5"
 if os.path.isfile(dataPath + StoreFile):
     os.remove(dataPath + StoreFile)
 store = pd.HDFStore(dataPath + StoreFile)
@@ -98,7 +98,7 @@ for clstNo in metadata["clstNo"]:
                     data = data[:, col]
 
                     fhat = KDE.do_KDE_and_get_peaks(data, weights)
-                    # this is not needed since the offset will be computed
+                    # This is not needed since the offset will be computed
                     # w.r.t. dark matter peak instead
                     # getg.compute_KDE_peak_offsets(fhat, original_f,
                     #                               clst_metadata["clstNo"])

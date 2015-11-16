@@ -1,4 +1,5 @@
 """Prototype script for final run.
+Copied from `fhat_star_as_a_func_of_projection.py`
 """
 from __future__ import (print_function,
                         division, absolute_import)
@@ -6,20 +7,21 @@ import pandas as pd
 import os
 
 dataPath = "../../data/"
-output_fhat_path = "test_fhat_129.h5"
-StoreFile = "test_peaks_df_129.h5"
+output_fhat_path = "test_DM_fhat_129.h5"
+StoreFile = "test_DM_peaks_df_129.h5"
 if os.path.isfile(dataPath + StoreFile):
     os.remove(dataPath + StoreFile)
 store = pd.HDFStore(dataPath + StoreFile)
 
 import numpy as np
 import sys
+from collections import OrderedDict
 sys.path.append("../")
 
-import extract_catalog as ext_cat
-import get_gal_centroids as getg
+import extract_catalog as ec
+import get_DM_centroids as getDM
 import get_KDE as KDE
-from collections import OrderedDict
+import compute_distance as getDist
 
 verbose = True
 import h5py
@@ -67,7 +69,7 @@ for clstNo in metadata["clstNo"]:
            "out of {0}".format(len(metadata["clstNo"])))
     peak_df = pd.DataFrame()
     clst_metadata["clstNo"] = clstNo
-    df = ext_cat.extract_clst(original_f, clstNo)
+    df = ec.extract_clst(original_f, clstNo)
 
     dfs_with_cuts = \
         getg.prep_data_with_cuts_and_wts(df, metadata["cuts"],
@@ -97,8 +99,9 @@ for clstNo in metadata["clstNo"]:
                     col = np.arange(data.shape[1]) != metadata["los_axis"]
                     data = data[:, col]
 
-                    fhat = KDE.do_KDE_and_get_peaks(data, weights)
-                    # this is not needed since the offset will be computed
+                    fhat = getDM.make_histogram_with_some_resolution()
+
+                    # This is not needed since the offset will be computed
                     # w.r.t. dark matter peak instead
                     # getg.compute_KDE_peak_offsets(fhat, original_f,
                     #                               clst_metadata["clstNo"])

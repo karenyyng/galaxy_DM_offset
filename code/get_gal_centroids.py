@@ -239,7 +239,7 @@ def construct_h5_file_for_saving_fhat(metadata, output_path="../../data/",
                            mode="a", compression="gzip",
                            compression_opts=9)
 
-    # would implement this recursively if the data structure were more regular
+    # Would implement this recursively if the data structure were more regular
     # for clstNo in metadata["clstNo"]:
     #     lvl1 = h5_fstream.create_group(str(clstNo))
 
