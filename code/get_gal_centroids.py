@@ -226,7 +226,7 @@ def convert_dict_peaks_to_df(fhat, metadata,
     for key in peak_info_keys:
         peak_df[key] = fhat[key]
 
-    # starts storing meta data
+    # Starts storing meta data
     for key, val in metadata.iteritems():
         peak_df[key] = val
 
@@ -616,6 +616,10 @@ def project_coords(coords, xi, phi, los_axis=2, radian=True):
 
     :return: same type of array like object as coords, same dimension
     """
+    xi = float(xi)
+    phi = float(phi)
+    los_axis = int(los_axis)
+
     if not radian:
         xi = xi / 180. * np.pi
         phi = phi / 180. * np.pi
@@ -687,7 +691,10 @@ def get_clst_gpBy_from_DM_metadata(metadata_df, gpBy_keys=None):
     """
     if gpBy_keys is None:
         gpBy_keys = list(metadata_df.keys()[-6:])
-    return metadata_df.groupby(gpBy_keys, as_index=False)
+
+    print ("gpBy_keys = ", gpBy_keys)
+    print ("len(gpBy_keys) = ", len(gpBy_keys))
+    return metadata_df.groupby(gpBy_keys, as_index=False), gpBy_keys
 
 
 # --------- depreciated R conversion functions ------------------------------

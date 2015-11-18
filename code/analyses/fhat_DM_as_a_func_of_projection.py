@@ -3,6 +3,7 @@ Copied from `fhat_star_as_a_func_of_projection.py`
 
 This
 * reads the metadata for the cuts from the fhat_star*.h5 file
+* produces the DM projections accordingly
 """
 from __future__ import (print_function,
                         division, absolute_import)
@@ -14,9 +15,14 @@ datetime_stamp = datetime.now().strftime("%D").replace('/', '_')
 
 data_path = "../../data/"
 # ------- specify output file paths  -----------------------
-print ("Current time is {}".format(datetime_stamp))
-output_fhat_filename = "test_DM_fhat_clst129_{}.h5".format(datetime_stamp)
-StoreFile = "test_DM_peaks_df_clst129_{}.h5".format(datetime_stamp)
+print ("Current date is {}".format(datetime_stamp))
+total_clstNo = 20
+output_fhat_filename = \
+    "test_DM_fhat_clst{0}_{1}.h5".format(total_clstNo, datetime_stamp)
+StoreFile = \
+    "test_DM_peaks_df_clst{0}_{1}.h5".format(total_clstNo, datetime_stamp)
+if os.path.isfile(data_path + StoreFile):
+    os.remove(data_path + StoreFile)
 store = pd.HDFStore(data_path + StoreFile)
 
 print ("Outputing files to:")
@@ -43,16 +49,18 @@ DM_h5file = data_path + \
 DM_fstream = h5py.File(DM_h5file)
 # ================ make all decisions ===========================
 # Specify fhat_star input file paths
-input_datetime_stamp = '11_17_15'
-input_star_file = "test_stars_peak_df_clst129_{}.h5".format(input_datetime_stamp)
+input_datetime_stamp = '11_18_15'
+input_star_file = \
+    "test_stars_peak_df_clst{}_{}.h5".format(total_clstNo, input_datetime_stamp)
 input_h5_key = "peak_df"
 DM_metadata, star_peak_df = \
-    getDM.retrieve_DM_metadata_from_gal_metadata(data_path, input_star_file,
-                                                 input_h5_key)
+    getDM.retrieve_DM_metadata_from_gal_metadata(
+        data_path, input_star_file, input_h5_key)
 
-star_gpBy = getgal.get_clst_gpBy_from_DM_metadata(star_peak_df)
+star_gpBy, star_gpBy_keys = \
+    getgal.get_clst_gpBy_from_DM_metadata(star_peak_df)
 
-DM_metadata["kernel_width"] = [0, 3, 30 * 4.45]
+DM_metadata["kernel_width"] = [0, 3, 30 * 4]
 sig_fraction = 0.2
 
 # ============== set up output file structure  ===========
@@ -76,11 +84,12 @@ pos_cols = ["SubhaloPos{}".format(i) for i in range(3)]
 
 clst_metadata = OrderedDict({})
 #### CHANGE THE RANGE of line below
-for clstNo in DM_metadata["clstNo"][-2:-1]:
-    print ("Processing clst {0} ".format(clstNo + 1) +
+for clstNo in DM_metadata["clstNo"][-1:]:
+    print ("Processing clst {0} ".format(int(clstNo) + 1) +
            "out of {0}".format(len(DM_metadata["clstNo"])))
     peak_df = pd.DataFrame()
-    clst_metadata["clstNo"] = clstNo
+    clst_metadata["clstNo"] = clstNo  # clstNo is a string
+    clstNo = int(clstNo)
     coord_dict = \
         ec.get_DM_particles([clstNo], DM_fstream, dataPath=data_path)[clstNo]
 
@@ -95,28 +104,44 @@ for clstNo in DM_metadata["clstNo"][-2:-1]:
 
             for los_axis in DM_metadata["los_axis"]:
                 clst_metadata["los_axis"] = los_axis
+                los_axis = int(los_axis)
 
                 #### CHANGE THE RANGE of line below
-                for i in range(len(DM_metadata["xi"]))[:1]:
+                for i in range(len(DM_metadata["xi"])):
                     clst_metadata["xi"] = DM_metadata["xi"][i]
                     clst_metadata["phi"] = DM_metadata["phi"][i]
 
-                    data = getgal.project_coords(coord_dict["coords"],
-                                                 clst_metadata["xi"],
-                                                 clst_metadata["phi"],
-                                                 los_axis=DM_metadata["los_axis"])
+                    data = getgal.project_coords(
+                        coord_dict["coords"], clst_metadata["xi"],
+                        clst_metadata["phi"],
+                        los_axis=clst_metadata["los_axis"])
 
-                    col = np.arange(data.shape[1]) != DM_metadata["los_axis"]
+                    col = np.arange(data.shape[1]) != los_axis
                     data = data[:, col]
 
                     #### CHANGE THE RANGE of DM_metadata["kernel_width"] below
                     # for kernel_width in DM_metadata["kernel_width"]:
-                    for kernel_width in DM_metadata["kernel_width"][:1]:
+                    for kernel_width in DM_metadata["kernel_width"]:
+
+                        # Find the correpsonding galaxy projection
+                        gpBy_keys = \
+                            tuple([clst_metadata[k]
+                                   for k in star_gpBy_keys])
+                        print ("gpBy_keys = ", gpBy_keys)
+                        print ("len(gpBy_keys) = ", len(gpBy_keys))
                         fhat_stars = \
-                            star_gpBy.get_group(tuple(clst_metadata.values()))
+                            star_gpBy.get_group(gpBy_keys)
 
-                        clst_metadata["kernel_width"] = kernel_width
+                        # Save the cluster metadata as strings
+                        # These are categorical.
+                        clst_metadata["kernel_width"] = \
+                            '{0:0.0f}'.format(kernel_width)
+                        clst_metadata["sig_fraction"] = \
+                            '{0:0.2f}'.format(sig_fraction)
 
+                        # Can think of directly smoothing the histogrammed
+                        # data from kernel_width = 0  here to reduce
+                        # computation time.
                         fhat = \
                             getDM.make_histogram_with_some_resolution(
                                 coord_dict, resolution=2)
@@ -126,16 +151,17 @@ for clstNo in DM_metadata["clstNo"][-2:-1]:
                                 ndimage.gaussian_filter(fhat["estimate"],
                                                         sigma=kernel_width)
 
-                        # find a good threshold
+                        # Find a good threshold
                         fhat_star_peak_dens = fhat_stars["peaks_dens"]
-                        fhat['sig_fraction'] = sig_fraction
-                        fhat["good_threshold"], _ = \
-                            getDM.apply_peak_num_threshold(fhat_star_peak_dens,
-                                                           fhat,
-                                                           sig_fraction=sig_fraction)
-                        # apply threshold
+                        clst_metadata["good_threshold"], _ = \
+                            getDM.apply_peak_num_threshold(
+                                fhat_star_peak_dens, fhat,
+                                sig_fraction=sig_fraction)
+
+
+                        # Apply threshold
                         threshold_mask = \
-                            fhat["peaks_dens"] > fhat['good_threshold']
+                            fhat["peaks_dens"] > clst_metadata['good_threshold']
                         fhat["peaks_dens"] = \
                             fhat["peaks_dens"][threshold_mask]
                         fhat["peaks_colIx"] = \
@@ -151,6 +177,9 @@ for clstNo in DM_metadata["clstNo"][-2:-1]:
                         peak_info_keys = \
                             ["peaks_xcoords", "peaks_ycoords", "peaks_rowIx",
                             "peaks_colIx", "peaks_dens"]
+
+                        clst_metadata["good_threshold"] = \
+                            '{0:0.10f}'.format(clst_metadata["good_threshold"])
 
                         peak_df = \
                             getgal.convert_dict_peaks_to_df(fhat,

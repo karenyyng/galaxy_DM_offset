@@ -8,8 +8,8 @@ import os
 from datetime import datetime
 datetime_stamp = datetime.now().strftime("%D").replace('/', '_')
 dataPath = "../../data/"
-output_fhat_filename = "test_stars_fhat_clst129_{}.h5".format(datetime_stamp)
-StoreFile = "test_stars_peak_df_clst129_{}.h5".format(datetime_stamp)
+output_fhat_filename = "test_stars_fhat_clst10_{}.h5".format(datetime_stamp)
+StoreFile = "test_stars_peak_df_clst10_{}.h5".format(datetime_stamp)
 if os.path.isfile(dataPath + StoreFile):
     os.remove(dataPath + StoreFile)
 store = pd.HDFStore(dataPath + StoreFile)
@@ -34,8 +34,8 @@ original_f = h5py.File(dataPath +
 pos_cols = ["SubhaloPos{0}".format(i) for i in range(3)]
 metadata = OrderedDict({})
 
-# no. of clsters
-metadata["clstNo"] = range(20) # range(128 - 20: 128)  # range(129)
+# no. of clsters - want these as strings, not int!
+metadata["clstNo"] = [str(i) for i in range(128-10, 128)]  #  range(129)
 
 # cuts
 cut_kwargs = {"DM_cut": 1e3, "star_cut": 5e2}
@@ -50,8 +50,12 @@ metadata["weights"] = OrderedDict({
 
 # projections
 nside = 1  # nsides of HEALpix are powers of 2, pix for 16 nsides = 3072 / 2
-metadata["los_axis"] = [1]  # use z-axis as los axis
+metadata["los_axis"] = [str(1)]  # use z-axis as los axis
+
+# Want to use string as key, not floats!
 metadata["xi"], metadata["phi"] = getg.angles_given_HEALpix_nsides(nside)
+metadata["xi"] = ['{0:1.10f}'.format(xi) for xi in metadata["xi"]]
+metadata["phi"] = ['{0:1.10f}'.format(phi) for phi in metadata["phi"]]
 
 print (
     "{} projections per cluster are constructed".format(len(metadata["xi"])))
@@ -70,7 +74,7 @@ h5_fstream = \
 # ============== prepare data based on the metadata ===========
 clst_metadata = OrderedDict({})
 for clstNo in metadata["clstNo"]:
-    print ("processing clst {0} ".format(clstNo + 1) +
+    print ("processing clst {0} ".format(int(clstNo) + 1) +
            "out of {0}".format(len(metadata["clstNo"])))
     peak_df = pd.DataFrame()
     clst_metadata["clstNo"] = clstNo
@@ -99,9 +103,9 @@ for clstNo in metadata["clstNo"]:
                     data = getg.project_coords(np.array(thisdf[pos_cols]),
                                                clst_metadata["xi"],
                                                clst_metadata["phi"],
-                                               los_axis=metadata["los_axis"])
+                                               los_axis=los_axis)
 
-                    col = np.arange(data.shape[1]) != metadata["los_axis"]
+                    col = np.arange(data.shape[1]) != int(los_axis)
                     data = data[:, col]
 
                     fhat = KDE.do_KDE_and_get_peaks(data, weights)
