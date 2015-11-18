@@ -5,9 +5,11 @@ from __future__ import (print_function,
 import pandas as pd
 import os
 
+from datetime import datetime
+datetime_stamp = datetime.now().strftime("%D").replace('/', '_')
 dataPath = "../../data/"
-output_fhat_path = "test_stars_fhat_129.h5"
-StoreFile = "test_stars_peaks_df_129.h5"
+output_fhat_filename = "test_stars_fhat_clst129_{}.h5".format(datetime_stamp)
+StoreFile = "test_stars_peak_df_clst129_{}.h5".format(datetime_stamp)
 if os.path.isfile(dataPath + StoreFile):
     os.remove(dataPath + StoreFile)
 store = pd.HDFStore(dataPath + StoreFile)
@@ -33,44 +35,49 @@ pos_cols = ["SubhaloPos{0}".format(i) for i in range(3)]
 metadata = OrderedDict({})
 
 # no. of clsters
-metadata["clstNo"] = range(129)
+metadata["clstNo"] = range(20) # range(128 - 20: 128)  # range(129)
 
 # cuts
 cut_kwargs = {"DM_cut": 1e3, "star_cut": 5e2}
 cut_methods = {"min": getg.cut_reliable_galaxies}
 cut_cols = {"min": pos_cols}
-metadata["cuts"] = {"min": cut_kwargs}
+metadata["cut"] = {"min": cut_kwargs}
 
 # weights
 metadata["weights"] = OrderedDict({
-    # "no": None,
     "i_band": getg.mag_to_lum
     })
 
 # projections
-nside = 16  # nsides of HEALpix are powers of 2, pix for 16 nsides = 3072 / 2
-metadata["los_axis"] = [2]  # use z-axis as los axis
+nside = 1  # nsides of HEALpix are powers of 2, pix for 16 nsides = 3072 / 2
+metadata["los_axis"] = [1]  # use z-axis as los axis
 metadata["xi"], metadata["phi"] = getg.angles_given_HEALpix_nsides(nside)
+
+print (
+    "{} projections per cluster are constructed".format(len(metadata["xi"])))
 
 # ============== set up output file structure  ===========
 # check_metadata against illegal types
 # create HDF5 file structure first!
-if os.path.isfile(dataPath + output_fhat_path):
-    os.remove(dataPath + output_fhat_path)
-h5_fstream = getg.construct_h5_file_for_saving_fhat(metadata, dataPath,
-                                                    output_fhat_path)
+if os.path.isfile(dataPath + output_fhat_filename):
+    os.remove(dataPath + output_fhat_filename)
+h5_fstream = \
+    getg.construct_h5_file_for_saving_fhat(metadata,
+                                           output_fhat_filename,
+                                           output_path=dataPath
+                                           )
 
 # ============== prepare data based on the metadata ===========
 clst_metadata = OrderedDict({})
 for clstNo in metadata["clstNo"]:
-    print ("processing clst {0} ".format(clstNo) +
+    print ("processing clst {0} ".format(clstNo + 1) +
            "out of {0}".format(len(metadata["clstNo"])))
     peak_df = pd.DataFrame()
     clst_metadata["clstNo"] = clstNo
     df = ext_cat.extract_clst(original_f, clstNo)
 
     dfs_with_cuts = \
-        getg.prep_data_with_cuts_and_wts(df, metadata["cuts"],
+        getg.prep_data_with_cuts_and_wts(df, metadata["cut"],
                                          cut_methods, cut_cols,
                                          metadata["weights"],
                                          verbose)

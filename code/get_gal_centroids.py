@@ -209,7 +209,7 @@ def find_gal_peak_ixes_in_DM_fhat(star_peaks_xcoord, star_peaks_ycoord, fhat):
 # ---------- Utilities for converting dictionaries to h5 objects -------
 def convert_dict_peaks_to_df(fhat, metadata,
                              save=False, output_path="../data/",
-                             peak_h5="fhat_peak.h5"):
+                             peak_h5="fhat_peak.h5", peak_info_keys=None):
     """
     :param fhat_list: list of python dictionary obtained from
         `convert_rfhat_to_dict`
@@ -218,8 +218,9 @@ def convert_dict_peaks_to_df(fhat, metadata,
     :return: df
     """
     peak_df_list = []
-    peak_info_keys = ["peaks_xcoords", "peaks_ycoords", "peaks_rowIx",
-                      "peaks_colIx", "peaks_dens"]
+    if peak_info_keys is None:
+        peak_info_keys = ["peaks_xcoords", "peaks_ycoords", "peaks_rowIx",
+                          "peaks_colIx", "peaks_dens"]
 
     peak_df = pd.DataFrame()
     for key in peak_info_keys:
@@ -232,39 +233,49 @@ def convert_dict_peaks_to_df(fhat, metadata,
     return peak_df
 
 
-def construct_h5_file_for_saving_fhat(metadata, output_path="../../data/",
-                                      dens_h5="test_fhat.h5"):
+def construct_h5_file_for_saving_fhat(metadata, dens_h5,
+                                      output_path="../../data/"):
+    """
+    :metadata: OrderedDict, keys correspond to the projections
+    :dens_h5: h5 file stream
+    """
     import h5py
     h5_fstream = h5py.File(output_path + dens_h5,
                            mode="a", compression="gzip",
                            compression_opts=9)
 
     # Would implement this recursively if the data structure were more regular
-    # for clstNo in metadata["clstNo"]:
-    #     lvl1 = h5_fstream.create_group(str(clstNo))
+    for clstNo in metadata["clstNo"]:
+        lvl1 = h5_fstream.create_group(str(clstNo))
 
-    #     for cuts in metadata["cuts"].keys():
-    #         lvl2 = lvl1.create_group(cuts)
+        # we put the "key" that corresponds to a dictionary of cuts
+        # as the meta data
+        for cuts in metadata["cut"].keys():
+            lvl2 = lvl1.create_group(cuts)
 
-    #         for weights in metadata["weights"].keys():
-    #             lvl3 = lvl2.create_group(weights)
+            # we put the "key" that corresponds to what band to weight
+            # the data by as the meta data
+            for weights in metadata["weights"].keys():
+                lvl3 = lvl2.create_group(weights)
 
-    #             for los_axis in metadata["los_axis"]:
-    #                 lvl4 = lvl3.create_group(str(los_axis))
+                for los_axis in metadata["los_axis"]:
+                    lvl4 = lvl3.create_group(str(los_axis))
 
-    #                 for xi in np.unique(metadata["xi"]):
-    #                     try:
-    #                         lvl5 = lvl4.create_group(str(xi))
-    #                     except ValueError:
-    #                         print(
-    #                             "ValueError raised due to creating existing groups")
+                    # should probably create 'xi_phi' as one group
+                    # or make sure there is no empty group
+                    for xi in np.unique(metadata["xi"]):
+                        try:
+                            lvl5 = lvl4.create_group(str(xi))
+                        except ValueError:
+                            print(
+                                "ValueError raised due to creating existing groups")
 
-    #                     for phi in np.unique(metadata["phi"]):
-    #                         try:
-    #                             lvl6 = lvl5.create_group(str(phi))
-    #                         except ValueError:
-    #                             print(
-    #                                 "ValueError raised due to creating existing groups")
+                        for phi in np.unique(metadata["phi"]):
+                            try:
+                                lvl5.create_group(str(phi))
+                            except ValueError:
+                                print(
+                                    "ValueError raised due to creating existing groups")
 
 
     return h5_fstream
@@ -631,6 +642,8 @@ def project_coords(coords, xi, phi, los_axis=2, radian=True):
 def same_projection(phi1, xi1, phi2, xi2):
     """
     determine if two sets of angles correspond to the same projection
+
+    Check if the projected coordinates look the same.
     """
     raise NotImplementedError
     return
@@ -661,6 +674,20 @@ def angles_given_HEALpix_nsides(nside):
     return xi, phi
 
 
+def get_clst_gpBy_from_DM_metadata(metadata_df, gpBy_keys=None):
+    """
+    :metadata_df: pandas dataframe, retrieved from `fhat_star_*_peak_df.h5` file
+    :gpBy_keys: list of strings, column names to groupBy
+
+    :returns: groupby object, gpBy_df
+        example usage:
+        >>> gps = gpBy_df.groups.keys()
+        >>> gpBy_df.get_group(gps[0])
+
+    """
+    if gpBy_keys is None:
+        gpBy_keys = list(metadata_df.keys()[-6:])
+    return metadata_df.groupby(gpBy_keys, as_index=False)
 
 
 # --------- depreciated R conversion functions ------------------------------
