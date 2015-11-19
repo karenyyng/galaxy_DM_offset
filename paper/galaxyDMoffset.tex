@@ -1,14 +1,63 @@
-%\pdfoutput=1
-%\input{style.tex}
-\documentclass[letterpaper,useAMS,usenatbib]{mn2e}
-\usepackage[colorlinks=true,
-            linkcolor=blue,
-            urlcolor=blue,
-					  citecolor=blue]{hyperref}
+\documentclass[usenatbib]{mn2e}
+\usepackage[pdftex]{graphicx}
+\newcommand{\be}{\begin{equation}}
+\newcommand{\ee}{\end{equation}}
+\newcommand{\bea}{\begin{eqnarray}}
+\newcommand{\eea}{\end{eqnarray}}
+\newcommand{\bc}{\begin{center}}
+\newcommand{\ec}{\end{center}}
+\newcommand{\ol}[1]{ {\overline{#1}}}
+\newcommand{\lu}{\,h^{-1}{\rm kpc}}
+\renewcommand{\vec}[1]{ {\bmath #1} } 
+\newcommand{\e}{{\rm e}}
+\newcommand{\dd}{{\rm d}}
+\newcommand{\ap}[1]{\textcolor{magenta}{#1}}
+\def\gsim{ \lower .75ex \hbox{$\sim$} \llap{\raise .27ex \hbox{$>$}} }
+\def\lsim{ \lower .75ex \hbox{$\sim$} \llap{\raise .27ex \hbox{$<$}} }
+
+% Individual page for figures
+\usepackage{afterpage}
+
+% Fancy merger rate symbol:
 \usepackage{amssymb}
-\usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage[amssymb]{SIunits} 
+
+% Make font much more compact
+\usepackage{times}
+
+% Compact lists (compactitem):
+\usepackage{paralist}
+
+% References highlighted in blue (include "draft" option for troubleshooting)
+\usepackage[bookmarks,bookmarksnumbered,colorlinks=true,citecolor=blue,linkcolor=black]{hyperref}
+\usepackage{color}
+
+% Line break inside table cell
+\usepackage{pbox}
+
+% Vertical spaces in table
+\usepackage{booktabs}
+
+% Tables with notes, etc.
+\usepackage[flushleft]{threeparttable}
+
+% Blocks of comments
+\usepackage{comment} 
+
+% Color highlighting
+\definecolor{darkgreen}{rgb}{0.0, 0.5, 0.0}
+\newcommand{\highlight}[1]{{\color{darkgreen} #1}}
+
+% Custom commands, to be used inside math environment:
+\newcommand{\Msun}{{\rm M_{\odot}}}
+
+\setlength{\topmargin}{-1.2cm}
+
+\renewcommand{\thefootnote}{\fnsymbol{footnote}}
+
+
+
 \usepackage{booktabs}
 \usepackage{hhline}
 \usepackage{breqn}
@@ -21,6 +70,7 @@
 \usepackage{algpseudocode}
 \usepackage[]{algorithm2e}
 \graphicspath{{figures/drafts/}{figures/finalized}}
+
 \newcommand{\mc}[1]{\multicolumn{1}{c}{#1}} % handy shortcut macro
 %-----------------------------------------------------------------------
 \def\apjl{ApJL }
@@ -83,9 +133,8 @@ The main goals of this paper include:
 			clusters that show highest correlation with $\Delta s$ 
 \end{itemize}
 
-\section{DATA}
 
-\subsection{Data from the Illustris simulation} 
+\section{The Illustris simulation Data} 
 \begin{figure}
 	\includegraphics[width=.95\linewidth]{clusterMassDist.eps}
 	\caption{
@@ -93,14 +142,25 @@ The main goals of this paper include:
 \end{figure}
 
 
-\subsubsection{Properties of the galaxy clusters / groups}
+\subsection{Galaxy Clusters and Galaxy Sample}
+
+Sample of clusters/groups: enough massive, enough rich
+
+M200 larger than 1e13 msun implies 129 objects
+
 Most important properties of the galaxy clusters that we examine in this
 study include, colors, magnitude, richness, concentration and non-relaxedness. We define
 and examined these properties one by one. 
-Fig 4. Relaxedness 
-Fig 5. 
+
+Sample of galaxy members: more than 1e3 particles AND more than 500 stellar particles.
+
+This corresponds to a minimum member mass of TBD and a minimum I-band magnitude of TBD.
+
 
 Richness characterizes the number of galaxies in a given cluster.
+
+
+On the relaxedness of the clusters.
 We provide several definitions of non-relaxedness to characterize whether
 the clusters underwent any recent merger activities. 
 1) These definitions of non-relaxedness.
@@ -109,7 +169,15 @@ The Shapiro-Wilk statistic can characterize the deviation from normality
 with the highest statistical power ().
 
 
-\subsubsection{Volume Selection}
+\begin{figure*}
+	\includegraphics[width=.95\linewidth]{figures/ph_fig_richnessAndColorMagnitudes.pdf}
+	\caption{
+		\label{fig:config}}
+\end{figure*}
+
+
+
+\subsection{Volume Selection}
 As a default output from the Illustris simulation, subhalos and particles of
 each galaxy cluster and group is identified by the Rockstar halo finder
 (CITATION). We make use of the member particle / subhalo identification as our
@@ -118,15 +186,21 @@ We understand that this choice of volume selection can be more ideal than
 observational conditions. However, we make use of this volume selection scheme
 for baseline comparisons. 
 
-2. Light cone 
+Levels of complexity:
+\begin{enumerate}
+\item FoF members and particles
+\item aperture around the center of the simulated FoF, and still only members and particles belonging to the FoF
+\item cylinder through the simulated box, centered around the simulated FoF, with a given observationally-motivated aperture, so including background and foreground galaxies.
+\end{enumerate}
+
+We start with case 1., assuming that member galaxies can be reliably identified observationally, e.g. thanks to spectroscopic information.
 
 
 
 
+\subsubsection{Spatial Projections}
 
-
-
-\subsubsection{spatial projections}
+The center findings are all based on 2D matter projections.
 
 For each cluster, we sample equilateral projections using healPy,
 so each angular pixel is of the same size.
@@ -151,16 +225,31 @@ that we have far too few samples of \dots
 
 
 
-\subsubsection{Galaxy Selection}
+
 \subsubsection{Galaxy weights}
 One of the most common weighting scheme employed for cluster galaxy data is to weight
 by the luminosity in a particular band.
 
 \subsubsection{Data with and without noise}
 1. Mass-richness diagram - with different cuts  
-\section{METHODS} 
 
-\subsection{Galaxy Centers}
+
+
+
+
+\section{Methods I: Galaxy Centers}
+
+Goal: to identify the ``center'' of the light distribution. Here the adopted tracers for the light distribution are the member galaxies of the cluster and groups.
+
+We focus on four ways to identify the light/galaxy centers:
+\begin{enumerate}
+\item centroids
+\item KDE + peak finder
+\item shrinking aperture method
+\item brightest cluster galaxy
+
+\end{enumerate}
+
 \subsubsection{Unweighted and weighted centroids}
 We follow the usual definition of spatial centroid as 
 \begin{equation}
@@ -219,7 +308,15 @@ different performances.
 
 \subsubsection{Brightest Cluster Galaxies (BCG)}
 
-\subsubsection{Comparison of the methods from test data}
+\begin{figure*}
+	\includegraphics[width=.95\linewidth]{figures/ph_fig_galaxycenter_mixtureTests.pdf}
+	\caption{
+		\label{fig:config}}
+\end{figure*}
+
+
+
+\subsection{Comparison of the methods from test data}
 In order to examine the performance of commonly used point-estimates of the
 distribution of the galaxy data, we test them on data drawn from Gaussian mixtures with
 known mean and variance. \\
@@ -243,7 +340,9 @@ The details and implementation can be found in our Bitbucket git repository.
 
 
 
-\subsection{DM Centers}
+\section{Section II: DM Centers (or Matter Centers?)}
+
+
 \subsection{Finding offsets} 
 
 We computed the projected offsets between the galaxy density peaks inferred from the
@@ -251,6 +350,19 @@ cross-validated KDE and the dark matter density peak. (TBD)
 The viewing angles of the projections are defined by an elevation angle
 $\xi$ and an azimuthal angle $\phi$. 
 
+
+\begin{figure*}
+	\includegraphics[width=.95\linewidth]{figures/ph_fig_galaxycenter_IllustrisClusters.pdf}
+	\caption{
+		\label{fig:config}}
+\end{figure*}
+
+
+\begin{figure*}
+	\includegraphics[width=.95\linewidth]{figures/ph_fig_DMcenter_IllustrisClusters.pdf}
+	\caption{
+		\label{fig:config}}
+\end{figure*}
 
 \section{RESULTS} 
 
@@ -261,7 +373,10 @@ $\xi$ and an azimuthal angle $\phi$.
 \subsection{Comparison to other simulations}
 \subsection{Comparison to other observational studies}
 \subsection{Galaxy-DM Offset in Merging Galaxy Clusters}
-\subsection{Summary}
+
+
+
+\section{Summary}
 We showed that 
 \begin{itemize}
 		\item  the peak finding method To-be-finalized for the density of cluster
