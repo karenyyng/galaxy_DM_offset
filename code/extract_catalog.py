@@ -64,8 +64,9 @@ def get_subhalos_of_a_cluster(f, clstID):
         cluster, second denotes the index of the last subhalo of the
         cluster
 
-    @stablity: to be tested
+    @stablity: ok!
     """
+    clstID = int(clstID)
     return [int(f["Group"]["GroupFirstSub"][ID])
             for ID in [clstID, clstID + 1]]
 

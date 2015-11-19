@@ -128,24 +128,117 @@ def match_DM_peaks_with_gal_peaks(fhat, fhat_stars, threshold=0.3,
     return dist, match
 
 
-def downsample_histogram_then_smooth(coord_dict, bandwidth=30.*4.45,
-                                     bin_width_as_multiple_of_bandwidth=0.5,
-                                     downsample_percentage=1.0):
-    """This function downsamples the number of particles
-    Parameters
-    ==========
-    :coord_dict:
-    :bandwidth: TODO
-    :bin_width_as_multiple_of_bandwidth: TODO
-    :downsample_percentage:
+def retrieve_DM_metadata_from_gal_metadata(dataPath, gal_metadata_h5_file,
+                                           h5key="peak_df", keys=None):
+    """This retrieves the gal metadata from the appropriate h5 file
+    * matches the DM metadata from the gal_metadata so we can compute the
+    correct offsets. There are no cuts / weights for the DM particles.
 
-    :returns: TODO
+    :gal_metadata_h5_file:
+    :returns: DM_metadata, this is a ordered dictionary
+    :returns: metadata_df,
+    """
+    import pandas as pd
+    from collections import OrderedDict
+
+    metadata_df = pd.read_hdf(dataPath + gal_metadata_h5_file, h5key)
+    if keys is None:
+        keys = ["clstNo", "cut", "weights", "los_axis",  ("xi", "phi")]
+
+    def retrieve_metadata(metadata_df, group_by_cols):
+        return (metadata_df
+                .groupby(group_by_cols, as_index=False)
+                .groups
+                .keys()
+                )
+
+    DM_metadata = OrderedDict({})
+
+    for k in keys:
+        if type(k) is not tuple:
+            DM_metadata[k] = retrieve_metadata(metadata_df, k)
+        else:
+            temp_data = retrieve_metadata(metadata_df, k)
+            temp_data = np.array([list(d) for d in temp_data]).transpose()
+            for i, td in enumerate(temp_data):
+                DM_metadata[k[i]] = td
+
+    return DM_metadata, metadata_df
+
+
+def construct_h5_file_for_saving_fhat(metadata, dens_h5,
+                                      output_path="../../data/"):
+    """
+    :metadata: OrderedDict
+    :dens_h5: file name for the hdf5 file for storing fhat
+    :output_path: directory for storing the h5 file dens_h5
+
+    :returns: hdf5 filestream
     """
 
+    import h5py
+    h5_fstream = h5py.File(output_path + dens_h5,
+                           mode="a", compression="gzip",
+                           compression_opts=9)
+
+    # Would implement this recursively if the data structure were more regular
+    # also need to do error handling.
+    for clstNo in metadata["clstNo"]:
+        lvl1 = h5_fstream.create_group(str(clstNo))
+
+        for cuts in metadata["cut"]:
+            lvl2 = lvl1.create_group(cuts)
+
+            for weights in metadata["weights"]:
+                lvl3 = lvl2.create_group(weights)
+
+                for los_axis in metadata["los_axis"]:
+                    lvl4 = lvl3.create_group(str(los_axis))
+
+                    for xi in np.unique(metadata["xi"]):
+                        try:
+                            lvl5 = lvl4.create_group(str(xi))
+                        except ValueError:
+                            print(
+                                "ValueError raised due to creating existing groups")
+
+                        for phi in np.unique(metadata["phi"]):
+                            try:
+                                lvl6 = lvl5.create_group(str(phi))
+                            except ValueError:
+                                print(
+                                    "ValueError raised due to creating existing groups")
+
+                            for kernel_width in metadata["kernel_width"]:
+                                lvl6.create_group(str(kernel_width))
+
+
+
+    return h5_fstream
+
+
+def convert_dict_dens_to_h5(fhat, clst_metadata, h5_fstream):
+    import get_gal_centroids as getgal
+
+    fixed_size_data_keys = ["eval_points", "estimate"]
+    path = getgal.h5path_from_clst_metadata(clst_metadata)
+    print (path)
+
+    for k in fixed_size_data_keys:
+        # print (k)
+        if k != "eval_points":
+            thispath = path + k
+            print (thispath)
+            h5_fstream[thispath] = fhat[k]
+        else:
+            for i in range(len(fhat[k])):
+                thispath = path + k + str(i)
+                print (thispath)
+                h5_fstream[thispath] = fhat[k][i]
 
     return
 
-# -stuff below this line are unstable but may be used if all else fails -----
+#  -stuff below this line are unstable but may be used if all else fails -----
 
 def get_dens_and_grid(x, y, bw='normal_reference',
                       gridsize=100, cut=4,
@@ -193,17 +286,26 @@ def find_num_of_significant_peaks(peak_dens_list, threshold=0.5):
 
 
 def apply_peak_num_threshold(gal_peak_dens_list, fhat,
-                             multiple_of_candidate_peaks=2):
+                             multiple_of_candidate_peaks=2,
+                             sig_fraction=0.2):
     """
     Parameters
     -----------
     gal_peak_dens_list : list of floats of relative the KDE peak dens to the
                          densest peak
     fhat : output from `make_histogram_with_some_resolution`
-    threshold : float, starting threshold of the iterative process of finding
-    a good threshold
+    multiple_of_candidate_peaks: int (optional), default = 2
+        how many DM candidate peaks to consider,
+            as a multiple of the number of galaxy peaks
+    sig_fraction : float, (optional) default = 0.2,
+       0 < sig_fraction < 1
+
     """
-    sig_gal_peaks = find_num_of_significant_peaks(gal_peak_dens_list, 0.2)
+    if sig_fraction < 0. or sig_fraction > 1.:
+        raise ValueError("0 < `sig_fractions` < 1 is required!")
+
+    sig_gal_peaks = find_num_of_significant_peaks(gal_peak_dens_list,
+                                                  sig_fraction)
 
     if sig_gal_peaks >= 3:
         acceptance = multiple_of_candidate_peaks * sig_gal_peaks

@@ -2,6 +2,11 @@
 Provides python wrapper around the R ks package for the KDE functions
 I try to keep a one-to-one correspondane between the R functions and the
 Python functions
+
+Prerequisite:
+* ks R package and its dependencies should be installed.
+* ks_KDE.r (or a soft link) should be in the same directory for which you import / use get_KDE.py
+
 Author: Karen Ng <karenyng@ucdavis.edu>
 License: BSD
 """
