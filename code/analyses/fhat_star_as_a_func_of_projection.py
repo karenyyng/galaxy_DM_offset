@@ -8,8 +8,11 @@ import os
 from datetime import datetime
 datetime_stamp = datetime.now().strftime("%D").replace('/', '_')
 dataPath = "../../data/"
-output_fhat_filename = "test_stars_fhat_clst10_{}.h5".format(datetime_stamp)
-StoreFile = "test_stars_peak_df_clst10_{}.h5".format(datetime_stamp)
+total_clstNo = 50
+output_fhat_filename = \
+    "test_stars_fhat_clst{0}_{1}.h5".format(total_clstNo, datetime_stamp)
+StoreFile = \
+    "test_stars_peak_df_clst{0}_{1}.h5".format(total_clstNo, datetime_stamp)
 if os.path.isfile(dataPath + StoreFile):
     os.remove(dataPath + StoreFile)
 store = pd.HDFStore(dataPath + StoreFile)
@@ -35,7 +38,7 @@ pos_cols = ["SubhaloPos{0}".format(i) for i in range(3)]
 metadata = OrderedDict({})
 
 # no. of clsters - want these as strings, not int!
-metadata["clstNo"] = [str(i) for i in range(128-10, 128)]  #  range(129)
+metadata["clstNo"] = [str(i) for i in range(128-total_clstNo, 128)]  #  range(129)
 
 # cuts
 cut_kwargs = {"DM_cut": 1e3, "star_cut": 5e2}

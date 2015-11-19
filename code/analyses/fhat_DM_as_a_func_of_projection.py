@@ -16,7 +16,7 @@ datetime_stamp = datetime.now().strftime("%D").replace('/', '_')
 data_path = "../../data/"
 # ------- specify output file paths  -----------------------
 print ("Current date is {}".format(datetime_stamp))
-total_clstNo = 20
+total_clstNo = 50
 output_fhat_filename = \
     "test_DM_fhat_clst{0}_{1}.h5".format(total_clstNo, datetime_stamp)
 StoreFile = \
@@ -84,7 +84,7 @@ pos_cols = ["SubhaloPos{}".format(i) for i in range(3)]
 
 clst_metadata = OrderedDict({})
 #### CHANGE THE RANGE of line below
-for clstNo in DM_metadata["clstNo"][-1:]:
+for clstNo in DM_metadata["clstNo"]:
     print ("Processing clst {0} ".format(int(clstNo) + 1) +
            "out of {0}".format(len(DM_metadata["clstNo"])))
     peak_df = pd.DataFrame()
