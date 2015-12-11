@@ -15,13 +15,22 @@ def convert_DM_path_to_star_path(DM_clstPath):
     return '/'.join(DM_clstPath.split('/')[:-3])
 
 
-def compute_euclidean_dist(data):
+def compute_euclidean_dist(data, origin=None):
     """
-    :param data: numpy array
-    :return: numpy array
+    :param data: numpy array, shape = (nobs, ndim)
+    :param origin: numpy array (optional), shape = (1, ndim )
+    :return: float
+
+    > assert origin.shape[1] == data.shape[1]
     """
     if type(data) is not np.ndarray:
         data = np.array(data)
+
+    if origin is None:
+        if len(data.shape) == 1:
+            data = data.reshape(1, data.shape[0])
+        origin = np.zeros(data.shape[1])
+    data = data - origin
 
     if data.ndim > 1:
         return np.array([np.sqrt(np.dot(data[i], data[i])) for i in

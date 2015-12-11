@@ -168,6 +168,33 @@ def test_angles_given_HEALpix_nsides():
     assert np.allclose(xi, test_xi)
     assert np.allclose(phi, test_phi)
 
+
+def test_angles_from_HEALpix_nsides_should_not_show_same_projection():
+    from itertools import combinations
+
+    xi_arr, phi_arr = angles_given_HEALpix_nsides(1)
+
+    # The number of comparisons needed is nC2,
+    combinations(range(len(xi_arr)), 2)
+
+    assert np.sum([
+
+    ])
+
+
+def test_same_projection():
+    """
+    :returns: TODO
+
+    """
+    coords_w_same_projection = np.array((0, 0, 180, 0)) * np.pi / 180.
+    coords_not_of_same_projection = np.array((0, 0, 90, 0)) * np.pi / 180.
+
+    assert same_projection(*coords_w_same_projection) == True
+    assert same_projection(*coords_not_of_same_projection) == False
+    return
+
+
 # def test_get_py_peaks_and_density_weights():
 #     """ Regression test """
 #     x =

@@ -647,12 +647,43 @@ def project_coords(coords, xi, phi, los_axis=2, radian=True):
 
 def same_projection(phi1, xi1, phi2, xi2):
     """
-    determine if two sets of angles correspond to the same projection
+    :phi1: float, azimuthal angle in radians
+    :xi1: float, elevation angle in radians
+    :phi2: float, azimuthal angle in radians
+    :xi2: float, elevation angle in radians
 
-    Check if the projected coordinates look the same.
+    Determine if two sets of angles correspond to the same projection.
+
+    Initialize two points with the spherical coordinates
+    pt1 = (1, phi1, xi1)
+    pt2 = (1, phi2, xi2)
+    and
+    origin = (0, 0, 0)
+    Compute Euclidean distance between the two points,
+    see if that equals the distance between
+    (pt1 - origin) + (pt2 - origin)
+
     """
-    raise NotImplementedError
-    return
+    pt1 = spherical_coord_to_cartesian(phi1, xi1)
+    pt2 = spherical_coord_to_cartesian(phi2, xi2)
+    origin = (0., 0., 0.)
+
+    dist1 = compute_euclidean_dist(pt1, origin)
+    dist2 = compute_euclidean_dist(pt2, origin)
+    dist12 = compute_euclidean_dist(pt1, pt2)
+
+    return dist12 == dist1 + dist2
+
+
+def spherical_coord_to_cartesian(phi, xi):
+    """
+    :ref:
+        https://en.wikipedia.org/wiki/Spherical_coordinate_system#Cartesian_coordinates
+    """
+    return (np.sin(xi) * np.cos(phi),
+            np.sin(xi) * np.sin(phi),
+            np.cos(phi)
+            )
 
 
 def angles_given_HEALpix_nsides(nside):
