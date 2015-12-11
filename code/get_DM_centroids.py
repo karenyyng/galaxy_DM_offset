@@ -9,7 +9,7 @@ from scipy.spatial import KDTree
 def make_histogram_with_some_resolution(data, resolution=2.0,
                                         coord_key="coords",
                                         spatial_axis=range(2),
-                                        close_plot=True):
+                                        close_plot=True, find_peak=True):
     """this function makes histogram and returns appropriate format
     this should be used
 
@@ -52,8 +52,9 @@ def make_histogram_with_some_resolution(data, resolution=2.0,
                                     data["min_coords"][spatial_axis[i]]
                                     for i in range(2)])
 
-    get_KDE.find_peaks_from_py_diff(fhat)
-    get_KDE.get_density_weights(fhat)
+    if find_peak:
+        get_KDE.find_peaks_from_py_diff(fhat)
+        get_KDE.get_density_weights(fhat)
 
     if close_plot:
         plt.close()
@@ -217,23 +218,25 @@ def construct_h5_file_for_saving_fhat(metadata, dens_h5,
     return h5_fstream
 
 
-def convert_dict_dens_to_h5(fhat, clst_metadata, h5_fstream):
+def convert_dict_dens_to_h5(fhat, clst_metadata, h5_fstream, verbose=False):
     import get_gal_centroids as getgal
 
     fixed_size_data_keys = ["eval_points", "estimate"]
     path = getgal.h5path_from_clst_metadata(clst_metadata)
-    print (path)
+    if verbose:
+        print (path)
 
     for k in fixed_size_data_keys:
-        # print (k)
         if k != "eval_points":
             thispath = path + k
-            print (thispath)
+            if verbose:
+                print (thispath)
             h5_fstream[thispath] = fhat[k]
         else:
             for i in range(len(fhat[k])):
                 thispath = path + k + str(i)
-                print (thispath)
+                if verbose:
+                    print (thispath)
                 h5_fstream[thispath] = fhat[k][i]
 
     return
@@ -287,7 +290,7 @@ def find_num_of_significant_peaks(peak_dens_list, threshold=0.5):
 
 def apply_peak_num_threshold(gal_peak_dens_list, fhat,
                              multiple_of_candidate_peaks=2,
-                             sig_fraction=0.2):
+                             sig_fraction=0.2, verbose=True):
     """
     Parameters
     -----------
@@ -316,20 +319,25 @@ def apply_peak_num_threshold(gal_peak_dens_list, fhat,
 
     # Guard against infinite loops.
     if (len(fhat["peaks_dens"]) < acceptance):
-       raise ValueError(
-           "There are not enough DM peaks to be considered.\n" +
-           "len(fhat['peaks_dens'][fhat['peaks_dens'] > good_threshold]]) " +
-           " < acceptance"
-           )
+        if verbose:
+            print (
+                "There are not enough DM peaks to be considered.\n" +
+                "len(fhat['peaks_dens'][fhat['peaks_dens'] > good_threshold]]) " +
+                " < acceptance"
+                )
+        return 0, sig_gal_peaks
 
     while (np.sum(fhat["peaks_dens"][fhat["peaks_dens"] > good_threshold]) <
            acceptance):
         good_threshold -= 0.01
 
         if good_threshold < 0.01:
-            raise ValueError(
-                "There is no good threshold for the input DM peaks.\n"
+            if verbose:
+                print (
+                    "Warning: There is no good threshold for the input DM peaks.\n"
                 )
+            good_threshold = 0.
+            break
 
     return good_threshold, sig_gal_peaks
 

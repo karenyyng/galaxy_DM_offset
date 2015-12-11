@@ -40,9 +40,11 @@ def prep_data_with_cuts_and_wts(df, cuts, cut_methods, cut_cols, wts,
     df_list : list of pandas dataframe
     """
     dfs_with_cuts = OrderedDict({})
+    richness = OrderedDict({})
     for cut_method_name, cut_kwargs in cuts.iteritems():
         if cut_kwargs is not None:  # skip if cut_kwargs is None
             mask = cut_methods[cut_method_name](df, **cut_kwargs)
+            richness[cut_method_name] = np.sum(mask)
             print "# of subhalos after the " + \
                 "{1} cut = {0}".format(np.sum(mask), cut_method_name)
             # col = cut_cols[cut_method_name]
@@ -57,11 +59,10 @@ def prep_data_with_cuts_and_wts(df, cuts, cut_methods, cut_cols, wts,
             else:
                 thisdf[weight + "_wt"] = np.ones(thisdf.shape[0])
 
-
         # have new df for each types of cuts
         dfs_with_cuts[cut_method_name] = thisdf.copy()
 
-    return dfs_with_cuts
+    return dfs_with_cuts, richness
 
 
 def mag_to_lum(mag):
@@ -209,7 +210,8 @@ def find_gal_peak_ixes_in_DM_fhat(star_peaks_xcoord, star_peaks_ycoord, fhat):
 # ---------- Utilities for converting dictionaries to h5 objects -------
 def convert_dict_peaks_to_df(fhat, metadata,
                              save=False, output_path="../data/",
-                             peak_h5="fhat_peak.h5", peak_info_keys=None):
+                             peak_h5="fhat_peak.h5", peak_info_keys=None,
+                             ):
     """
     :param fhat_list: list of python dictionary obtained from
         `convert_rfhat_to_dict`
@@ -217,10 +219,12 @@ def convert_dict_peaks_to_df(fhat, metadata,
 
     :return: df
     """
-    peak_df_list = []
     if peak_info_keys is None:
-        peak_info_keys = ["peaks_xcoords", "peaks_ycoords", "peaks_rowIx",
-                          "peaks_colIx", "peaks_dens"]
+        peak_info_keys = ["peaks_xcoords",
+                          "peaks_ycoords",
+                          # "peaks_rowIx",
+                          # "peaks_colIx",
+                          "peaks_dens"]
 
     peak_df = pd.DataFrame()
     for key in peak_info_keys:
@@ -449,8 +453,6 @@ def normalize_data(data):
         please check your data"
 
     return data / normalization, normalization
-
-
 
 
 def compute_weighted_centroids(x, w=None):

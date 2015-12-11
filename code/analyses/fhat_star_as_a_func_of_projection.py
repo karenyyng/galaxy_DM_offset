@@ -8,7 +8,9 @@ import os
 from datetime import datetime
 datetime_stamp = datetime.now().strftime("%D").replace('/', '_')
 dataPath = "../../data/"
-total_clstNo = 50
+total_clstNo = 128
+assert total_clstNo <=128 and total_clstNo >= 0, \
+    "0 <= total_clstNo <= 128"
 output_fhat_filename = \
     "test_stars_fhat_clst{0}_{1}.h5".format(total_clstNo, datetime_stamp)
 StoreFile = \
@@ -74,6 +76,7 @@ h5_fstream = \
                                            output_path=dataPath
                                            )
 
+
 # ============== prepare data based on the metadata ===========
 clst_metadata = OrderedDict({})
 for clstNo in metadata["clstNo"]:
@@ -83,7 +86,7 @@ for clstNo in metadata["clstNo"]:
     clst_metadata["clstNo"] = clstNo
     df = ext_cat.extract_clst(original_f, clstNo)
 
-    dfs_with_cuts = \
+    dfs_with_cuts, richness = \
         getg.prep_data_with_cuts_and_wts(df, metadata["cut"],
                                          cut_methods, cut_cols,
                                          metadata["weights"],
@@ -120,6 +123,7 @@ for clstNo in metadata["clstNo"]:
                         getg.convert_dict_peaks_to_df(fhat, clst_metadata)
                     store.append("peak_df", peak_df)
 
+                    # clst_metadata[cut + 'richness'] = richness
                     getg.convert_dict_dens_to_h5(fhat, clst_metadata,
                                                  h5_fstream)
 

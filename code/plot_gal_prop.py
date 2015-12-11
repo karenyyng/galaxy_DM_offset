@@ -184,7 +184,6 @@ def plot_KDE_peaks(fhat, lvls=range(2, 100, 10), allPeaks=True,
     # rotate tick label
     map(lambda x: x.set_rotation(xlabel_rotate_angle), ax.get_xticklabels())
 
-
     if R200C is not None:
         R200_circl = plt.Circle((0, 0), radius=R200C, color='k', lw=2,
                                 ls='solid', fill=False, label="R200C")
