@@ -651,7 +651,7 @@ def project_coords(coords, xi, phi, los_axis=2, radian=True):
 
 def same_projection(phi1, xi1, phi2, xi2):
     """
-    WARNING: This does not test for identical points.
+    WARNING: This may not test for identical points.
     :phi1: float, azimuthal angle in radians
     :xi1: float, elevation angle in radians
     :phi2: float, azimuthal angle in radians

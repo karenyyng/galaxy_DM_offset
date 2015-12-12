@@ -169,14 +169,18 @@ def test_galaxies_closest_to_peak():
 #     assert np.allclose(phi, test_phi)
 
 
-def test_angles_from_HEALpix_nsides_should_not_show_same_projection():
-    xi_arr, phi_arr = angles_given_HEALpix_nsides(1)
+def test_same_projection_respects_spherical_symmetry():
+    for nside in range(4):
+        xi_arr, phi_arr = angles_given_HEALpix_nsides(1)
 
-    # The number of comparisons needed is nC2
-    same_projection_bools, pairs = \
-        angles_give_same_projections(phi_arr, xi_arr)
+        # The number of comparisons needed is nC2
+        same_projection_bools, pairs = \
+            angles_give_same_projections(phi_arr, xi_arr)
 
-    # assert np.sum(same_projection_bools) == 0, "Pairs not unique :("
+        pairs = np.array(pairs)
+        same_projection_bools = np.array(same_projection_bools)
+
+        assert len(pairs[same_projection_bools]) == len(xi_arr) / 2
 
 
 def test_same_projection():
