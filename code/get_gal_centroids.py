@@ -6,6 +6,10 @@ import numpy as np
 import pandas as pd
 from get_KDE import *
 from compute_distance import compute_euclidean_dist
+import logging
+
+logging.basicConfig(filename="Debug_get_gal_centroids.log",
+                    level=logging.DEBUG)
 
 
 # --------- functions for preparing cuts, projections, weighting -----------
@@ -647,6 +651,7 @@ def project_coords(coords, xi, phi, los_axis=2, radian=True):
 
 def same_projection(phi1, xi1, phi2, xi2):
     """
+    WARNING: This does not test for identical points.
     :phi1: float, azimuthal angle in radians
     :xi1: float, elevation angle in radians
     :phi2: float, azimuthal angle in radians
@@ -666,13 +671,42 @@ def same_projection(phi1, xi1, phi2, xi2):
     """
     pt1 = spherical_coord_to_cartesian(phi1, xi1)
     pt2 = spherical_coord_to_cartesian(phi2, xi2)
-    origin = (0., 0., 0.)
 
-    dist1 = compute_euclidean_dist(pt1, origin)
-    dist2 = compute_euclidean_dist(pt2, origin)
+    # sign1 = pt1 > 0
+    # sign2 = pt2 > 0
+    # opposite_sign = np.sum(sign1 * sign2) == 1
+
+    # return np.sum(np.abs(pt1) - np.abs(pt2)) < 1.e-6 and opposite_sign
+
     dist12 = compute_euclidean_dist(pt1, pt2)
 
-    return dist12 == dist1 + dist2
+    logging.debug("------------------------------------")
+    logging.debug("(phi, xi)1 = ({0}, {1}),".format(phi1 * 180. / np.pi,
+                                                xi1 * 180./ np.pi) +
+                  "(phi, xi)2 = ({0}, {1})".format(phi2 * 180. / np.pi,
+                                               xi2 * 180./ np.pi))
+    logging.debug("\npt1={0}, pt2={1}\n".format(np.array(pt1) ,
+                                                np.array(pt2) ))
+    logging.debug("\ndist12={0}\n".format(dist12))
+
+    same_projection = np.abs(dist12 - 2.0) < np.finfo(np.float32).eps
+    same_projection = same_projection or np.sum(pt1 - pt2) == 0.
+    logging.debug ("Same_project = {}".format(same_projection))
+    return same_projection
+
+
+def angles_give_same_projections(phi_arr, xi_arr):
+    """
+    :param phi_arr: np array of floats, in RADIANS
+    :param xi_arr: np array of floats, in RADIANS
+
+    :returns: an array of bools
+    """
+    from itertools import combinations
+    combo = np.array([c for c in combinations(range(len(xi_arr)), 2)])
+    return [same_projection(phi_arr[pair[0]], xi_arr[pair[0]],
+                            phi_arr[pair[1]], xi_arr[pair[1]])
+            for pair in combo], combo
 
 
 def spherical_coord_to_cartesian(phi, xi):
@@ -680,10 +714,10 @@ def spherical_coord_to_cartesian(phi, xi):
     :ref:
         https://en.wikipedia.org/wiki/Spherical_coordinate_system#Cartesian_coordinates
     """
-    return (np.sin(xi) * np.cos(phi),
-            np.sin(xi) * np.sin(phi),
-            np.cos(phi)
-            )
+    return np.array([np.sin(xi) * np.cos(phi),
+                    np.sin(xi) * np.sin(phi),
+                    np.cos(xi)
+                     ])
 
 
 def angles_given_HEALpix_nsides(nside):
@@ -702,11 +736,13 @@ def angles_given_HEALpix_nsides(nside):
     from healpy.pixelfunc import nside2npix
 
     npix = nside2npix(nside)
-    # we only want half the pixels on the sphere due to symmetry
-    angle_idxes = np.array([range(2 * (i - 1), 2 * (i - 1) + 2)
-                            for i in np.arange(1, int(npix / 2), 2)]
-                           ).ravel()  # flatten array
-    xi, phi = pix2ang(nside, angle_idxes)
+    # We only want half the pixels on the sphere due to symmetry
+    # And we have to figure out what the pattern is for symmetry
+    angle_idxes = range(npix)
+    # angle_idxes = np.array([range(2 * (i - 1), 2 * (i - 1) + 2)
+    #                         for i in np.arange(1, int(npix / 2), 2)]
+    #                        ).ravel()  # flatten array
+    xi, phi = pix2ang(nside, angle_idxes, nest=False)
 
     return xi, phi
 

@@ -17,6 +17,9 @@ def convert_DM_path_to_star_path(DM_clstPath):
 
 def compute_euclidean_dist(data, origin=None):
     """
+    between numpy array of (nobs, ndim) and one point
+    if origin doest not represent a data point, results may be wrong.
+
     :param data: numpy array, shape = (nobs, ndim)
     :param origin: numpy array (optional), shape = (1, ndim )
     :return: float

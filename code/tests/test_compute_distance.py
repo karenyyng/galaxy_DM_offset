@@ -36,6 +36,8 @@ def test_compute_distance_between_DM_and_gal_peaks():
 def test_compute_euclidean_dist():
     """test if we are computing correct distances
     """
+    test_null_pt1 = (0, 0)
+    test_null_pt2 = (0, 0, 0)
     test_pt1 = (1, 1)
     test_pt2 = (1, 1, 1)
     test_pts = np.array([[2, 1, 1], [1, 3, 1], [1, 1, 4]])
@@ -49,3 +51,9 @@ def test_compute_euclidean_dist():
     assert np.array_equal(compute_euclidean_dist(test_pts, test_pt2),
                           np.array([1, 2, 3])), \
                           "Failed computing distance of {0} and {1}".format(test_pts, test_pts)
+
+    assert compute_euclidean_dist(test_null_pt1) == 0., \
+        "Failed computing norm of {}".format(test_null_pt1)
+
+    assert compute_euclidean_dist(test_null_pt2) == 0., \
+        "Failed computing norm of {}".format(test_null_pt2)
