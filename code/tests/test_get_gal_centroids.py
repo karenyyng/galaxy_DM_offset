@@ -170,30 +170,30 @@ def test_galaxies_closest_to_peak():
 
 
 def test_same_projection_respects_spherical_symmetry():
-    for nside in range(4):
-        xi_arr, phi_arr = angles_given_HEALpix_nsides(1)
+    from healpy import nside2npix
+    for i in range(3):
+        nside = 2 ** i
+        npix = nside2npix(nside)
+        xi_arr, phi_arr = angles_given_HEALpix_nsides(nside)
 
-        # The number of comparisons needed is nC2
-        same_projection_bools, pairs = \
-            angles_give_same_projections(phi_arr, xi_arr)
-
-        pairs = np.array(pairs)
-        same_projection_bools = np.array(same_projection_bools)
-
-        assert len(pairs[same_projection_bools]) == len(xi_arr) / 2
+        assert len(xi_arr) == npix / 2
 
 
 def test_same_projection():
     """
-    :returns: TODO
+    the angles are (phi, xi, phi1, xi1) where
+    phi is the azimuthal angle
+    xi is the elevation angle
     """
     coords_w_same_projection1 = np.array((0, 0, 180, 180)) * np.pi / 180.
     coords_w_same_projection2 = np.array((180, 0, 180, 180)) * np.pi / 180.
     coords_not_of_same_projection1 = np.array((0, 90, 0, 0)) * np.pi / 180.
+    coords_not_of_same_projection2 = np.array((10, 30, 30, 60)) * np.pi / 180.
 
     assert same_projection(*coords_w_same_projection1) == True
     assert same_projection(*coords_w_same_projection2) == True
     assert same_projection(*coords_not_of_same_projection1) == False
+    assert same_projection(*coords_not_of_same_projection2) == False
     return
 
 

@@ -8,8 +8,8 @@ from get_KDE import *
 from compute_distance import compute_euclidean_dist
 import logging
 
-logging.basicConfig(filename="Debug_get_gal_centroids.log",
-                    level=logging.DEBUG)
+# logging.basicConfig(filename="Debug_get_gal_centroids.log",
+#                     level=logging.DEBUG)
 
 
 # --------- functions for preparing cuts, projections, weighting -----------
@@ -669,29 +669,31 @@ def same_projection(phi1, xi1, phi2, xi2):
     (pt1 - origin) + (pt2 - origin)
 
     """
+    if phi1 == phi2 and xi1 == xi2:
+        # Monster wants to climb out of the screen and eat users who supply
+        # this type of inputs to this function
+        return True
+    elif xi1 == xi2 and (xi1 == 0. or xi1 == np.pi):
+        # Points at the zenith show same projection no matter what phi values
+        return True
+
     pt1 = spherical_coord_to_cartesian(phi1, xi1)
     pt2 = spherical_coord_to_cartesian(phi2, xi2)
 
-    # sign1 = pt1 > 0
-    # sign2 = pt2 > 0
-    # opposite_sign = np.sum(sign1 * sign2) == 1
-
-    # return np.sum(np.abs(pt1) - np.abs(pt2)) < 1.e-6 and opposite_sign
-
     dist12 = compute_euclidean_dist(pt1, pt2)
+    same_projection = np.abs(dist12 - 2.0) < np.finfo(np.float32).eps
 
     logging.debug("------------------------------------")
-    logging.debug("(phi, xi)1 = ({0}, {1}),".format(phi1 * 180. / np.pi,
-                                                xi1 * 180./ np.pi) +
-                  "(phi, xi)2 = ({0}, {1})".format(phi2 * 180. / np.pi,
-                                               xi2 * 180./ np.pi))
-    logging.debug("\npt1={0}, pt2={1}\n".format(np.array(pt1) ,
-                                                np.array(pt2) ))
+    logging.debug(
+        "(phi, xi)1 = ({0}, {1}),".format(phi1 * 180. / np.pi,
+                                          xi1 * 180./ np.pi) +
+        "(phi, xi)2 = ({0}, {1})".format(phi2 * 180. / np.pi,
+                                         xi2 * 180./ np.pi))
+    logging.debug(
+        "\npt1={0}, pt2={1}\n".format(np.array(pt1), np.array(pt2) ))
     logging.debug("\ndist12={0}\n".format(dist12))
-
-    same_projection = np.abs(dist12 - 2.0) < np.finfo(np.float32).eps
-    same_projection = same_projection or np.sum(pt1 - pt2) == 0.
     logging.debug ("Same_project = {}".format(same_projection))
+
     return same_projection
 
 
@@ -703,6 +705,8 @@ def angles_give_same_projections(phi_arr, xi_arr):
     :returns: an array of bools
     """
     from itertools import combinations
+
+    # The number of comparisons needed is nC2
     combo = np.array([c for c in combinations(range(len(xi_arr)), 2)])
     return [same_projection(phi_arr[pair[0]], xi_arr[pair[0]],
                             phi_arr[pair[1]], xi_arr[pair[1]])
@@ -736,15 +740,21 @@ def angles_given_HEALpix_nsides(nside):
     from healpy.pixelfunc import nside2npix
 
     npix = nside2npix(nside)
-    # We only want half the pixels on the sphere due to symmetry
-    # And we have to figure out what the pattern is for symmetry
     angle_idxes = range(npix)
     # angle_idxes = np.array([range(2 * (i - 1), 2 * (i - 1) + 2)
     #                         for i in np.arange(1, int(npix / 2), 2)]
     #                        ).ravel()  # flatten array
-    xi, phi = pix2ang(nside, angle_idxes, nest=False)
+    xi_arr, phi_arr = pix2ang(nside, angle_idxes, nest=False)
+    same_projections, pairs = angles_give_same_projections(phi_arr, xi_arr)
 
-    return xi, phi
+    same_projections = np.array(same_projections)
+    pairs = np.array(pairs)
+
+    # We only want half the pixels on the sphere due to symmetry
+    # Index masks need to be numpy arrays
+    unique_ixes = np.array([p[0] for p in pairs[same_projections]])
+
+    return xi_arr[unique_ixes], phi_arr[unique_ixes]
 
 
 def get_clst_gpBy_from_DM_metadata(metadata_df, gpBy_keys=None):

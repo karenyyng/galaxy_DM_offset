@@ -7,8 +7,11 @@ import os
 
 from datetime import datetime
 datetime_stamp = datetime.now().strftime("%D").replace('/', '_')
+
+# =========== Decide what to output ============================
 dataPath = "../../data/"
-total_clstNo = 128
+total_clstNo = 3
+# =========== Decide what to output ============================
 assert total_clstNo <=128 and total_clstNo >= 0, \
     "0 <= total_clstNo <= 128"
 output_fhat_filename = \
@@ -29,12 +32,13 @@ import get_KDE as KDE
 from collections import OrderedDict
 
 verbose = True
+# Do not import h5py before opening the store, it may crash
 import h5py
 original_f = h5py.File(dataPath +
                        "Illustris-1_fof_subhalo_myCompleteHaloCatalog_00135" +
                        ".hdf5")
 
-# ================ make all decisions ===========================
+# ================ make science related decisions ===========================
 
 pos_cols = ["SubhaloPos{0}".format(i) for i in range(3)]
 metadata = OrderedDict({})

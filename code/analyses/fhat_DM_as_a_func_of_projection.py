@@ -16,7 +16,9 @@ datetime_stamp = datetime.now().strftime("%D").replace('/', '_')
 data_path = "../../data/"
 # ------- specify output file paths  -----------------------
 print ("Current date is {}".format(datetime_stamp))
-total_clstNo = 128
+total_clstNo = 3
+input_datetime_stamp = datetime_stamp  # what fhat_star file to read in
+# ----------------------------------------------------------
 output_fhat_filename = \
     "test_DM_fhat_clst{0}_{1}.h5".format(total_clstNo, datetime_stamp)
 StoreFile = \
@@ -51,7 +53,6 @@ DM_h5file = data_path + \
 DM_fstream = h5py.File(DM_h5file)
 # ================ make all decisions ===========================
 # Specify fhat_star input file paths
-input_datetime_stamp = '11_21_15'
 input_star_file = \
     "test_stars_peak_df_clst{}_{}.h5".format(total_clstNo, input_datetime_stamp)
 input_h5_key = "peak_df"
@@ -62,7 +63,7 @@ DM_metadata, star_peak_df = \
 star_gpBy, star_gpBy_keys = \
     getgal.get_clst_gpBy_from_DM_metadata(star_peak_df)
 
-DM_metadata["kernel_width"] = [0, 3]  #  10]
+DM_metadata["kernel_width"] = [0, 3, 8]
 sig_fraction = 0.2
 
 # ============== set up output file structure  ===========
@@ -132,15 +133,15 @@ for clstNo in DM_metadata["clstNo"]:
                         gpBy_keys = \
                             tuple([clst_metadata[k]
                                    for k in star_gpBy_keys])
-                        print ("gpBy_keys = ", gpBy_keys)
 
                         fhat_stars = \
                             star_gpBy.get_group(gpBy_keys)
 
                         # Save the cluster metadata as strings
                         # These are categorical.
-                        clst_metadata["kernel_width"] = \
-                            '{0:0.0f}'.format(kernel_width)
+                        kw = '{0:0.0f}'.format(kernel_width)
+                        clst_metadata["kernel_width"] = kw
+                        print ("gpBy_keys = ", gpBy_keys, "kernel_width = ", kw)
                         clst_metadata["sig_fraction"] = \
                             '{0:0.2f}'.format(sig_fraction)
 
@@ -166,7 +167,7 @@ for clstNo in DM_metadata["clstNo"]:
 
                         # Find distance and good peak threshold
                         (offset, fhat_ixes), _, _, good_threshold = \
-                            getDist.compute_distance_between_fhat_DM_and_gal_peaks(
+                            getDist.compute_distance_between_DM_and_gal_peaks(
                                 fhat_stars, fhat
                             )
                         clst_metadata["good_threshold"] = \
