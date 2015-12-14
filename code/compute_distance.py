@@ -7,12 +7,12 @@ import sys
 sys.path.append("../")
 import get_DM_centroids as getDM
 
-def convert_DM_path_to_star_path(DM_clstPath):
+def convert_DM_path_to_star_path(DM_clstPath, star_key_no=6):
     """
     :DM_clstPath: string, slash separated paths in HDF5 file
     :returns: string, star_clstPath
     """
-    return '/'.join(DM_clstPath.split('/')[:-3])
+    return '/'.join(DM_clstPath.split('/')[:star_key_no])
 
 
 def compute_euclidean_dist(data, origin=None):

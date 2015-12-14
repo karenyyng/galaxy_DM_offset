@@ -10,7 +10,7 @@ datetime_stamp = datetime.now().strftime("%D").replace('/', '_')
 
 # =========== Decide what to output ============================
 dataPath = "../../data/"
-total_clstNo = 3
+total_clstNo =  10
 
 # =========== Decide what to output ============================
 assert total_clstNo <=128 and total_clstNo >= 0, \
@@ -45,7 +45,7 @@ pos_cols = ["SubhaloPos{0}".format(i) for i in range(3)]
 metadata = OrderedDict({})
 
 # no. of clsters - want these as strings, not int!
-metadata["clstNo"] = [str(i) for i in range(128-total_clstNo, 128)]  #  range(129)
+metadata["clstNo"] = [str(i) for i in range(28, 38)]  #  range(129)
 
 # cuts
 cut_kwargs = {"DM_cut": 1e3, "star_cut": 5e2}

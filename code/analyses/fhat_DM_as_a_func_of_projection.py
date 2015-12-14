@@ -16,11 +16,11 @@ datetime_stamp = datetime.now().strftime("%D").replace('/', '_')
 data_path = "../../data/"
 
 # ------- specify output file paths  -----------------------
+total_clstNo = 10
 logging.info ("Current date is {}".format(datetime_stamp))
-total_clstNo = 3
 input_datetime_stamp = datetime_stamp  # what fhat_star file to read in
 logging_filename = "DM_logging_{0}_{1}".format(total_clstNo, datetime_stamp)
-logging.basicConfig(filename=logging_filename, level=logging.DEBUG)
+logging.basicConfig(filename=logging_filename, level=logging.INFO)
 
 # ----------------------------------------------------------
 output_fhat_filename = \
@@ -180,14 +180,16 @@ for clstNo in DM_metadata["clstNo"]:
                             getKDE.find_peaks_from_py_diff(fhat)
                             getKDE.get_density_weights(fhat)
 
-                        # Find distance and good peak threshold
-                        (offset, fhat_ixes), _, _, good_threshold = \
-                            getDist.compute_distance_between_DM_and_gal_peaks(
-                                fhat_stars, fhat
+                        # Find a good threshold
+                        fhat["good_threshold"], _ = \
+                            getDM.apply_peak_num_threshold(
+                                fhat_stars["peaks_dens"],
+                                fhat, sig_fraction=sig_fraction
                             )
-                        clst_metadata["good_threshold"] = \
-                            '{0:0.10f}'.format(good_threshold)
+                        threshold_mask = \
+                            fhat["peaks_dens"] > fhat['good_threshold']
 
+                        # only entries listed in peak_info_keys get stored
                         peak_info_keys = \
                             ["peaks_xcoords",
                              "peaks_ycoords",
@@ -195,12 +197,27 @@ for clstNo in DM_metadata["clstNo"]:
                              # "peaks_colIx",
                              "peaks_dens"]
 
-                        # Only include DM peaks that are matched to the gal peaks
+                        # Apply the threshold
                         for peak_property in peak_info_keys:
-                            fhat[peak_property] = fhat[peak_property][fhat_ixes]
+                            fhat[peak_property] = \
+                                fhat[peak_property][threshold_mask]
 
-                        fhat["offset"] = offset
-                        peak_info_keys.append("offset")
+                        # uncomment the following if you just want the best
+                        # matched peak
+                        # Find distance and good peak threshold
+                        # (offset, fhat_ixes), _, _, good_threshold = \
+                        #     getDist.compute_distance_between_DM_and_gal_peaks(
+                        #         fhat_stars, fhat
+                        #     )
+                        # clst_metadata["good_threshold"] = \
+                        #     '{0:0.10f}'.format(good_threshold)
+
+                        # Uncomment to only include DM peaks that are matched to the gal peaks
+                        # for peak_property in peak_info_keys:
+                        #     fhat[peak_property] = fhat[peak_property][fhat_ixes]
+
+                        # fhat["offset"] = offset
+                        # peak_info_keys.append("offset")
 
                         peak_df = \
                             getgal.convert_dict_peaks_to_df(

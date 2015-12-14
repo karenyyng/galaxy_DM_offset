@@ -8,22 +8,22 @@ import compute_distance as get_dist
 
 def plot_DM_fhat(fhat, fhat_stars, clstNo, threshold=0.3,
                  convert_kpc_over_h_to_kpc=True, fontsize=25,
-                 unit_conversion = 1. / .704, dict_format=True
-                 ):
+                 unit_conversion = 1. / .704):
 
+    markersize = 25
     if "log_est" not in fhat.keys():
         fhat["log_est"] = np.log(fhat["estimate"])
 
     plt.subplot('111', axisbg='black', aspect='equal')
 
     # Plot DM particle histograms
-    if dict_format:
-        plt.contourf(fhat["eval_points"][0], fhat["eval_points"][1],
-                    fhat["log_est"].transpose(), cmap=plt.cm.afmhot)
-    else:
-        plt.contourf(fhat["eval_points0"], fhat["eval_points1"],
-                     np.array(fhat["log_est"][...]).transpose(),
-                     cmap=plt.cm.afmhot)
+    # if dict_format:
+    plt.contourf(fhat["eval_points"][0], fhat["eval_points"][1],
+                fhat["log_est"].transpose(), cmap=plt.cm.afmhot)
+    # else:
+    #     plt.contourf(fhat["eval_points0"], fhat["eval_points1"],
+    #                  np.array(fhat["log_est"][...]).transpose(),
+    #                  cmap=plt.cm.afmhot)
 
 
     ((dist, matched_DM_ixes), sign_gal_peak_no, sign_DM_peak_no, gd_threshold) = \
@@ -35,12 +35,12 @@ def plot_DM_fhat(fhat, fhat_stars, clstNo, threshold=0.3,
     plt.plot(fhat["peaks_xcoords"][:sign_DM_peak_no],
              fhat["peaks_ycoords"][:sign_DM_peak_no],
              "o", color='cyan', fillstyle="none", mew=3,
-             ms=35, label="candidate DM peaks")
+             ms=markersize, label="candidate DM peaks")
 
     plt.plot(fhat["peaks_xcoords"][matched_DM_ixes],
              fhat["peaks_ycoords"][matched_DM_ixes],
              "o", color='blue', fillstyle="none", mew=3,
-             ms=35, label="matched DM peaks")
+             ms=markersize, label="matched DM peaks")
 
     # Plot I-band luminosity peaks
     # Peaks with density > 0.5 density of densest peak are in red.
@@ -50,7 +50,7 @@ def plot_DM_fhat(fhat, fhat_stars, clstNo, threshold=0.3,
         print (unit_conversion)
         plt.plot(fhat_stars["peaks_xcoords"][:sign_gal_peak_no] * unit_conversion,
                  fhat_stars["peaks_ycoords"][:sign_gal_peak_no] * unit_conversion,
-                 'o', color='m', fillstyle="none", mew=3, ms=35,
+                 'o', color='m', fillstyle="none", mew=3, ms=markersize,
                  label="significant I band luminosity peaks")
 
     offset_string = ["{0:0.0f}".format(i) for i in dist]
@@ -62,7 +62,7 @@ def plot_DM_fhat(fhat, fhat_stars, clstNo, threshold=0.3,
     plt.tick_params(axis='both', which='both', labelsize=fontsize)
     plt.xticks(rotation=45)
 
-    lgd = plt.legend(loc='best', fontsize=fontsize, frameon=1,
+    lgd = plt.legend(loc='best', fontsize=int(fontsize * 0.7), frameon=1,
                      numpoints=1)
     frame = lgd.get_frame()
     frame.set_facecolor('white')
