@@ -1,4 +1,4 @@
-""" various functions for inferring centroids of galaxy population
+""" Various functions for inferring centroids of galaxy population
 """
 from __future__ import division
 from collections import OrderedDict
@@ -620,7 +620,7 @@ def project_coords(coords, xi, phi, los_axis=2, radian=True):
     :param phi: float, azimuthal angle in degree
     :param los_axis: integer, line-of-sight (los) axis, 0 = x, 1 = y, 2 = z
 
-    :return: same type of array like object as coords, same dimension
+    :return: array like object as coords, same dimension
     """
     xi = float(xi)
     phi = float(phi)

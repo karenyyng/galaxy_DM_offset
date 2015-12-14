@@ -32,6 +32,7 @@ def make_histogram_with_some_resolution(data, resolution=2.0,
         histogram
 
     :note: Illustris 1 DM particle resolution is 1.42 kpc
+    :states: no
 
     """
     # compute bin numbers for each spatial dimension with 2 kpc resolution

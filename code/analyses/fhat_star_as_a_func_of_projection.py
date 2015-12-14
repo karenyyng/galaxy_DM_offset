@@ -11,6 +11,7 @@ datetime_stamp = datetime.now().strftime("%D").replace('/', '_')
 # =========== Decide what to output ============================
 dataPath = "../../data/"
 total_clstNo = 3
+
 # =========== Decide what to output ============================
 assert total_clstNo <=128 and total_clstNo >= 0, \
     "0 <= total_clstNo <= 128"
@@ -115,8 +116,8 @@ for clstNo in metadata["clstNo"]:
                                                clst_metadata["phi"],
                                                los_axis=los_axis)
 
-                    col = np.arange(data.shape[1]) != int(los_axis)
-                    data = data[:, col]
+                    cols = np.arange(data.shape[1]) != int(los_axis)
+                    data = data[:, cols]
 
                     fhat = KDE.do_KDE_and_get_peaks(data, weights)
                     # This is not needed since the offset will be computed

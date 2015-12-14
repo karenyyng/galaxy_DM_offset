@@ -7,17 +7,21 @@ This
 """
 from __future__ import (print_function,
                         division, absolute_import)
+import logging
 import pandas as pd
 import os
 from scipy import ndimage
 from datetime import datetime
 datetime_stamp = datetime.now().strftime("%D").replace('/', '_')
-
 data_path = "../../data/"
+
 # ------- specify output file paths  -----------------------
-print ("Current date is {}".format(datetime_stamp))
+logging.info ("Current date is {}".format(datetime_stamp))
 total_clstNo = 3
 input_datetime_stamp = datetime_stamp  # what fhat_star file to read in
+logging_filename = "DM_logging_{0}_{1}".format(total_clstNo, datetime_stamp)
+logging.basicConfig(filename=logging_filename, level=logging.DEBUG)
+
 # ----------------------------------------------------------
 output_fhat_filename = \
     "test_DM_fhat_clst{0}_{1}.h5".format(total_clstNo, datetime_stamp)
@@ -27,9 +31,8 @@ if os.path.isfile(data_path + StoreFile):
     os.remove(data_path + StoreFile)
 store = pd.HDFStore(data_path + StoreFile)
 
-print ("Outputing files to:")
-print (output_fhat_filename)
-print (StoreFile)
+logging.info ("Outputing files to: " + output_fhat_filename)
+logging.info (StoreFile)
 
 import numpy as np
 import sys
@@ -63,7 +66,7 @@ DM_metadata, star_peak_df = \
 star_gpBy, star_gpBy_keys = \
     getgal.get_clst_gpBy_from_DM_metadata(star_peak_df)
 
-DM_metadata["kernel_width"] = [0, 3, 8]
+DM_metadata["kernel_width"] = [0]  # , 3, 8]
 sig_fraction = 0.2
 
 # ============== set up output file structure  ===========
@@ -73,31 +76,34 @@ sig_fraction = 0.2
 if os.path.isfile(data_path + output_fhat_filename):
     os.remove(data_path + output_fhat_filename)
 
-print ("{} projections per cluster are constructed.".format(
+logging.info ("{} projections per cluster are constructed.".format(
     len(DM_metadata["xi"])))
 
 h5_fstream = \
-    getDM.construct_h5_file_for_saving_fhat(DM_metadata,
-                                            output_fhat_filename,
-                                            output_path=data_path
-                                            )
+    getDM.construct_h5_file_for_saving_fhat(
+        DM_metadata, output_fhat_filename, output_path=data_path
+        )
 
 # ============== prepare data based on the metadata ===========
 pos_cols = ["SubhaloPos{}".format(i) for i in range(3)]
 
 clst_metadata = OrderedDict({})
-clst_range = (int(128 - total_clstNo) + 1,
-              len(DM_metadata["clstNo"]) + 128 - total_clstNo + 1)
+# clst_range = (int(128 - total_clstNo) + 1,
+#               len(DM_metadata["clstNo"]) + 128 - total_clstNo + 1)
 
 #### CHANGE THE RANGE of line below
 for clstNo in DM_metadata["clstNo"]:
-    print ("Processing clst {0} ".format(int(clstNo) + 1) +
-           "out of the range {0} to {1}".format(*clst_range))
+    logging.info ("Processing clst {0} ".format(int(clstNo) + 1) +
+           "out of the range {0} to {1}".format(*DM_metadata['clstNo']))
     peak_df = pd.DataFrame()
     clst_metadata["clstNo"] = clstNo  # clstNo is a string
     clstNo = int(clstNo)
+
+    # Get coordinates without shifting coordinates to be positive
     coord_dict = \
-        ec.get_DM_particles([clstNo], DM_fstream, dataPath=data_path)[clstNo]
+        ec.get_DM_particles([clstNo], DM_fstream, dataPath=data_path,
+                            shift_coords_for_hist=False
+                            )[clstNo]
 
     # There are no cuts / weights for the DM particles.
     # However, the DM peaks are informed by the galaxy peaks.
@@ -110,6 +116,7 @@ for clstNo in DM_metadata["clstNo"]:
 
             for los_axis in DM_metadata["los_axis"]:
                 clst_metadata["los_axis"] = los_axis
+                # We save the meta data as string but needs int for los_axis
                 los_axis = int(los_axis)
 
                 #### CHANGE THE RANGE of line below
@@ -122,11 +129,18 @@ for clstNo in DM_metadata["clstNo"]:
                         clst_metadata["phi"],
                         los_axis=clst_metadata["los_axis"])
 
+                    # Retain the 2 spatial axes that is not the los_axis
                     col = np.arange(data.shape[1]) != los_axis
                     data = data[:, col]
 
+                    # Put data in a dictionary to pretend to have
+                    # the same layout as required by the function
+                    # `make_histogram_with_some_resolution`
+                    data = {"coords": data}
+                    data['min_coords'] = np.min(data["coords"], axis=0)
+                    data['coords'] = data['coords'] - data['min_coords']
+
                     #### CHANGE THE RANGE of DM_metadata["kernel_width"] below
-                    # for kernel_width in DM_metadata["kernel_width"]:
                     for kernel_width in DM_metadata["kernel_width"]:
 
                         # Find the correpsonding galaxy projection
@@ -141,7 +155,7 @@ for clstNo in DM_metadata["clstNo"]:
                         # These are categorical.
                         kw = '{0:0.0f}'.format(kernel_width)
                         clst_metadata["kernel_width"] = kw
-                        print ("gpBy_keys = ", gpBy_keys, "kernel_width = ", kw)
+                        logging.info ("gpBy_keys = ", gpBy_keys, "kernel_width = ", kw)
                         clst_metadata["sig_fraction"] = \
                             '{0:0.2f}'.format(sig_fraction)
 
@@ -153,9 +167,10 @@ for clstNo in DM_metadata["clstNo"]:
                         else:
                             find_peak = True
 
+
                         fhat = \
                             getDM.make_histogram_with_some_resolution(
-                                coord_dict, resolution=2,  # in kpc
+                                data, resolution=2,  # in kpc
                                 find_peak=find_peak)
 
                         if kernel_width != 0:
@@ -193,11 +208,11 @@ for clstNo in DM_metadata["clstNo"]:
                                 peak_info_keys=peak_info_keys)
                         store.append("peak_df", peak_df)
 
-                        print ("Putting fhat into h5")
+                        logging.info ("Putting fhat into h5")
                         getDM.convert_dict_dens_to_h5(fhat, clst_metadata,
                                                       h5_fstream, verbose=False)
 
-print ("Done with all loops.")
+logging.info ("Done with all loops.")
 h5_fstream.close()
 store.close()
 DM_fstream.close()
