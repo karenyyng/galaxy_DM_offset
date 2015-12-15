@@ -9,6 +9,8 @@ from compare_peak_methods import draw_gaussian
 import pytest
 import numpy as np
 import pandas as pd
+import logging
+logging.basicConfig(filename="Debug_test_get_gal_centroids.log", level=logging.DEBUG)
 
 
 @pytest.fixture
@@ -174,8 +176,16 @@ def test_same_projection_respects_spherical_symmetry():
     for i in range(3):
         nside = 2 ** i
         npix = nside2npix(nside)
-        xi_arr, phi_arr = angles_given_HEALpix_nsides(nside)
+        phi_arr, xi_arr = angles_given_HEALpix_nsides(nside)
+        assert np.all(phi_arr < np.pi * 2) and np.all(xi_arr < np.pi), \
+                  "Mixed up phi and xi at angles_given_HEALpix_nsides(nside)"
 
+        projections = zip(phi_arr * 180. / np.pi,
+                          xi_arr * 180. / np.pi)
+        print ("nside = ", i)
+        print ("unique (phi, xi) = \n")
+        map(print, projections)
+        print ("\n------------------------------------\n")
         assert len(xi_arr) == npix / 2
 
 

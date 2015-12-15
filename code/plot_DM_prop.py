@@ -50,7 +50,7 @@ def plot_DM_fhat(fhat, fhat_stars, clstNo, threshold=0.3,
         print (unit_conversion)
         plt.plot(fhat_stars["peaks_xcoords"][:sign_gal_peak_no] * unit_conversion,
                  fhat_stars["peaks_ycoords"][:sign_gal_peak_no] * unit_conversion,
-                 'o', color='m', fillstyle="none", mew=3, ms=markersizet ,
+                 'o', color='m', fillstyle="none", mew=3, ms=markersize,
                  label="significant I band luminosity peaks")
 
     offset_string = ["{0:0.0f}".format(i) for i in dist]

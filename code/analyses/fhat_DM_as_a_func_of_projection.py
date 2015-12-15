@@ -16,11 +16,11 @@ datetime_stamp = datetime.now().strftime("%D").replace('/', '_')
 data_path = "../../data/"
 
 # ------- specify output file paths  -----------------------
-total_clstNo = 10
-logging.info ("Current date is {}".format(datetime_stamp))
+total_clstNo = 2
+logging.warning ("Current date is {}".format(datetime_stamp))
 input_datetime_stamp = datetime_stamp  # what fhat_star file to read in
-logging_filename = "DM_logging_{0}_{1}".format(total_clstNo, datetime_stamp)
-logging.basicConfig(filename=logging_filename, level=logging.INFO)
+logging_filename = "DM_logging_{0}_{1}.log".format(total_clstNo, datetime_stamp)
+logging.basicConfig(filename=logging_filename, level=logging.warning)
 
 # ----------------------------------------------------------
 output_fhat_filename = \
@@ -31,8 +31,8 @@ if os.path.isfile(data_path + StoreFile):
     os.remove(data_path + StoreFile)
 store = pd.HDFStore(data_path + StoreFile)
 
-logging.info ("Outputing files to: " + output_fhat_filename)
-logging.info (StoreFile)
+logging.warning ("Outputing files to: " + output_fhat_filename)
+logging.warning (StoreFile)
 
 import numpy as np
 import sys
@@ -76,7 +76,7 @@ sig_fraction = 0.2
 if os.path.isfile(data_path + output_fhat_filename):
     os.remove(data_path + output_fhat_filename)
 
-logging.info ("{} projections per cluster are constructed.".format(
+logging.warning ("{} projections per cluster are constructed.".format(
     len(DM_metadata["xi"])))
 
 h5_fstream = \
@@ -93,7 +93,7 @@ clst_metadata = OrderedDict({})
 
 #### CHANGE THE RANGE of line below
 for clstNo in DM_metadata["clstNo"]:
-    logging.info ("Processing clst {0} ".format(int(clstNo) + 1) +
+    logging.warning ("Processing clst {0} ".format(int(clstNo) + 1) +
            "out of the range {0} to {1}".format(*DM_metadata['clstNo']))
     peak_df = pd.DataFrame()
     clst_metadata["clstNo"] = clstNo  # clstNo is a string
@@ -155,7 +155,8 @@ for clstNo in DM_metadata["clstNo"]:
                         # These are categorical.
                         kw = '{0:0.0f}'.format(kernel_width)
                         clst_metadata["kernel_width"] = kw
-                        logging.info ("gpBy_keys = ", gpBy_keys, "kernel_width = ", kw)
+                        logging.warning ("gpBy_keys = {}, \n".format(gpBy_keys) +
+                                         "kernel_width = {}".format(kw))
                         clst_metadata["sig_fraction"] = \
                             '{0:0.2f}'.format(sig_fraction)
 
@@ -225,11 +226,11 @@ for clstNo in DM_metadata["clstNo"]:
                                 peak_info_keys=peak_info_keys)
                         store.append("peak_df", peak_df)
 
-                        logging.info ("Putting fhat into h5")
+                        logging.debug ("Putting fhat into h5")
                         getDM.convert_dict_dens_to_h5(fhat, clst_metadata,
                                                       h5_fstream, verbose=False)
 
-logging.info ("Done with all loops.")
+logging.warning ("Done with all loops.")
 h5_fstream.close()
 store.close()
 DM_fstream.close()
