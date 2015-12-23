@@ -17,14 +17,22 @@ from plot_gal_prop import plot_cf_contour
 
 # plot styles
 lvls = [68, 95]
-g_colors = [(0 / 255., i / (len(lvls) + 1.), 0 / 255.)
-            for i in xrange(1, len(lvls) + 1)]
 
-b_colors = [(0 / 255., 0 / 255., i / (len(lvls) + 1.))
-            for i in xrange(1, len(lvls) + 1)]
+# g_colors = [(0 / 255., i / (len(lvls) + 1.), 0 / 255.)
+#             for i in xrange(1, len(lvls) + 1)]
+# b_colors = [(0 / 255., 0 / 255., i / (len(lvls) + 1.))
+#             for i in xrange(1, len(lvls) + 1)]
+# r_colors = [(i / (len(lvls) + 1.), 0 / 255., 0 / 255.)
+#             for i in xrange(1, len(lvls) + 1)]
 
-r_colors = [(i / (len(lvls) + 1.), 0 / 255., 0 / 255.)
-            for i in xrange(1, len(lvls) + 1)]
+# Color palette are from http://colorbrewer2.org/
+g_colors = [(127, 191, 123), (27, 120, 55)]
+
+b_colors = [(103, 169, 207), (33, 102, 172)]
+
+# This represents purple to be color-blind friendly
+r_colors = [(136, 86, 167), (129, 15, 124)]
+
 
 # ------------------data sampling -----------------------------
 

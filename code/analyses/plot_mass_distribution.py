@@ -1,3 +1,8 @@
+"""
+This is a script for plotting the cummulative distribution of mass
+for 129 `clusters`.
+"""
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -6,6 +11,7 @@ import sys
 sys.path.append("../")
 from plot_clst_prop import *
 
+close = True
 h5File = \
     "../../data/" + \
     "Illustris-1_fof_subhalo_myCompleteHaloCatalog_00135.hdf5"
@@ -13,8 +19,8 @@ h5File = \
 f = h5py.File(h5File, "r")
 
 groupMass = f["Group"]["GroupMass"][...]
-groupMcrit200 = f["Group"]["Group_M_Crit200"][...]
-groupMcrit500 = f["Group"]["Group_M_Crit500"][...]
+groupMcrit200 = f["Group"]["Group_M_Crit200"][:]
+groupMcrit500 = f["Group"]["Group_M_Crit500"][:]
 
 ticks, countGroupMass = compute_clst_no_above_mass_threshold(groupMass)
 ticks, countGroupMcrit200 = compute_clst_no_above_mass_threshold(groupMcrit200)
@@ -28,3 +34,6 @@ y_ticks = r"$N(> M_{Cluster})$"
 plot_cluster_mass_distribution(ticks, y_data,
                                y_legend, x_ticks, y_ticks,
                                save=True, path="../../paper/figures/drafts/")
+
+if close:
+    f.close()

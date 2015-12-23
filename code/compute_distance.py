@@ -93,25 +93,6 @@ def combine_DM_df_and_h5_to_dict(gpBy, h5fhat, h5path):
     return fhat
 
 
-# def compute_distance_for_h5_outputs(
-#         DM_df, star_df, no_of_DM_keys=9, no_of_gal_keys=6,
-#         fhat_star_to_DM_coord_conversion=1./0.704
-#     ):
-#     """compute the distance for the peak_df HDF5 file
-#
-#     :DM_df: pandas dataframe, peak_df object from HDF5 files
-#     :star_df: pandas dataframe, peak_df
-#     :returns: TODO
-#     """
-#     # from scipy.spatial import KDTree
-#
-#     DM_gpBy = get_gpBy_DM_objects(DM_df, no_of_DM_keys=no_of_DM_keys)
-#     star_gpBy = \
-#         get_gpBy_star_objects(star_df, no_of_gal_keys=no_of_gal_keys)
-#
-#     return
-
-
 def compute_distance_between_DM_and_gal_peaks(
         fhat_star, fhat, fhat_star_to_DM_coord_conversion=1. / 0.704):
     """
@@ -167,5 +148,24 @@ def compute_distance_between_DM_and_gal_peaks(
             output["gal_peak_no"],\
             output["DM_peak_no"],\
             good_threshold
+
+
+# def compute_distance_for_h5_outputs(
+#         DM_df, star_df, no_of_DM_keys=9, no_of_gal_keys=6,
+#         fhat_star_to_DM_coord_conversion=1./0.704
+#     ):
+#     """compute the distance for the peak_df HDF5 file
+#
+#     :DM_df: pandas dataframe, peak_df object from HDF5 files
+#     :star_df: pandas dataframe, peak_df
+#     :returns: TODO
+#     """
+#     # from scipy.spatial import KDTree
+#
+#     DM_gpBy = get_gpBy_DM_objects(DM_df, no_of_DM_keys=no_of_DM_keys)
+#     star_gpBy = \
+#         get_gpBy_star_objects(star_df, no_of_gal_keys=no_of_gal_keys)
+#
+#     return
 
 

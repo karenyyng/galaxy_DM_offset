@@ -3,6 +3,9 @@
     DM particle mass are the same as `6262734.7210382931`
 * `Illustris-1_00135_APillepich_KarenNG_ParticleData_Group_PartType4.h5` - all
     stellar particles 
+* `Illustris-1_fof_subhalo_myCompleteHaloCatalog_00135.hdf5` - all the subhalos
+    in Illustris, there is an ID to identify to which Cluster / Group each
+    subhalo belongs to. 
 
 # Which file to look at for computing offsets      
 * `test_peak_df_129.h5`    

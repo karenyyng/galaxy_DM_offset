@@ -16,11 +16,11 @@ datetime_stamp = datetime.now().strftime("%D").replace('/', '_')
 data_path = "../../data/"
 
 # ------- specify output file paths  -----------------------
-total_clstNo = 2
-logging.warning ("Current date is {}".format(datetime_stamp))
+total_clstNo = 128
 input_datetime_stamp = datetime_stamp  # what fhat_star file to read in
 logging_filename = "DM_logging_{0}_{1}.log".format(total_clstNo, datetime_stamp)
-logging.basicConfig(filename=logging_filename, level=logging.warning)
+logging.basicConfig(filename=logging_filename, level=logging.INFO)
+logging.info ("Current date is {}".format(datetime_stamp))
 
 # ----------------------------------------------------------
 output_fhat_filename = \
@@ -31,8 +31,8 @@ if os.path.isfile(data_path + StoreFile):
     os.remove(data_path + StoreFile)
 store = pd.HDFStore(data_path + StoreFile)
 
-logging.warning ("Outputing files to: " + output_fhat_filename)
-logging.warning (StoreFile)
+logging.info ("Outputing files to: " + output_fhat_filename)
+logging.info (StoreFile)
 
 import numpy as np
 import sys
@@ -58,15 +58,19 @@ DM_fstream = h5py.File(DM_h5file)
 # Specify fhat_star input file paths
 input_star_file = \
     "test_stars_peak_df_clst{}_{}.h5".format(total_clstNo, input_datetime_stamp)
+logging.info ("input_star_file = " + input_star_file)
 input_h5_key = "peak_df"
 DM_metadata, star_peak_df = \
     getDM.retrieve_DM_metadata_from_gal_metadata(
         data_path, input_star_file, input_h5_key)
 
+logging.info("ClstNo to be analyzed from reading metadata")
+logging.info("DM_metadata['clstNo'] = {}".format(DM_metadata['clstNo']))
+
 star_gpBy, star_gpBy_keys = \
     getgal.get_clst_gpBy_from_DM_metadata(star_peak_df)
 
-DM_metadata["kernel_width"] = [0]  # , 3, 8]
+DM_metadata["kernel_width"] = [0, 3]
 sig_fraction = 0.2
 
 # ============== set up output file structure  ===========
@@ -76,7 +80,7 @@ sig_fraction = 0.2
 if os.path.isfile(data_path + output_fhat_filename):
     os.remove(data_path + output_fhat_filename)
 
-logging.warning ("{} projections per cluster are constructed.".format(
+logging.info ("{} projections per cluster are constructed.".format(
     len(DM_metadata["xi"])))
 
 h5_fstream = \
@@ -91,10 +95,16 @@ clst_metadata = OrderedDict({})
 # clst_range = (int(128 - total_clstNo) + 1,
 #               len(DM_metadata["clstNo"]) + 128 - total_clstNo + 1)
 
-#### CHANGE THE RANGE of line below
-for clstNo in DM_metadata["clstNo"]:
-    logging.warning ("Processing clst {0} ".format(int(clstNo) + 1) +
-           "out of the range {0} to {1}".format(*DM_metadata['clstNo']))
+clsts_Nos = sorted([int(d) for d in DM_metadata['clstNo']])
+begin_clst = clsts_Nos[0]
+end_clst = clsts_Nos[-1]
+
+# #### CHANGE THE RANGE of line below
+for i, clstNo in enumerate(DM_metadata["clstNo"]):
+    logging.info ("Processing clst {0} ".format(i) +
+           "out of the range {0} to {1}".format(begin_clst,
+                                                end_clst
+                                                ))
     peak_df = pd.DataFrame()
     clst_metadata["clstNo"] = clstNo  # clstNo is a string
     clstNo = int(clstNo)
@@ -114,6 +124,7 @@ for clstNo in DM_metadata["clstNo"]:
         for weights in DM_metadata["weights"]:
             clst_metadata['weights'] = weights
 
+            # los = line of sight
             for los_axis in DM_metadata["los_axis"]:
                 clst_metadata["los_axis"] = los_axis
                 # We save the meta data as string but needs int for los_axis
@@ -140,6 +151,11 @@ for clstNo in DM_metadata["clstNo"]:
                     data['min_coords'] = np.min(data["coords"], axis=0)
                     data['coords'] = data['coords'] - data['min_coords']
 
+                    fhat = \
+                        getDM.make_histogram_with_some_resolution(
+                            data, resolution=2,  # in kpc
+                            find_peak=False)
+
                     #### CHANGE THE RANGE of DM_metadata["kernel_width"] below
                     for kernel_width in DM_metadata["kernel_width"]:
 
@@ -154,32 +170,19 @@ for clstNo in DM_metadata["clstNo"]:
                         # Save the cluster metadata as strings
                         # These are categorical.
                         kw = '{0:0.0f}'.format(kernel_width)
-                        clst_metadata["kernel_width"] = kw
-                        logging.warning ("gpBy_keys = {}, \n".format(gpBy_keys) +
-                                         "kernel_width = {}".format(kw))
                         clst_metadata["sig_fraction"] = \
                             '{0:0.2f}'.format(sig_fraction)
 
-                        # Can think of directly smoothing the histogrammed
-                        # data from kernel_width = 0  here to reduce
-                        # computation time.
-                        if kernel_width != 0:
-                            find_peak = False
-                        else:
-                            find_peak = True
-
-
-                        fhat = \
-                            getDM.make_histogram_with_some_resolution(
-                                data, resolution=2,  # in kpc
-                                find_peak=find_peak)
-
+                        clst_metadata["kernel_width"] = kw
+                        logging.info ("gpBy_keys = {}, \n".format(gpBy_keys) +
+                                         "kernel_width = {}".format(kw))
                         if kernel_width != 0:
                             fhat['estimate'] = \
                                 ndimage.gaussian_filter(fhat["estimate"],
                                                         sigma=kernel_width)
-                            getKDE.find_peaks_from_py_diff(fhat)
-                            getKDE.get_density_weights(fhat)
+
+                        getKDE.find_peaks_from_py_diff(fhat)
+                        getKDE.get_density_weights(fhat)
 
                         # Find a good threshold
                         fhat["good_threshold"], _ = \
@@ -226,11 +229,11 @@ for clstNo in DM_metadata["clstNo"]:
                                 peak_info_keys=peak_info_keys)
                         store.append("peak_df", peak_df)
 
-                        logging.debug ("Putting fhat into h5")
+                        logging.info ("Putting fhat into h5")
                         getDM.convert_dict_dens_to_h5(fhat, clst_metadata,
                                                       h5_fstream, verbose=False)
 
-logging.warning ("Done with all loops.")
+logging.info ("Done with all loops.")
 h5_fstream.close()
 store.close()
 DM_fstream.close()

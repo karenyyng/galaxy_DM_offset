@@ -12,8 +12,8 @@ datetime_stamp = datetime.now().strftime("%D").replace('/', '_')
 # =========== Decide what to output ============================
 
 dataPath = "../../data/"
-total_clstNo = 2
-start_clstNo = 28
+total_clstNo = 128
+start_clstNo = 0
 logging_filename = "star_logging_{0}_{1}.log".format(total_clstNo,
                                                      datetime_stamp)
 
@@ -27,7 +27,7 @@ StoreFile = \
 if os.path.isfile(dataPath + StoreFile):
     os.remove(dataPath + StoreFile)
 store = pd.HDFStore(dataPath + StoreFile)
-logging.basicConfig(filename=logging_filename, level=logging.info)
+logging.basicConfig(filename=logging_filename, level=logging.INFO)
 
 import numpy as np
 import sys
@@ -92,7 +92,7 @@ h5_fstream = \
 # ============== prepare data based on the metadata ===========
 clst_metadata = OrderedDict({})
 for clstNo in metadata["clstNo"]:
-    logging.info("Processing clst {0} ".format(int(clstNo) + 1) +
+    logging.info("Processing clst {0} ".format(int(clstNo)) +
                  "out of the range {0} to {1}".format(metadata['clstNo'][0],
                                                       metadata['clstNo'][-1]))
     peak_df = pd.DataFrame()
@@ -136,7 +136,7 @@ for clstNo in metadata["clstNo"]:
                         getg.convert_dict_peaks_to_df(fhat, clst_metadata)
                     store.append("peak_df", peak_df)
 
-                    # clst_metadata[cut + 'richness'] = richness
+                    clst_metadata[cut + 'richness'] = richness
                     getg.convert_dict_dens_to_h5(fhat, clst_metadata,
                                                  h5_fstream)
 

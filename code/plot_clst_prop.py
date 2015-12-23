@@ -77,10 +77,12 @@ def visualize_3D_clst(df, position_keys):
 
     ax.legend(loc='best')
 
-    # code that I will eventually use to check my projections
-    # for ii in xrange(0,360,1):
-    #     ax.view_init(elev=10., azim=ii)
-    #     savefig("movie"%ii+".png")
     plt.show()
 
 
+def plot_mass_vs_richness(df):
+    """TODO: Docstring for plot_mass_vs_richness.
+    :returns: TODO
+
+    """
+    pass
