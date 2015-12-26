@@ -5,38 +5,54 @@ from mpl_toolkits.mplot3d import Axes3D
 
 
 def plot_cluster_mass_distribution(ticks, y_data,
-                                   y_legend, x_ticks, y_ticks,
-                                   save=True, path="../../paper/figures/"):
+                                   y_legend, x_label, y_label, ax=None,
+                                   save=True, path="../../paper/figures/",
+                                   labelsize=10):
     """
     :param ticks: numpy array of floats
     :param y_data: list of numpy array of data
+    :param x_label: str, x axis label of the plot
+    :param y_label: str, y axis label of the plot
+    :param ax: matplotlib ax object
+    :param save: bool, whether to save the plot to file
+    :param path: str, path of the directory to save the file
 
+    :return ax:
     """
     assert len(y_legend) == len(y_data), "number of legends has to match " + \
         " length of data"
 
+    if ax is None:
+        fig = plt.figure()
+        ax = fig.add_subplot(111, aspect='equal')
+
     ticks = np.vstack((ticks, ticks)).transpose().ravel()[1:]
     ticks = np.concatenate((ticks, np.array([1e5])))
+    ticks *= 1e10
 
     for i in range(len(y_data)):
         y = y_data[i]
         y = np.array(y)
         y = np.vstack((y, y)).transpose().ravel()
-        plt.loglog(ticks, y, lw=2, label=y_legend[i])
+        ax.loglog(ticks, y, lw=2, label=y_legend[i])
 
-    plt.title("Illustris clusters at z=0", fontsize=20)
-    plt.xlabel(x_ticks, fontsize=20)
-    plt.ylabel(y_ticks, fontsize=20)
-    plt.tick_params(width=2, length=8, which='major', labelsize=14)
-    plt.tick_params(width=1.5, length=6, which='minor', labelsize=10)
-    plt.legend(loc='best')
+    ax.set_title(
+        r"Mass distribution of Illustris clusters at $z=0$ above certain mass",
+        fontsize=12)
+    ax.set_xlabel(x_label, fontsize=13)
+    ax.set_ylabel(y_label, fontsize=13)
+    ax.tick_params(width=1.5, length=8, which='major', labelsize=labelsize)
+    ax.tick_params(width=1.5, length=6, which='minor', labelsize=labelsize)
+    ax.xaxis.set_ticks_position('bottom')
+    ax.yaxis.set_ticks_position('left')
+    ax.legend(loc='best')
 
     if save:
         filename = path + "clusterMassDist.eps"
         print "saving figure {0}".format(filename)
         plt.savefig(filename, bbox_inches="tight")
 
-    return
+    return ax
 
 
 def compute_clst_no_above_mass_threshold(mass,

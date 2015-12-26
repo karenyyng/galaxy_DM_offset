@@ -3,37 +3,49 @@ This is a script for plotting the cummulative distribution of mass
 for 129 `clusters`.
 """
 
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
-import h5py
-import sys
-sys.path.append("../")
-from plot_clst_prop import *
 
-close = True
-h5File = \
-    "../../data/" + \
-    "Illustris-1_fof_subhalo_myCompleteHaloCatalog_00135.hdf5"
+def make_cumulative_mass_distribution(groupMass, groupMcrit200, groupMcrit500):
+    from plot_clst_prop import *
+    ticks, countGroupMass = compute_clst_no_above_mass_threshold(groupMass)
+    ticks, countGroupMcrit200 = compute_clst_no_above_mass_threshold(groupMcrit200)
+    ticks, countGroupMcrit500 = compute_clst_no_above_mass_threshold(groupMcrit500)
 
-f = h5py.File(h5File, "r")
+    y_data = [countGroupMass, countGroupMcrit200, countGroupMcrit500]
+    y_legend = [r"$M_{\rm FoF}$", r"$M_{200c}$", r"$M_{500c}$"]
+    x_label = r"$M_{Cluster}(M_{\odot})$"
+    y_label = r"$N(> M_{Cluster})$"
 
-groupMass = f["Group"]["GroupMass"][...]
-groupMcrit200 = f["Group"]["Group_M_Crit200"][:]
-groupMcrit500 = f["Group"]["Group_M_Crit500"][:]
+    plot_cluster_mass_distribution(ticks, y_data,
+                                   y_legend, x_label, y_label,
+                                   save=True, path="../../paper/figures/drafts/")
 
-ticks, countGroupMass = compute_clst_no_above_mass_threshold(groupMass)
-ticks, countGroupMcrit200 = compute_clst_no_above_mass_threshold(groupMcrit200)
-ticks, countGroupMcrit500 = compute_clst_no_above_mass_threshold(groupMcrit500)
+    if close:
+        f.close()
 
-y_data = [countGroupMass, countGroupMcrit200, countGroupMcrit500]
-y_legend = [r"$M_{\rm FoF}$", r"$M_{200c}$", r"$M_{500c}$"]
-x_ticks = r"$M_{Cluster}(10^{10} M_{\odot})$"
-y_ticks = r"$N(> M_{Cluster})$"
 
-plot_cluster_mass_distribution(ticks, y_data,
-                               y_legend, x_ticks, y_ticks,
-                               save=True, path="../../paper/figures/drafts/")
+def plot_mass_richness_relationship(mass, richness):
+    """
+    :mass: numpy array of floats, (FoF) masses of clusters
+    :richness: numpy array of int, richness after a certain cut
+    :returns:
+    """
 
-if close:
-    f.close()
+    return
+
+
+if __name__ == "__main__":
+    import h5py
+    import sys
+    sys.path.append("../")
+
+    close = True
+    h5File = \
+        "../../data/" + \
+        "Illustris-1_fof_subhalo_myCompleteHaloCatalog_00135.hdf5"
+
+    f = h5py.File(h5File, "r")
+
+    groupMass = f["Group"]["GroupMass"][:]
+    groupMcrit200 = f["Group"]["Group_M_Crit200"][:]
+    groupMcrit500 = f["Group"]["Group_M_Crit500"][:]
+    make_cumulative_mass_distribution(groupMass, groupMcrit200, groupMcrit500)
