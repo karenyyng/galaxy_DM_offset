@@ -6,6 +6,8 @@ import numpy as np
 import pandas as pd
 from get_KDE import *
 from compute_distance import compute_euclidean_dist
+import calculate_astrophy_quantities as cal_astrophy
+
 import logging
 
 # logging.basicConfig(filename="Debug_get_gal_centroids.log",
@@ -14,25 +16,9 @@ import logging
 
 # --------- functions for preparing cuts, projections, weighting -----------
 
-# def cut_reliable_galaxies(df, DM_cut=1e3, star_cut=1e2):
-#     """ consider all cluster galaxies with minimal cuts
-#     :params df: pandas dataframe contains one cluster
-#     :params DM_cut: integer, how many DM particles needed for us to consider
-#         subhalos to be reliable
-#     :params star_cut: integer, how many stellar particles needed for us to
-#         consider subhalos to be reliable
-#     :returns: numpy array of booleans
-#
-#     :usage:
-#         >>> cut_reliable_galaxies(df, **cut_kwargs)
-#
-#     :notes:
-#     http://illustris-project.org/w/index.php/Data_Details#Snapshot_Contents
-#     """
-#     return np.array(np.logical_and(df["SubhaloLenType1"] > DM_cut,
-#                                    df["SubhaloLenType4"] > star_cut))
 
-def cut_reliable_galaxies(df, limiting_mag_band="i_band", limiting_mag=-17.):
+def cut_reliable_galaxies(df, limiting_mag_band="i_band",
+                          limiting_mag=None):
     """ make observationally realistic cuts to galaxies
     :df: pandas dataframe containing subhalos of one cluster
     :limiting_mag_band: str, "*_band" that is part of the pandas dataframe
@@ -43,6 +29,7 @@ def cut_reliable_galaxies(df, limiting_mag_band="i_band", limiting_mag=-17.):
     :note: limiting magnitude of i < -17 is calculated base on
     apparent magnitude < 24 and a luminosity distance of z = 0.3
     """
+
     return np.array(df[limiting_mag_band] < limiting_mag)
 
 
