@@ -17,14 +17,14 @@ from plot_clst_prop import visualize_3D_clst
 from mpl_toolkits.mplot3d import Axes3D
 
 parser = argparse.ArgumentParser(
-        description="Visualize DM subhalos in 3D for specific cluster.")
+    description="Visualize DM subhalos in 3D for specific cluster.")
 parser.add_argument("clstNo", metavar="cluster_no", type=int,
                     help="Zeroth based numbering of cluster number")
 args = parser.parse_args()
 
 dataPath = "../../data/"
-original_f = h5py.File(dataPath +
-                "Illustris-1_fof_subhalo_myCompleteHaloCatalog_00135.hdf5")
+original_f = h5py.File(
+    dataPath + "Illustris-1_fof_subhalo_myCompleteHaloCatalog_00135.hdf5")
 
 fig = plt.figure()
 ax = Axes3D(fig)
@@ -32,7 +32,11 @@ df = ext_cat.extract_clst(original_f, args.clstNo)
 position_keys = [k for k in df.keys() if "SubhaloPos" in k]
 
 ax.plot(df[position_keys[0]], df[position_keys[1]], df[position_keys[2]],
-        'o', alpha=0.05, label='subhalo location')
+        'o', alpha=0.5, label='subhalo location')
+
+ax.set_xlabel('x (Mpc/h)')
+ax.set_ylabel('y (Mpc/h)')
+ax.set_zlabel('z (Mpc/h)')
 
 ax.legend(loc='best')
 plt.show()
