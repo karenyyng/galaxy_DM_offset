@@ -111,35 +111,54 @@ Illustris simulation}
 	can be rare test beds for the particle properties of DM.
 	However, the continuous merger and accretion events of clusters also
 	complicate the modeling of galaxy clusters.
-	With the various modeling choices and observational constraints, 
+	With uncertainties coming from various modeling choices and observational constraints, 
 	we need to carefully account for the
-	uncertainties for us to give meaningful quantitative constraints from the studies of galaxy clusters. In this paper, we test various summary statistics of the different components
+	uncertainties for us to give meaningful quantitative constraints from 
+	the studies of galaxy clusters. In this paper, 
+	we test various summary statistics of the different components
 	of galaxy clusters by applying them to data from a cosmological simulation,
-	the Illustris simulation.
-	
-	quantify the uncertainties of the different one-point statistics that
-	are intermediate quantities for characterizing the spatial offsets between
+	the Illustris simulation. 
+	We examine the uncertainties of the different one-point statistics that
+	are intermediate quantities for computing the spatial offsets between
 	the member galaxies and the dark matter components. 
-
 \end{abstract}
+
 \begin{keywords}
-	galaxy clusters, dark matter, something else 
+	galaxy clusters, dark matter, statistics 
 \end{keywords}
+
 \section{INTRODUCTION} 
 Galaxies that belongs to a galaxy cluster or group are stochastic samples
 of the underlying dark matter (DM) mass density. 
+There are many reasonable models for summarizing the overall spatial
+distribution of cluster components. Each method has different uncertainties.
+They fall under several categories, 1) mixture models, 2) basis function
+expansions, such as wavelet methods 
+ and 3) non-parametric estimations such as a kernel density estimation. 
+
+Not only do the performance of the first two methods depend heavily on model parameters, 
+the data fit also depend quite strongly on the underlying mixture model /
+wavelet basis. Often times, the most common mixture models and wavelet bases 
+carry symmetry assumptions that may not be valid for galaxy clusters. 
+This is because galaxy clusters have substructures over a wide range of length
+scales, from galaxy scales of hundreds of pc to fraction of a Mpc. 
+The symmetry assumption will bias the estimate of the point estimate that we
+are after for non-symmetric clusters.
+
 We quantify the bias and uncertainty associated with the one-point summary
 statistic for summarizing the physical state of a galaxy cluster. 
-
+Commonly used one-point statistic of galaxy clusters include:
+1) papers reported using centroids but did not state what centroid that they
+used 
+2) papers used center of mass 
+3) papers that used peaks  
 % What are the reported offsets?
 Uncertainties affect the conclusion for the computation the hypothesis test / parameter
 estimation
 Previous work on quantifying galaxy-DM offsets included  
 What centroids they have used
-1) papers reported using centroids but did not state what centroid that they
-used 
-2) papers used center of mass 
-3) papers that used peaks  
+
+Physical motivation for using the galaxy density peak 
 
 In this paper, we 
 1) extract realistic observables from the Illustris simulation for
@@ -168,6 +187,7 @@ Subfind
 
 
 % how are things called in the Illustris simulation?
+
 Terminology 
 halos - what we refer to cluster sized halos identified by RockStar  / Subfind 
 
@@ -175,59 +195,34 @@ subhalos - galaxy sized
 observation bands - u, g, r, i, z
 
 
-\section{The Illustris simulation Data} 
+\section{The Illustris simulation data} 
+\label{sec:illustris_sim}
 \begin{figure*}
 	\includegraphics[width=\linewidth]{./figures/finalized/clusterMassDist.eps}
 	\caption{ {\bf Left figure:} Mass distribution of the group / cluster sized DM halos
-		for different halo selection schemes, either selected by the
-		Friends-of-Friends RockStar algorithm (M$_{FoF}$), or within the radius in
-		which the average density is 200 or 500 times the critical density of the universe
-		(M$_{200c}$ and M$_{500c}$ respectively). Discrepancies between the different
+		for different halo selection schemes. Mass estiamtes obtained by the
+		Friends-of-Friends RockStar algorithm are labeled as  M$_{\text{FoF}}$.
+		Masses centered on the most bound particle within a radius those the 
+		average density is 200 or 500 times the critical density of the universe are 
+		labeled as M$_{200c}$ and M$_{500c}$ respectively. 
+		Discrepancies between the different
 		measures of mass of the clusters indicate the presence of spatially
 		separated substructures for the clusters. (See Fig ? ){\bf Right figure:} Mass-richness
 	relationship. We require clusters to have more than 50 member galaxies that
 	are above observation limit, i.e. apparent $i \leq 24$ when we assume a cosmological redshift
-	of $z=0.4$, as shown by the richness cut. \label{fig:mass_richness}}
+of $z=0.4$, as shown by the richness cut. \label{fig:mass_richness}}
+
 \end{figure*}
 
-
-\subsection{Galaxy Clusters and the Member Galaxy Sample}
-The evolution of the baryonic component of the Illustris simulation was
-simulated in a self-consistent manner by solving the Euler equation with the
-moving-mesh technique AREPO \cite{Springel2010}. More details about the
-galaxies can be found in \cite{Vogelsberger2014}.
-% What is a subhalo? What is a halo? 
-This results in galaxies with well-resolved morphologies, such as early-type,
-late-type and irregular galaxies.
-A galaxy formation recipe in Illustris implies that,
-most, if not all subhalos contain baryonic stellar components, but not all the
-subhalos contain enough stellar content to be bright enough as galaxies. 
-
-
-\subsection{Member galaxy selection criteria}
-We only make use of subhalos in a cluster that 
-are brighter than a certain magnitude. 
-% S/N calculation for faint objects p. 26
-% https://www2.keck.hawaii.edu/observing/kecktelgde/ktelinstupdate.pdf
-With realistic observation duration, approximately an hour of exposure, 
-the dimmest absolute magnitude cutoff corresponds to $m < -17.0$ or an apparent
-magnitude of $M \sim 24.0$. This yields a signal-to-noise (S/N) of around 5 for spectroscopic
-instruments such as the Keck II DEIMOS. 
-We adopt this cut off as we advocate for 
-securely identifying galaxy memberships of the cluster through the use of spectroscopic redshifts.
-Foreground galaxies can either be mistaken as the brightest cluster galaxy (BCG) 
-or be a severe source of contamination in the luminosity map.
-This magnitude cutoff implies that we only include subhalos with 
-at least several hundreds of stellar particles. 
-We note that the richness of a cluster is relatively more sensitive to the choice of
-limiting magnitude than the field of view for wide-view telescopes such as the
+	field of view for wide-view telescopes such as the
 Subaru suprime camera.
-Finally, for our final results, we only make use of galaxy clusters / groups that have at least 50 member galaxies after this magnitude cut. 
-
-
-
+Finally, for our final results, we only make use of galaxy clusters / groups 
+that have at least 50 member galaxies after this magnitude cut. This is because
+of the huge statistical uncertainty of estimating the luminosity peaks for 
+groups with less than 50 member galaxies. 
 
 \subsection{Selection of the field of view}
+\label{sec:FOV}
 As a default output from the Illustris simulation, subhalos and particles of
 each galaxy cluster and group are identified by the Rockstar halo finder
 (CITATION). We make use of the member particle / subhalo identification as our
@@ -256,7 +251,8 @@ by using HealPy (CITE), which is a Python wrapper for HealPix (CITE).
 	\begin{tabular}{@{}lcccc@{}}
 \hline 
 Data &  Selection strategy  & Sensitivity & Relevant section  \\ \hline
-Field of view (FOV) & RockStar halo finder& comparable to FOV of the Subaru Suprime camera &   \\ 
+Field of view (FOV) & RockStar halo finder& comparable to FOV of the Subaru
+Suprime camera &   \\ 
 Observed filter & $i$-band & consistent over the redder $r, i, z$ bands &   \\ 
 Richness of member galaxies & $i \leq 24$ and $z = 0.4$  & sensitive to
 the assumed cosmological redshift of cluster and &    \\ 
@@ -290,7 +286,8 @@ Peak finding from KDE & density peak & Lower sensitivity to substructures &
 Higher & Relatively computationally demanding but doable\\
 Brightest cluster galaxy & & Sensitive to foreground contaminants & Canonical
 method\\ 
-Most bounded particle & bottom of gravitational potential well & & 
+Most bound particle & bottom of gravitational potential well & may be affected
+by statistical noise & 
 & unobservable but presented for comparison \\
 \hline
 \end{tabular} 
@@ -301,18 +298,31 @@ Most bounded particle & bottom of gravitational potential well & &
 \end{center} 
 \end{table*}
 \subsubsection{Galaxy weights}
-Not all galaxies are created equal. Some of them are more massive 
-
-One of the most common weighting scheme employed for cluster galaxy data is to weight
+\label{subsubsec:galaxy_weights}
+Not all galaxies are created equal, so they should not be considered with equal
+importance. Galaxies reside in host halos with different masses and 
+contain different stellar masses. The brightness of galaxies in a cluster are 
+also affected by the cluster environments.
+For example the star formation rates of cluster galaxies are known to be 
+suppressed by the high concentration of intracluster medium. (CITE)
+One of the most common weighting schemes employed for galaxy data is to weight
 by the luminosity in a particular band.
+We examined 
 
 \subsubsection{Cluster properties}
+\label{subsubsec:cluster_properties}
+
 \subsection{Relaxedness of the clusters}
 On the relaxedness of the clusters.
 We provide several definitions of non-relaxedness to characterize whether
 the clusters underwent any recent merger activities. 
-1) These definitions of non-relaxedness.
-2) 
+These definitions of non-relaxedness include.
+\begin{itemize}
+	\item ratio of mass outside the dominant dark matter halo over the total mass
+		of the galaxuy cluster 
+	\item distance between the most bound particle from the center of mass as a
+		function of $R_{200c}$.
+\end{itemize}
 
 % \begin{figure*}
 % 	\includegraphics[width=.95\linewidth]{figures/ph_fig_richnessAndColorMagnitudes.pdf}
@@ -321,18 +331,6 @@ the clusters underwent any recent merger activities.
 % \end{figure*}
 
 \section{Methods for summarizing the spatial distribution of ??}
-There are many reasonable models for summarizing the overall spatial
-distribution of cluster components. Each method has different uncertainties.
-They fall under several categories, 1) mixture models, 2) wavelet or other
-basis expansions, and 3) non-parametric estimations such as a kernel density estimation. 
-
-Not only do the performance of the first two methods depend heavily on model parameters, 
-the data fit also depend quite strongly on the underlying mixture model /
-wavelet basis. Often times, the most common mixture models and wavelet basis carry symmetry
-assumptions that may not be valid for galaxy clusters. 
-This is because galaxy clusters have substructures over a wide range of length
-scales, from galaxy scales of hundreds of pc to fraction of a Mpc. 
-models carry over symmetry assumptions that may not be valid.
 
 Well known tradeoff Bias-variance tradeoff
 
@@ -349,7 +347,8 @@ We compare four ways to identify the light/galaxy centers:
 
 \end{enumerate}
 
-\subsubsection{Unweighted centroids}
+\subsubsection{Centroids or center of mass}
+\label{Unweighted}
 We follow the usual definition of spatial centroid as 
 \begin{equation}
 	\bar{\bf x} = \frac{1}{n} \sum_i \vec{x}_i. 
@@ -366,12 +365,21 @@ field of view.
 
 \subsubsection{Cross-validated Kernel Density Estimation (KDE) and the peak finder} 
 We employed a KDE algorithm to infer a smooth density distribution of the
-galaxies while using smoothed cross-validation to obtain the optimal smoothing
-bandwidth matrices ($H$). Specifically, we made use of the KDE function in
+galaxies.
+It is known that the choice of the functional form of the smoothing kernel does
+not dominate the density estimate $\hat{f}$ as long as the chosen kernel is smooth (CITE).
+Instead we focus our effort to use cross-validation to obtain the optimal smoothing
+bandwidth matrices ($H$). 
+\begin{equation}
+	\hat{f}(x; \bf{H}) = n^{-1} \sum_{i=1}^n K\left(\frac{x-X}{h}\right)
+\end{equation}
+
+Specifically, we made use of the KDE function in
 the statistical package ks (Duong) in the R statistical computing environment (R Core Team 2014).
 Cross validation eliminates free parameters in the KDE and minimizes
 the asymptotic mean-integrated squared error (AMISE) for a best fit to the
 data.
+
 After obtaining the KDE estimate, we employed a finite differencing algorithm
 to find the local maxima. We sorted the local maxima according to the KDE
 density at the maxima locations and identified the dominant peak. 
@@ -380,7 +388,9 @@ Spatial location and the density of the subdominant peaks are also stored.
 We investigated if the presence of subdominant peaks are correlated with
 $\Delta s$. 
 
-% -[  ] dig up Harvard slides and put the equations here 
+
+
+
 
 \subsubsection{Shrinking aperture}
 Another popular method among astronomers for finding the peak of a spatial
@@ -452,6 +462,9 @@ have smaller impact on the results.
 The 2D histogram of the dark matter is analogous to a convergence map which is
 a product of a weak / strong lensing analysis. 
 
+% - [  ] Add the equation calculating a lensing kernel due to S/N constraint 
+% apropos conversation with Marusa and Austin 's 
+
 
 \subsection{Finding offsets} 
 We computed the projected offsets between the galaxy density peaks inferred from the
@@ -477,10 +490,16 @@ $\xi$ and an azimuthal angle $\phi$.
 
 \subsection{Galaxy-DM Offset in Illustris}
 \subsubsection{Projected offsets}
+* those between BCG, the most bound particle and the other masses. 
+
+
 \subsubsection{Correlations between the offsets and properties of the cluster / groups}
 \section{DISCUSSION}
 \subsection{Comparison to other simulations}
 \subsection{Comparison to other observational studies}
+Central galaxy paradigm
+
+
 \subsection{Galaxy-DM Offset in Merging Galaxy Clusters}
 
 
