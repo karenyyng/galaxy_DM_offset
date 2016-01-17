@@ -30,7 +30,7 @@
 \usepackage{paralist}
 
 % References highlighted in blue (include "draft" option for troubleshooting)
-\usepackage[bookmarks,bookmarksnumbered,colorlinks=true,citecolor=blue,linkcolor=black]{hyperref}
+\usepackage[bookmarks,bookmarksnumbered,colorlinks=true,citecolor=blue,linkcolor=blue]{hyperref}
 \usepackage{color}
 
 % Line break inside table cell
@@ -75,6 +75,7 @@
 
 \newcommand{\mc}[1]{\multicolumn{1}{c}{#1}} % handy shortcut macro
 %-----------------------------------------------------------------------
+\def\Hmat{\mathbf{\it H}}
 \def\apjl{ApJL }
 \def\aj{AJ }
 \def\apj{ApJ }
@@ -90,10 +91,8 @@
 \providecommand{\adsurl}[1]{\href{#1}{ADS}}
 \providecommand{\ISBN}[1]{\href{http://cosmologist.info/ISBN/#1}{ISBN: #1}} 
 %-----------------------------------------------------------------------
-\title[
-	Galaxy-dark matter offsets in galaxy clusters and groups of the
-Illustris simulation
-]
+\title[Galaxy-dark matter offsets in galaxy clusters and groups of the
+Illustris simulation]
 {Galaxy-dark matter offsets in galaxy clusters and groups of the
 Illustris simulation}
 \author[Karen Y. Ng et al.]{Karen Y. Ng,$^{1}$
@@ -128,15 +127,27 @@ Illustris simulation}
 \end{keywords}
 
 \section{INTRODUCTION} 
-Galaxies that belongs to a galaxy cluster or group are stochastic samples
-of the underlying dark matter (DM) mass density. 
+Galaxies that belong to a galaxy cluster or group represents the overdensities
+of the underlying dark matter (DM) distribution. 
+% Why we want to compare galaxies with the DM distribution? 
+There have been many literature that tried to compare the galaxies and the DM
+distribution. 
+
+
+% What are the observational methods for summarizing dark matter distribution?
+Weak and strong lensing for finding out the dark matter distribution. 
+While 
+Common to all the methods are the estimation of the density peaks. 
+Convergence map.  
+
+
+% What are the methods for summarizing the galaxy distribution?
 There are many reasonable models for summarizing the overall spatial
 distribution of cluster components. Each method has different uncertainties.
 They fall under several categories, 1) mixture models, 2) basis function
 expansions, such as wavelet methods 
  and 3) non-parametric estimations such as a kernel density estimation. 
-
-Not only do the performance of the first two methods depend heavily on model parameters, 
+ Not only do the performance of the first two methods depend heavily on model parameters, 
 the data fit also depend quite strongly on the underlying mixture model /
 wavelet basis. Often times, the most common mixture models and wavelet bases 
 carry symmetry assumptions that may not be valid for galaxy clusters. 
@@ -167,59 +178,68 @@ summarizing the member galaxy population of a galaxy cluster, 3)
 give estimates for the offsets between the summary statistics of the galaxy  
 population and the DM population. We call this offset as 
 \begin{equation}
-	\Delta s \equiv |\bf{s}_{gal} - \bf{s}_{DM}|,
+	\Delta s \equiv |\vec{s}_{gal} - \vec{s}_{DM}|,
 \end{equation}
 where $\bf{s}_{gal}$ and $\bf{s}_{DM}$ are the two dimensional (2D) spatial
 locations of the summary statistic of the galaxy population, and the density
 peak of DM respectively. 
 Finally, we provide the distribution and investigrate origin of $\Delta s$. 
 
+% how are things called in the Illustris simulation?
+
+
+In section \ref{sec:illustris_sim},
+we will describe the physical properties of the products of the Illustris
+simulation, and the selection criteria that we have employed to ensure that the
+quantities that we examine resemble observables but without noise and
+systematics from observations. Then in section ? we will describe the methods for computing various 
+one-point statistics of the spatial distribution of galaxies how we prepare our dark
+matter spatial data to resemble convergence maps. We will show the comparison
+of the different summary statistics in section before we show the main results
+in section . 
+
+\section{The Illustris simulation data} 
+\label{sec:illustris_sim}
 The data that we use: The Illustris simulation 
 one of the most detailed cosmological simulations of our universe. 
-Cold Dark matter 
-Our paper adopt the same cosmology
+Under the assumed Lambda Cold Dark Matter cosmology, it is unclear 
+that how large the offset $\Delta \vec{s}$ should be. 
 
+
+Our analyses make use of the same cosmology as the Illustris simulation.
 The highest resolution Illustris-1 simulation. 
 With a snapshot at $z=0$. 
 Two sets of halo finder - one is for halo sized stuff 
-the other one for particles 
-Subfind 
-
-
-% how are things called in the Illustris simulation?
-
+the other one for particles Subfind 
 Terminology 
 halos - what we refer to cluster sized halos identified by RockStar  / Subfind 
 
 subhalos - galaxy sized  
-observation bands - u, g, r, i, z
+observation bands $u, g, r, i, z$
 
 
-\section{The Illustris simulation data} 
-\label{sec:illustris_sim}
+
 \begin{figure*}
 	\includegraphics[width=\linewidth]{./figures/finalized/clusterMassDist.eps}
 	\caption{ {\bf Left figure:} Mass distribution of the group / cluster sized DM halos
-		for different halo selection schemes. Mass estiamtes obtained by the
+		for different halo selection schemes. Mass estimates obtained by the
 		Friends-of-Friends RockStar algorithm are labeled as  M$_{\text{FoF}}$.
 		Masses centered on the most bound particle within a radius those the 
 		average density is 200 or 500 times the critical density of the universe are 
 		labeled as M$_{200c}$ and M$_{500c}$ respectively. 
 		Discrepancies between the different
 		measures of mass of the clusters indicate the presence of spatially
-		separated substructures for the clusters. (See Fig ? ){\bf Right figure:} Mass-richness
-	relationship. We require clusters to have more than 50 member galaxies that
+		separated substructures for the clusters (See Fig ? ). {\bf Right figure:} Mass-richness
+		relationship of galaxy clusters and groups with $M_{FoF} > 10^{13} M_{}$ . We require clusters to have more than 50 member galaxies that
 	are above observation limit, i.e. apparent $i \leq 24$ when we assume a cosmological redshift
 of $z=0.4$, as shown by the richness cut. \label{fig:mass_richness}}
 
 \end{figure*}
 
-	field of view for wide-view telescopes such as the
-Subaru suprime camera.
 Finally, for our final results, we only make use of galaxy clusters / groups 
 that have at least 50 member galaxies after this magnitude cut. This is because
-of the huge statistical uncertainty of estimating the luminosity peaks for 
-groups with less than 50 member galaxies. 
+of the relatively large statistical uncertainty from small number summary
+statistics. 
 
 \subsection{Selection of the field of view}
 \label{sec:FOV}
@@ -230,9 +250,10 @@ default volume selection scheme for each cluster / group.
 We understand that this choice of volume selection can be more ideal than
 observational conditions. We make use of this volume selection scheme
 for baseline comparisons. 
+
 Furthermore, assuming a conservative line-of-sight (los) distance 
 , i.e. cosmological redshift, of $z = 0.4$, 
-the projected extent for most of the Illustris galaxy clusters, 
+the projected extent for most of the Illustris galaxy clusters and groups, 
 fits inside the field of view of telescopes, such as the Subaru Suprime Camera,
 which covers a physical area of $\sim 9$ Mpc $\times 7$ Mpc. 
 
@@ -261,7 +282,7 @@ Two-dimensional projections & even HealPix samples over half a sphere &
 discussed as results  & \\  
 \hline
 \end{tabular} 
-\label{tab:inputs} 
+\label{tab:selection_criteria} 
 \footnotesize{
 }
 \end{minipage}
@@ -279,19 +300,17 @@ discussed as results  & \\
 \hline 
 Method &  One-point statistic & Sensitivity to biases & Uncertainty  & Relevant
 section & Comment  \\ \hline
-Centroid & 2D spatial averages & High & Low & Not recommended \\
+Centroid & 2D spatial averages & High & Low & \\
 Shrinking aperture & proxy for density peak & High sensitivity to substructures & Medium
-& Not recommended\\
+& \\
 Peak finding from KDE & density peak & Lower sensitivity to substructures &
-Higher & Relatively computationally demanding but doable\\
-Brightest cluster galaxy & & Sensitive to foreground contaminants & Canonical
-method\\ 
-Most bound particle & bottom of gravitational potential well & may be affected
-by statistical noise & 
-& unobservable but presented for comparison \\
+Higher & \\
+Brightest cluster galaxy & & Sensitive to foreground contaminants & \\ 
+Most bound particle & bottom of gravitational potential well &  & 
+&  \\
 \hline
 \end{tabular} 
-\label{tab:inputs} 
+\label{tab:summary_stat_info} 
 \footnotesize{
 }
 \end{minipage}
@@ -319,7 +338,7 @@ the clusters underwent any recent merger activities.
 These definitions of non-relaxedness include.
 \begin{itemize}
 	\item ratio of mass outside the dominant dark matter halo over the total mass
-		of the galaxuy cluster 
+		of the galaxy cluster 
 	\item distance between the most bound particle from the center of mass as a
 		function of $R_{200c}$.
 \end{itemize}
@@ -357,7 +376,7 @@ While the weighted centroids are just:
 \begin{equation}
 	\bar{\bf x}_w = \frac{\sum_i w_i \vec{x}_i}{\sum_i w_i},
 \end{equation}
-for each spatial dimension and the weights $w_i$ for the $i-th$ galaxy
+for each spatial dimension and the weights $w_i$ for the $i$-th galaxy
 is described in section.
 Centroids can be biased 1) by subcomponents from merging activities yet do
 not provide explicit evidence for ongoing merger or accretion, 2) by the 
@@ -367,15 +386,21 @@ field of view.
 We employed a KDE algorithm to infer a smooth density distribution of the
 galaxies.
 It is known that the choice of the functional form of the smoothing kernel does
-not dominate the density estimate $\hat{f}$ as long as the chosen kernel is smooth (CITE).
-Instead we focus our effort to use cross-validation to obtain the optimal smoothing
-bandwidth matrices ($H$). 
-\begin{equation}
-	\hat{f}(x; \bf{H}) = n^{-1} \sum_{i=1}^n K\left(\frac{x-X}{h}\right)
-\end{equation}
+not dominate the density estimate $\hat{f}$ as long as the chosen kernel is
+smooth (CITE). Instead we focus our effort to use cross-validation to obtain the optimal 2D smoothing
+bandwidth matrix for each cluster ($\Hmat$) for our 2D Gaussian kernel. 
+\begin{align}
+	\hat{f}(X; \Hmat) &= \frac{1}{n} \frac{1}{(2\pi)^{d/2}|\Hmat|^{1/2}}
+	\sum_{i=1}^n \exp((X-{\bf x}_i)^T H^{-1} (X-{\bf x}_i)),
+\end{align}
+where the dimensionality is $d=2$ for our projected quantities,
+$X$ represents the uniform grid points for evaluation, and 
+$\bf{x}_i$ contains the spatial coordinates for each of the identified member galaxies 
+that survived our brightness cut.
 
 Specifically, we made use of the KDE function in
-the statistical package ks (Duong) in the R statistical computing environment (R Core Team 2014).
+the statistical package ks (Duong) in the R statistical computing environment 
+(R Core Team 2014).
 Cross validation eliminates free parameters in the KDE and minimizes
 the asymptotic mean-integrated squared error (AMISE) for a best fit to the
 data.
@@ -395,14 +420,14 @@ $\Delta s$.
 \subsubsection{Shrinking aperture}
 Another popular method among astronomers for finding the peak of a spatial
 distribution include what we call a shrinking aperture method.
-We test if the shrinking aperture method is able to recover the highest peak reliably.
+We test if the shrinking aperture method is able to reliably recover the highest peak.
 This method is dependent on the initial diameter and the initial center location of the aperture.
 This method does not evaluate if the cluster is consist of
 several subcomponents so the peak estimate can be easily biased by
 substructures. Furthermore, the convergence rate for this iterative algorithm is not
 analytical and is dependent on the data. We present the
-convergence criteria for reference. We note that different implementation may result in
-different performances.
+convergence criteria for reference. 
+We note that the exact implementation may result in different performances.
 \begin{algorithm}
 	\caption{Shrinking aperture algorithm}
 	\KwData{subhalo that satisfy cuts as a galaxy}
@@ -418,14 +443,12 @@ different performances.
  \end{algorithm}
 
 
-
-
 \subsubsection{Brightest Cluster Galaxies (BCG)}
 
 \begin{figure*}
 	\includegraphics[width=.95\linewidth]{figures/ph_fig_galaxycenter_mixtureTests.pdf}
-	\caption{
-		\label{fig:config}}
+	\caption{}
+		% \label{fig:config}}
 \end{figure*}
 
 
@@ -476,14 +499,14 @@ $\xi$ and an azimuthal angle $\phi$.
 \begin{figure*}
 	\includegraphics[width=.95\linewidth]{figures/ph_fig_galaxycenter_IllustrisClusters.pdf}
 	\caption{
-		\label{fig:config}}
+		\label{fig:centers}}
 \end{figure*}
 
 
 \begin{figure*}
 	\includegraphics[width=.95\linewidth]{figures/ph_fig_DMcenter_IllustrisClusters.pdf}
-	\caption{
-		\label{fig:config}}
+	\caption{}
+		% \label{fig:config}}
 \end{figure*}
 
 \section{RESULTS} 
@@ -497,7 +520,7 @@ $\xi$ and an azimuthal angle $\phi$.
 \section{DISCUSSION}
 \subsection{Comparison to other simulations}
 \subsection{Comparison to other observational studies}
-Central galaxy paradigm
+Central galaxy paradigm (CGP)
 
 
 \subsection{Galaxy-DM Offset in Merging Galaxy Clusters}
@@ -532,8 +555,8 @@ A galaxy cluster is not a closed system.
 
 
 \bibliographystyle{mn2e}
-\bibliography{galDMoffset.bib}
-\bibliography{R_package.bib}
+\bibliography{galDMoffset}
+\bibliography{R_package}
 \appendix
 \section{KDE}
 \clearpage\bsp\label{lastpage} 
