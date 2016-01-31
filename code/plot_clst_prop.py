@@ -152,9 +152,9 @@ def plot_mass_vs_richness(FoF_mass, clst_df_list, ax=None,
 
         richness[z] = map(lambda m: np.sum(m), mask[z])
 
-    for z in z_ranges:
-        ax.plot(FoF_mass, richness[z], '.', label="assumed z = {}".format(z),
-                mew=2)
+    for z in z_ranges[::-1]:
+        ax.plot(FoF_mass, richness[z], 'o', label="assumed z = {}".format(z),
+                mew=1.5, fillstyle='none', alpha=0.8)
         ax.legend(loc='upper left', frameon=True)
         ax.set_xscale("log", nonposx='clip')
         ax.set_xlim(1e13, 1e15)
@@ -162,10 +162,11 @@ def plot_mass_vs_richness(FoF_mass, clst_df_list, ax=None,
     ax.set_xlabel(r"$M_{FoF}$")
     ax.set_ylabel("Richness")
 
-    ax.axhline(50, color='k')
-    ax.text(1.8e14, 55,"richness cut > 50", size=12)
-    ax.arrow(1.6e14, 50, 0, 30, head_width=1e13, head_length=20,
-             fc='k', ec='k')
+    # richness cut
+    # ax.axhline(50, color='k')
+    # ax.text(1.8e14, 55,"richness cut > 50", size=12)
+    # ax.arrow(1.6e14, 50, 0, 30, head_width=1e13, head_length=20,
+    #          fc='k', ec='k')
 
 
     if not show:
@@ -313,5 +314,6 @@ def N_by_N_lower_triangle_plot(data, space, var_list, axlims=None,
         plt.savefig(path + prefix + suffix, dpi=200, bbox_inches='tight')
 
     return
+
 
 

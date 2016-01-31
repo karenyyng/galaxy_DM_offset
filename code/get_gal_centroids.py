@@ -632,9 +632,14 @@ def project_coords(coords, xi, phi, los_axis=2, radian=True):
 
     from numpy import cos, sin
     # rotate our view point, origin is at (0, 0, 0)
-    mtx = np.array([[cos(phi)*cos(xi), -sin(phi), cos(phi)*sin(xi)],
-                    [sin(phi)*cos(xi), cos(phi), sin(phi)*sin(xi)],
-                    [-sin(xi), 0, cos(xi)]])
+    # rotate by azimuthal angle phi first then elevation angle xi
+    mtx = np.array([[cos(phi) * cos(xi), -cos(xi)*sin(phi), sin(xi)],
+                    [sin(phi), cos(phi), 0],
+                    [-cos(phi) * sin(xi), sin(phi) * sin(xi), cos(xi)]
+                    ])
+    # mtx = np.array([[cos(phi)*cos(xi), -sin(phi), cos(phi)*sin(xi)],
+    #                 [sin(phi)*cos(xi), cos(phi), sin(phi)*sin(xi)],
+    #                 [-sin(xi), 0, cos(xi)]])
 
     if type(coords) != np.ndarray:
         coords = np.array(coords)
@@ -677,11 +682,11 @@ def angles_given_HEALpix_nsides(nside):
     angle_idxes = range(npix)
     xi_arr, phi_arr = pix2ang(nside, angle_idxes, nest=False)
 
-    # Because we picked z-axis to project,
-    # the azimuthal angle gives the symmetry
-    half_of_the_sphere = phi_arr < np.pi
+    # Find duplicate projection by brute force
+    sameP, combo = angles_give_same_projections(phi_arr, xi_arr)
+    first_half, second_half = combo[sameP].transpose()
 
-    return phi_arr[half_of_the_sphere], xi_arr[half_of_the_sphere],
+    return phi_arr[first_half], xi_arr[first_half],
 
 
 def get_clst_gpBy_from_DM_metadata(metadata_df, gpBy_keys=None):
@@ -701,6 +706,37 @@ def get_clst_gpBy_from_DM_metadata(metadata_df, gpBy_keys=None):
     print ("len(gpBy_keys) = ", len(gpBy_keys))
     return metadata_df.groupby(gpBy_keys, as_index=False), gpBy_keys
 
+
+def same_projection(phi1, xi1, phi2, xi2):
+    """
+    :phi1: float, azimuthal angle in radians
+    :xi1: float, elevation angle in radians
+    :phi2: float, azimuthal angle in radians
+    :xi2: float, elevation angle in radians
+
+    Determine if two sets of angles correspond to the same projection.
+
+    We test for azimuthal symmetry because we project w.r.t. z-axis.
+
+    :tests: passed
+
+    """
+    if phi1 == phi2 and xi1 == xi2:
+        return True
+    elif (xi1 == 0. or xi1 == np.pi) and (xi2 == 0. or xi2 == np.pi):
+        # Points at the zenith show same projection no matter what phi values
+        return True
+    else:
+        pt1 = project_coords(np.array([1, 2, 3])/np.sqrt(14.), xi1, phi1)
+        pt2 = project_coords(np.array([1, 2, 3])/np.sqrt(14.), xi2, phi2)
+        pt0 = np.zeros(3)
+        dist1 = compute_euclidean_dist(pt1, pt0)
+        dist2 = compute_euclidean_dist(pt2, pt0)
+        # print dist1, " ", dist2
+        same_projection = np.abs(dist1 - dist2) < np.finfo(np.float32).eps
+
+
+    return same_projection
 
 # --------- depreciated R conversion functions ------------------------------
 
@@ -777,72 +813,19 @@ def get_clst_gpBy_from_DM_metadata(metadata_df, gpBy_keys=None):
 #
 #     return func(fhat, verbose)
 
-def same_projection(phi1, xi1, phi2, xi2):
+
+
+def angles_give_same_projections(phi_arr, xi_arr):
     """
-    :phi1: float, azimuthal angle in radians
-    :xi1: float, elevation angle in radians
-    :phi2: float, azimuthal angle in radians
-    :xi2: float, elevation angle in radians
+    :param phi_arr: np array of floats, in RADIANS, azimuthal angle, 0 to 2 * np.pi
+    :param xi_arr: np array of floats, in RADIANS, elevation angle, 0 to np.pi
 
-    Determine if two sets of angles correspond to the same projection.
-
-    Initialize two points with the spherical coordinates
-    pt1 = (1, phi1, xi1)
-    pt2 = (1, phi2, xi2)
-    and
-    origin = (0, 0, 0)
-    Compute Euclidean distance between the two points,
-    see if that equals the distance between
-    (pt1 - origin) + (pt2 - origin)
-
-    :tests: passed
-
+    :returns: an array of bools
     """
-    if phi1 == phi2 and xi1 == xi2:
-        # Monster wants to climb out of the screen and eat users who supply
-        # this type of inputs to this function
-        return True
-    elif xi1 == xi2 and (xi1 == 0. or xi1 == np.pi):
-        # Points at the zenith show same projection no matter what phi values
-        return True
-    elif xi1 != xi2:
-        return False
-    elif xi1 == xi2 and np.abs(phi1 - phi2) / np.pi - 1. < np.finfo(np.float32).eps:
-        return True
-    elif xi1 == xi2 and np.abs(phi1 - phi2) != np.pi:
-        return False
+    from itertools import combinations
 
-    # pt1 = spherical_coord_to_cartesian(phi1, xi1)
-    # pt2 = spherical_coord_to_cartesian(phi2, xi2)
-
-    # dist12 = compute_euclidean_dist(pt1, pt2)
-    # same_projection = np.abs(dist12 - 2.0) < np.finfo(np.float32).eps
-
-    # logging.debug("------------------------------------")
-    # logging.debug(
-    #     "(phi, xi)1 = ({0}, {1}),".format(phi1 * 180. / np.pi,
-    #                                       xi1 * 180./ np.pi) +
-    #     "(phi, xi)2 = ({0}, {1})".format(phi2 * 180. / np.pi,
-    #                                      xi2 * 180./ np.pi))
-    # logging.debug(
-    #     "\npt1={0}, pt2={1}\n".format(np.array(pt1), np.array(pt2) ))
-    # logging.debug("\ndist12={0}\n".format(dist12))
-    # logging.debug ("Same_project = {}".format(same_projection))
-
-    return same_projection
-
-
-# def angles_give_same_projections(phi_arr, xi_arr):
-#     """
-#     :param phi_arr: np array of floats, in RADIANS, azimuthal angle, 0 to 2 * np.pi
-#     :param xi_arr: np array of floats, in RADIANS, elevation angle, 0 to np.pi
-#
-#     :returns: an array of bools
-#     """
-#     from itertools import combinations
-#
-#     # The number of comparisons needed is nC2
-#     combo = np.array([c for c in combinations(range(len(xi_arr)), 2)])
-#     return np.array([same_projection(phi_arr[pair[0]], xi_arr[pair[0]],
-#                                      phi_arr[pair[1]], xi_arr[pair[1]])
-#                     for pair in combo]), np.array(combo)
+    # The number of comparisons needed is nC2
+    combo = np.array([c for c in combinations(range(len(xi_arr)), 2)])
+    return np.array([same_projection(phi_arr[pair[0]], xi_arr[pair[0]],
+                                     phi_arr[pair[1]], xi_arr[pair[1]])
+                    for pair in combo]), np.array(combo)

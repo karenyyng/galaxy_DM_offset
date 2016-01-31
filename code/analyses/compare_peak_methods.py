@@ -16,8 +16,7 @@ from plot_gal_prop import plot_cf_contour
 
 
 # plot styles
-lvls = [68, 95]
-
+# lvls = [68]  #, 95]
 # g_colors = [(0 / 255., i / (len(lvls) + 1.), 0 / 255.)
 #             for i in xrange(1, len(lvls) + 1)]
 # b_colors = [(0 / 255., 0 / 255., i / (len(lvls) + 1.))
@@ -26,13 +25,12 @@ lvls = [68, 95]
 #             for i in xrange(1, len(lvls) + 1)]
 
 # Color palette are from http://colorbrewer2.org/
-g_colors = [(127, 191, 123), (27, 120, 55)]
+g_colors = [(127./255, 191./255, 123./255), (27./255, 120/255., 55./255)]
 
-b_colors = [(103, 169, 207), (33, 102, 172)]
+b_colors = [(103./255, 169./255, 207./255), (33./255, 102/255., 172./255)]
 
 # This represents purple to be color-blind friendly
-r_colors = [(136, 86, 167), (129, 15, 124)]
-
+r_colors = [(136./255, 86./255, 167./255), (129./255, 15./255, 124./255)]
 
 # ------------------data sampling -----------------------------
 
@@ -257,7 +255,7 @@ def plot_grid_spec(gauss_data, bimodal_data, dumb_data, f, figsize=(13, 13),
     plt.figure(figsize=figsize)
     rowNo = 3
     colNo = 2
-    hspace = 0.01
+    hspace = 0.1
 
     # plot the left two columns
     gs1 = gridspec.GridSpec(rowNo, colNo)
@@ -332,33 +330,37 @@ def plot_grid_spec(gauss_data, bimodal_data, dumb_data, f, figsize=(13, 13),
     return
 
 
-def plot_error_as_a_func_of_data_pts(f, data_set, colors=['b', 'g', 'r'],
+def plot_error_as_a_func_of_data_pts(f, data_set,
                                      ax=None, methods=["KDE",
                                                        "shrink",
-                                                       "cent"]):
+                                                       "cent"],
+                                     show_xlabel=False
+                                     ):
     if ax is None:
         fig = plt.figure()
         ax = fig.add_subplot(111)
 
     data_size = [20, 50, 100, 500]
 
-    if len(colors) != len(methods):
-        raise ValueError("Number of color supplied for plotting must\n" +
-                         "match number of peak finding methods")
+    # if len(colors) != len(methods):
+    #     raise ValueError("Number of color supplied for plotting must\n" +
+    #                      "match number of peak finding methods")
 
     errs = compute_errors_from_data(f, data_set, methods=methods,
                                     data_size=data_size)
 
     for i, method in enumerate(methods):
-        for j in [0, 1]:
-            for size in data_size:
-                ax.plot(size, errs[str(size)][method].values()[j], 'x',
-                        linestyle='-', mew=2, ms=10,
-                        color=colors[i], label=method)
+        cf68 = [errs[str(size)][method].values()[0]
+                for size in data_size]
+        ax.plot(data_size, cf68, 'x-',
+                mew=2, ms=10,
+                label=method)
 
     ax.set_xlim(0, 550)
-    ax.set_ylabel("Uncertainty", size="small")
-    ax.set_xlabel("Number of data points", size="small")
+    ax.set_ylim(0, ax.get_ylim()[-1] * 1.1)
+    ax.set_ylabel("68% confidence region", size=15)
+    if show_xlabel:
+        ax.set_xlabel("Number of data points", size="small")
     return
 
 
@@ -411,7 +413,9 @@ def plot_gauss_data(gauss_data, ax=None, xlim=None,
 
 def plot_gauss_contour(KDE_peak_dens, shrink_peak_dens,
                        cent_peak_dens, ax=None, xlim=None,
-                       ylim=None):
+                       ylim=None,
+                       b_colors=b_colors, g_colors=g_colors, r_colors=r_colors
+                       ):
     if ax is None:
         fig = plt.figure()
         ax = fig.add_subplot(111, aspect='equal')
@@ -421,25 +425,26 @@ def plot_gauss_contour(KDE_peak_dens, shrink_peak_dens,
                     KDE_peak_dens["eval_points"][:][0],
                     KDE_peak_dens["eval_points"][:][1],
                     colors=b_colors, ax=ax)
-    ax.annotate('KDE peak\nconfidence region', (0.3, 0.62),
-                textcoords='axes fraction',
-                color='b')
+    # ax.annotate('KDE peak\nconfidence region', (0.3, 0.62),
+    #             textcoords='axes fraction',
+    #             color='b')
 
     plot_cf_contour(shrink_peak_dens["estimate"][:],
                     shrink_peak_dens["eval_points"][:][0],
                     shrink_peak_dens["eval_points"][:][1],
                     colors=g_colors, ax=ax)
-    ax.annotate('Shrink. apert. peak\nconfidence region', (0.3, 0.25),
-                textcoords='axes fraction',
-                color='g')
+    # ax.annotate('Shrink. apert. peak\nconfidence region', (0.3, 0.25),
+    #             textcoords='axes fraction',
+    #             color='g')
 
     plot_cf_contour(cent_peak_dens["estimate"][:],
                     cent_peak_dens["eval_points"][:][0],
                     cent_peak_dens["eval_points"][:][1],
                     colors=r_colors, ax=ax)
-    ax.annotate('Centroid\nconfidence region', (0.6, 0.5),
-                textcoords='axes fraction',
-                color='r')
+    # ax.annotate('Centroid\nconfidence region', (0.6, 0.5),
+    #             textcoords='axes fraction',
+    #             color='r')
+
     ax.plot(1, 1, "kx", mew=2, label="True center", markersize=5)
     ax.legend(loc='best', frameon=False)
     # ax.title('Confidence region from one Gaussian at (1, 1)',
@@ -455,6 +460,8 @@ def plot_gauss_contour(KDE_peak_dens, shrink_peak_dens,
 def plot_gauss_zoomed_contours(KDE_peak_dens1, shrink_peak_dens1,
                                cent_peak_dens1, xlim=None, ylim=None,
                                markersize=10,
+                               b_colors=b_colors, g_colors=g_colors,
+                               r_colors=r_colors,
                                ax=None):
     """
     :param KDE_peak_dens1: dictionary like / hdf5 file stream with appropriate
@@ -510,7 +517,7 @@ def plot_gauss_zoomed_contours(KDE_peak_dens1, shrink_peak_dens1,
     if xlim is not None:
         ax.set_xlim(xlim)
 
-    ax.legend(loc='lower right', frameon=False, fontsize='small')
+    # ax.legend(loc='lower right', frameon=False, fontsize='small')
     # ax.title("Zoomed-in view near the dominant peak",
     #          fontsize=15)
 
@@ -533,7 +540,7 @@ def plot_one_big_one_small_gaussian(
     ax.plot(2, 2, 'kx', mew=2, ms=10, label='Mean of dominant Gaussian')
     ax.plot(0, 0, 'x', color='grey',
             mew=2, ms=10, label='Mean of subdominant Gaussian')
-    ax.legend(loc='best', frameon=False, fontsize='small')
+    # ax.legend(loc='best', frameon=False, fontsize='small')
 
     ax.set_xlim(xlim)
     ax.set_ylim(ylim)
@@ -555,28 +562,28 @@ def plot_one_big_one_small_gaussian_contour(
                     KDE_peak_dens1["eval_points"][:][0],
                     KDE_peak_dens1["eval_points"][:][1],
                     colors=b_colors, ax=ax)
-    ax.annotate('KDE peak\nconfidence region', (0.12, 0.52),
-                textcoords='axes fraction',
-                color='b')
+    # ax.annotate('KDE peak\nconfidence region', (0.12, 0.52),
+    #             textcoords='axes fraction',
+    #             color='b')
 
     plot_cf_contour(shrink_peak_dens1["estimate"][:],
                     shrink_peak_dens1["eval_points"][:][0],
                     shrink_peak_dens1["eval_points"][:][1],
                     colors=g_colors, ax=ax)
-    ax.annotate('Shrink. apert. peak\nconfidence region', (0.3, 0.7),
-                textcoords='axes fraction',
-                color='g')
+    # ax.annotate('Shrink. apert. peak\nconfidence region', (0.3, 0.7),
+    #             textcoords='axes fraction',
+    #             color='g')
 
     plot_cf_contour(cent_peak_dens1["estimate"][:],
                     cent_peak_dens1["eval_points"][:][0],
                     cent_peak_dens1["eval_points"][:][1],
                     colors=r_colors, ax=ax)
-    ax.annotate('Centroid\nconfidence region', (0.3, 0.42),
-                textcoords='axes fraction',
-                color='r')
+    # ax.annotate('Centroid\nconfidence region', (0.3, 0.42),
+    #             textcoords='axes fraction',
+    #             color='r')
 
     ax.plot(2, 2, "kx", mew=2, label="True center", markersize=5)
-    ax.legend(loc='best', frameon=False)
+    # ax.legend(loc='best', frameon=False)
     # ax.title('Confidence region from one Gaussian at (1, 1)',
     #           fontsize=15)
     if xlim is not None:
@@ -639,7 +646,7 @@ def plot_one_big_one_small_gaussian_zoomed_contour(
     if xlim is not None:
         ax.set_xlim(xlim)
 
-    ax.legend(loc='lower right', frameon=False, fontsize='small')
+    # ax.legend(loc='lower right', frameon=False, fontsize='small')
     return contours
 
 
@@ -662,7 +669,7 @@ def plot_dumbbell_data(
     ax.plot(0, 0, "x", color="k", mew=3,
             label="Mean of subdominant Gaussian",
             markersize=markersize)
-    ax.legend(loc='best', frameon=False)
+    # ax.legend(loc='best', frameon=False)
     # ax.title("Dumbbell data with 3 mixtures of Gaussians", size=15)
 
     if xlim is not None:
@@ -681,7 +688,9 @@ def plot_dumbbell_contour(
         xlim=None, ylim=None,
         save=False, markersize=6,
         plot_path="../../paper/figures/drafts/",
-        plot_fig_name="confidence_regions_dumbbell.pdf", ax=None):
+        plot_fig_name="confidence_regions_dumbbell.pdf", ax=None,
+        r_colors=r_colors, b_colors=b_colors, g_colors=g_colors
+):
 
     if ax is None:
         fig = plt.figure()
@@ -696,40 +705,35 @@ def plot_dumbbell_contour(
                     KDE_peak_dens2["eval_points"][:][0],
                     KDE_peak_dens2["eval_points"][:][1],
                     colors=b_colors, ax=ax)
-    ax.annotate('KDE dominant\npeak confidence region', (0.55, 0.53),
-                textcoords='axes fraction',
-                color='b')
+    # ax.annotate('KDE dominant\npeak confidence region', (0.55, 0.53),
+    #             textcoords='axes fraction',
+    #             color='b')
 
     plot_cf_contour(KDE_peak_dens2b["estimate"][:],
                     KDE_peak_dens2b["eval_points"][:][0],
                     KDE_peak_dens2b["eval_points"][:][1],
                     colors=b_colors, ax=ax)
 
-    ax.annotate('KDE subdominant\npeak confidence region', (0.49, 0.35),
-                textcoords='axes fraction',
-                color='b')
-    # ax.figtext(0.49, 0.35, 'KDE subdominant peak\nconfidence region',
-    #            color='b')
+    # ax.annotate('KDE subdominant\npeak confidence region', (0.49, 0.35),
+    #             textcoords='axes fraction',
+    #             color='b')
 
     plot_cf_contour(shrink_peak_dens2["estimate"][:],
                     shrink_peak_dens2["eval_points"][:][0],
                     shrink_peak_dens2["eval_points"][:][1],
                     colors=g_colors, ax=ax)
 
-    ax.annotate('Shrink apert peak\nconfidence region', (0.45, 0.65),
-                textcoords='axes fraction',
-                color='g')
-    # ax.figtext(0.45, 0.65, 'Shrink apert peak\nconfidence region',
-    #            color='g')
+    # ax.annotate('Shrink apert peak\nconfidence region', (0.45, 0.65),
+    #             textcoords='axes fraction',
+    #             color='g')
 
     plot_cf_contour(cent_peak_dens2["estimate"][:],
                     cent_peak_dens2["eval_points"][:][0],
                     cent_peak_dens2["eval_points"][:][1],
                     colors=r_colors, ax=ax)
-    ax.annotate('Centroid \nconfidence region', (0.43, 0.55),
-                textcoords='axes fraction',
-                color='r')
-    # ax.figtext(0.43, 0.55, 'Centroid \nconfidence region', color='r')
+    # ax.annotate('Centroid \nconfidence region', (0.43, 0.55),
+    #             textcoords='axes fraction',
+    #             color='r')
 
     markersize = 8
     ax.plot(2, 2, "kx", mew=2,
@@ -741,7 +745,7 @@ def plot_dumbbell_contour(
     ax.plot(0, 0, "x", color="grey", mew=3,
             label="Mean of subdominant Gaussian",
             markersize=markersize)
-    ax.legend(loc='lower right', frameon=False, fontsize='small')
+    # ax.legend(loc='lower right', frameon=False, fontsize='small')
 
     # ax.title('Confidence regions and best estimates of peak finding methods',
     #          fontsize=13)
@@ -757,7 +761,9 @@ def plot_dumbbell_zoomed_contour(
         xlim=(0.25, 4), ylim=(-0.6, 4),
         save=False,
         plot_path="../../paper/figures/drafts/",
-        plot_fig_name="confidence_regions_dumbbell.pdf", ax=None):
+        plot_fig_name="confidence_regions_dumbbell.pdf", ax=None,
+        b_colors=b_colors, r_colors=r_colors, g_colors=g_colors
+):
 
     if ax is None:
         fig = plt.figure()
@@ -796,7 +802,7 @@ def plot_dumbbell_zoomed_contour(
     ax.plot(2, 2, "kx", mew=2, label="Mean of dominant Gaussian",
             markersize=markersize)
 
-    ax.legend(loc='lower right', frameon=False, fontsize='small')
+    # ax.legend(loc='lower right', frameon=False, fontsize='small')
     # ax.title("Zoomed-in view near the dominant peak",
     #          fontsize=15)
 
