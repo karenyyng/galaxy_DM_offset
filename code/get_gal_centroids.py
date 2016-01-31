@@ -16,9 +16,27 @@ import logging
 
 # --------- functions for preparing cuts, projections, weighting -----------
 
+def cut_reliable_galaxies(df, DM_cut=1e3, star_cut=1e2):
+    """ consider all cluster galaxies with minimal cuts
+    :params df: pandas dataframe contains one cluster
+    :params DM_cut: integer, how many DM particles needed for us to consider
+        subhalos to be reliable
+    :params star_cut: integer, how many stellar particles needed for us to
+        consider subhalos to be reliable
+    :returns: numpy array of booleans
 
-def cut_reliable_galaxies(df, limiting_mag_band="i_band",
-                          limiting_mag=None):
+    :usage:
+        >>> cut_reliable_galaxies(df, **cut_kwargs)
+
+    :notes:
+    http://illustris-project.org/w/index.php/Data_Details#Snapshot_Contents
+    """
+    return np.array(np.logical_and(df["SubhaloLenType1"] > DM_cut,
+                                   df["SubhaloLenType4"] > star_cut))
+
+
+def cut_dim_galaxies(df, limiting_mag_band="i_band",
+                          limiting_mag=24):
     """ make observationally realistic cuts to galaxies
     :df: pandas dataframe containing subhalos of one cluster
     :limiting_mag_band: str, "*_band" that is part of the pandas dataframe
@@ -723,20 +741,21 @@ def same_projection(phi1, xi1, phi2, xi2):
     """
     if phi1 == phi2 and xi1 == xi2:
         return True
-    elif (xi1 == 0. or xi1 == np.pi) and (xi2 == 0. or xi2 == np.pi):
-        # Points at the zenith show same projection no matter what phi values
+    elif np.abs(xi1 + xi2 - np.pi) < np.finfo(np.float32).eps and \
+        np.abs(np.abs(phi1 - phi2) - np.pi) < np.finfo(np.float32).eps:
         return True
     else:
-        pt1 = project_coords(np.array([1, 2, 3])/np.sqrt(14.), xi1, phi1)
-        pt2 = project_coords(np.array([1, 2, 3])/np.sqrt(14.), xi2, phi2)
-        pt0 = np.zeros(3)
-        dist1 = compute_euclidean_dist(pt1, pt0)
-        dist2 = compute_euclidean_dist(pt2, pt0)
-        # print dist1, " ", dist2
-        same_projection = np.abs(dist1 - dist2) < np.finfo(np.float32).eps
+        return False
+        # Brute force
+        # pt1 = project_coords(np.array([1, 2, 3])/np.sqrt(14.), xi1, phi1)
+        # pt2 = project_coords(np.array([1, 2, 3])/np.sqrt(14.), xi2, phi2)
+        # pt0 = np.zeros(3)
+        # dist1 = compute_euclidean_dist(pt1, pt0)
+        # dist2 = compute_euclidean_dist(pt2, pt0)
+        # same_projection = np.abs(dist1 - dist2) < np.finfo(np.float32).eps
 
 
-    return same_projection
+    # return same_projection
 
 # --------- depreciated R conversion functions ------------------------------
 
