@@ -11,18 +11,19 @@ def plot_DM_fhat(fhat, fhat_stars, clstNo, threshold=0.3,
                  unit_conversion = 1. / .704):
 
     markersize = 25
+    # Make sure the zero entries don't choke up `np.log`
     if "log_est" not in fhat.keys():
-        fhat["log_est"] = np.log(fhat["estimate"])
+        fhat["log_est"] = np.log(fhat["estimate"][:] + 1e-11)
 
     plt.subplot('111', axisbg='black', aspect='equal')
 
     # Plot DM particle histograms
     # if dict_format:
-    plt.contourf(fhat["eval_points"][0], fhat["eval_points"][1],
+    plt.contourf(fhat["eval_points"][0][:], fhat["eval_points"][1][:],
                 fhat["log_est"].transpose(), cmap=plt.cm.afmhot)
     # else:
     #     plt.contourf(fhat["eval_points0"], fhat["eval_points1"],
-    #                  np.array(fhat["log_est"][...]).transpose(),
+    #                  np.array(fhat["log_est"][:]).transpose(),
     #                  cmap=plt.cm.afmhot)
 
 

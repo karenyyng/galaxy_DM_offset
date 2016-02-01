@@ -12,8 +12,8 @@ datetime_stamp = datetime.now().strftime("%D").replace('/', '_')
 # =========== Decide what to output ============================
 
 dataPath = "../../data/"
-total_clstNo = 128
-start_clstNo = 0
+start_clstNo = 13
+total_clstNo = 5
 logging_filename = "star_logging_{0}_{1}.log".format(total_clstNo,
                                                      datetime_stamp)
 
@@ -66,7 +66,7 @@ metadata["weights"] = OrderedDict({
     })
 
 # projections
-nside = 1  # nsides of HEALpix are powers of 2, pix for 16 nsides = 3072 / 2
+nside = 2  # nsides of HEALpix are powers of 2, pix for 16 nsides = 3072 / 2
 metadata["los_axis"] = [str(1)]  # use z-axis as los axis
 
 # Want to use string as key, not floats!
@@ -136,7 +136,7 @@ for clstNo in metadata["clstNo"]:
                         getg.convert_dict_peaks_to_df(fhat, clst_metadata)
                     store.append("peak_df", peak_df)
 
-                    clst_metadata[cut + 'richness'] = richness
+                    # clst_metadata[cut + '_richness'] = richness['min']
                     getg.convert_dict_dens_to_h5(fhat, clst_metadata,
                                                  h5_fstream)
 

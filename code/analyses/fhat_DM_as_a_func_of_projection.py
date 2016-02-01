@@ -16,7 +16,7 @@ datetime_stamp = datetime.now().strftime("%D").replace('/', '_')
 data_path = "../../data/"
 
 # ------- specify output file paths  -----------------------
-total_clstNo = 128
+total_clstNo = 5
 input_datetime_stamp = datetime_stamp  # what fhat_star file to read in
 logging_filename = "DM_logging_{0}_{1}.log".format(total_clstNo, datetime_stamp)
 logging.basicConfig(filename=logging_filename, level=logging.INFO)
@@ -70,7 +70,8 @@ logging.info("DM_metadata['clstNo'] = {}".format(DM_metadata['clstNo']))
 star_gpBy, star_gpBy_keys = \
     getgal.get_clst_gpBy_from_DM_metadata(star_peak_df)
 
-DM_metadata["kernel_width"] = [0, 3]
+DM_resolution = 2.  # kpc
+DM_metadata["kernel_width"] = np.array([0, 50]) / DM_resolution
 sig_fraction = 0.2
 
 # ============== set up output file structure  ===========
@@ -168,10 +169,10 @@ for i, clstNo in enumerate(DM_metadata["clstNo"]):
                             star_gpBy.get_group(gpBy_keys)
 
                         # Save the cluster metadata as strings
-                        # These are categorical.
+
                         kw = '{0:0.0f}'.format(kernel_width)
-                        clst_metadata["sig_fraction"] = \
-                            '{0:0.2f}'.format(sig_fraction)
+                        # clst_metadata["sig_fraction"] = \
+                        #     '{0:0.2f}'.format(sig_fraction)
 
                         clst_metadata["kernel_width"] = kw
                         logging.info ("gpBy_keys = {}, \n".format(gpBy_keys) +
