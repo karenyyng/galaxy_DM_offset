@@ -11,21 +11,18 @@ def plot_DM_fhat(fhat, fhat_stars, clstNo, threshold=0.3,
                  unit_conversion = 1. / .704):
 
     markersize = 25
-    # Make sure the zero entries don't choke up `np.log`
     if "log_est" not in fhat.keys():
-        fhat["log_est"] = np.log(fhat["estimate"][:] + 1e-11)
+        fhat["log_est"] = np.log(fhat["estimate"][:])
 
     plt.subplot('111', axisbg='black', aspect='equal')
 
     # Plot DM particle histograms
-    # if dict_format:
-    plt.contourf(fhat["eval_points"][0][:], fhat["eval_points"][1][:],
-                fhat["log_est"].transpose(), cmap=plt.cm.afmhot)
-    # else:
-    #     plt.contourf(fhat["eval_points0"], fhat["eval_points1"],
-    #                  np.array(fhat["log_est"][:]).transpose(),
-    #                  cmap=plt.cm.afmhot)
-
+    plt.imshow(fhat["log_est"].transpose(), cmap=plt.cm.afmhot,
+               extent=[
+                    fhat["eval_points"][0][0], fhat["eval_points"][0][-1],
+                    fhat["eval_points"][1][-1], fhat["eval_points"][1][0],
+                    ]
+               )
 
     ((dist, matched_DM_ixes), sign_gal_peak_no, sign_DM_peak_no, gd_threshold) = \
         get_dist.compute_distance_between_DM_and_gal_peaks(fhat_stars, fhat)
@@ -63,8 +60,8 @@ def plot_DM_fhat(fhat, fhat_stars, clstNo, threshold=0.3,
     plt.tick_params(axis='both', which='both', labelsize=fontsize)
     plt.xticks(rotation=45)
 
-    lgd = plt.legend(loc='best', fontsize=int(fontsize * 0.7), frameon=1,
-                     numpoints=1)
+    lgd = plt.legend(fontsize=int(fontsize * 0.7), frameon=1,
+                     numpoints=1, bbox_to_anchor=(1.0, 1.4))
     frame = lgd.get_frame()
     frame.set_facecolor('white')
     plt.xlabel('kpc', size=fontsize)

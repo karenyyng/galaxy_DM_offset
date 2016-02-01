@@ -177,7 +177,7 @@ for i, clstNo in enumerate(DM_metadata["clstNo"]):
                         clst_metadata["kernel_width"] = kw
                         logging.info ("gpBy_keys = {}, \n".format(gpBy_keys) +
                                          "kernel_width = {}".format(kw))
-                        if kernel_width != 0:
+                        if kernel_width > 0.:
                             fhat['estimate'] = \
                                 ndimage.gaussian_filter(fhat["estimate"],
                                                         sigma=kernel_width)
