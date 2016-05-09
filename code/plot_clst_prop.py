@@ -145,7 +145,7 @@ def plot_mass_vs_richness(FoF_mass, clst_df_list, ax=None,
     for i, z in enumerate(z_ranges):
 
         mask[z] = map(lambda df:
-                      get_gal.cut_reliable_galaxies(
+                      get_gal.cut_dim_galaxies(
                         df, limiting_mag=limiting_mag_list[i]),
                       clst_df_list
                       )

@@ -1,9 +1,12 @@
 from __future__ import (division, print_function)
+from matplotlib import rc
 import matplotlib.pyplot as plt
 import numpy as np
 import sys
 sys.path.append("../")
 import compute_distance as get_dist
+
+rc("font", family="serif")
 
 
 def plot_DM_fhat(fhat, fhat_stars, clstNo, threshold=0.3,
