@@ -8,6 +8,7 @@ import get_gal_centroids as get_gal
 import calculate_astrophy_quantities as cal_astrophy
 
 
+
 def plot_cluster_mass_distribution(groupMass, groupMcrit200 , groupMcrit500,
                                    y_legend, x_label, y_label, ax=None,
                                    save=True, path="../../paper/figures/",
@@ -114,14 +115,17 @@ def visualize_3D_clst(df, position_keys):
 
 def plot_mass_vs_richness(FoF_mass, clst_df_list, ax=None,
                           z_ranges=(0.3, 0.4, 0.5), show=False,
-                          prop_cycler=None):
+                          prop_cycler=None, show_richness_cut=False,
+                          richness_cut=50):
     """FoF mass vs richness assuming
     :FoF_mass: numpy array of floats, each float corresponds to the mass of each
     cluster
     :clst_df_list: list of pandas dataframes, each df contains the subhalos
-
+    :show_richness_cut: bool
+    :richness_cut: integer, what is the minimum number of subhalos for a
+        cluster to be considered
     """
-    from cycler import cycler
+    # from cycler import cycler
     if ax is None:
         fig = plt.figure()
         ax = fig.add_subplot(111)
@@ -163,10 +167,11 @@ def plot_mass_vs_richness(FoF_mass, clst_df_list, ax=None,
     ax.set_ylabel("Richness")
 
     # richness cut
-    # ax.axhline(50, color='k')
-    # ax.text(1.8e14, 55,"richness cut > 50", size=12)
-    # ax.arrow(1.6e14, 50, 0, 30, head_width=1e13, head_length=20,
-    #          fc='k', ec='k')
+    if show_richness_cut:
+        ax.axhline(50, color='k')
+        ax.text(1.8e14, 55,"richness cut > 50", size=12)
+        ax.arrow(1.6e14, 50, 0, 30, head_width=1e13, head_length=20,
+                 fc='k', ec='k')
 
 
     if not show:
@@ -210,6 +215,9 @@ def N_by_N_lower_triangle_plot(data, space, var_list, axlims=None,
     """
     from matplotlib.ticker import MaxNLocator
 
+    def comb_zip(ls1, ls2):
+        return [(lb1, lb2) for lb1 in ls1 for lb2 in ls2]
+
     # begin checking if inputs make sense
     N = len(var_list)
     assert N <= len(axlabels), "length of axlabels is wrong"
@@ -243,7 +251,7 @@ def N_by_N_lower_triangle_plot(data, space, var_list, axlims=None,
 
     # impossible for the matrix plot not to be squared in terms of dimensions
     # set each of the subplot to be squared with the figsize option
-    f, axarr = pylab.subplots(N, N, figsize=(figsize, figsize))
+    f, axarr = plt.subplots(N, N, figsize=(figsize, figsize))
     f.subplots_adjust(wspace=space, hspace=space)
 
     # remove unwanted plots on the upper right

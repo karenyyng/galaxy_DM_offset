@@ -4,56 +4,93 @@ License: BSD
 """
 from __future__ import division, print_function
 import matplotlib.pyplot as plt
+from matplotlib.patches import Ellipse
 # from matplotlib.mlab import bivariate_normal
 import numpy as np
-from matplotlib.patches import Ellipse
 # import rpy2.robjects as robjects
+
+# my own modules
+import calculate_astrophy_quantities as cal_astro
 
 
 def plot_color_mag_diag(df, bluer_band, redder_band, band_limit,
+                        highlight_mag_limit=24,
                         plot=False, save=False, subhalo_len_lim=1e3,
-                        savePath="../plots/", clst=None, verbose=False, *args,
-                        **kwargs):
+                        savePath="../plots/", clst=None, verbose=True,
+                        convert_to_apparent_mag=False, assume_z=0.3,
+                        highlight_observable_subhalos=True,
+                        fileprefix="color_magnitude_diagram_clst"
+                        ):
     """
     :parameters:
     df = pandas df of each cluster
     bluer_band = string, df colname
     red_band = string, df colname
     band_limit = float,
-        how many band magnitude fainter than BCG do we want to examine
+        how many band magnitude fainter than BCG do we want to show
+    highlight_mag = float,
+        the band limit below which we highlight because subhalos like those
+        should be observable
     particleLim = int,
-        want to ensure subhalos has at least that many particles
+        want to ensure subhalos has at least that many DM `particles`
+    savePath = string, file path directory to save to
+    clst = string, string or integer that denotes the ID of the cluster that is
+        visualized
+    verbose = bool, whether to show the plot or not
+    convert_to_apparent_mag = bool, whether to convert the absolute magitude to
+    apparent magnitude
+    assume_z = float, the cosmological redshift assumed when we converting
+    absolute magnitude to apparent magnitude
 
     :returns: None
 
     :stability: works
     """
+    # compute the color first
     bcg_i = df[redder_band].min()
     mask_i = df[redder_band] < bcg_i + band_limit
-
-    if verbose:
-        print("subhalos need at least {0} DM".format(subhalo_len_lim) +
-              " particles to be plotted")
-    # examine number of DM particles
-    mask_ii = df["SubhaloLenType1"] > subhalo_len_lim
-
-    mask_i = np.logical_and(mask_i, mask_ii)
-
     g_i = df[bluer_band][mask_i] - df[redder_band][mask_i]
 
-    plt.plot(df[redder_band][mask_i], g_i, "b.", alpha=0.3)
-    plt.title("Color-magnitude diagram for".format(clst) +
-              " {0} subhalos".format(np.sum(mask_i)))
+    if convert_to_apparent_mag and verbose:
+        print ("Converting apparent magnitude to absolute magnitude\n")
+        print ("assuming the cosmological redshift is z = {}".format(assume_z))
+
+        # convert the magnitude to absolute magnitude
+        Illustris_cosmo = cal_astro.get_Illustris_cosmology()
+        df['apparent_' + redder_band] = \
+            df[redder_band].apply(
+                lambda x:
+                cal_astro.convert_abs_mag_to_apparent_mag(x, Illustris_cosmo,
+                                                          z=assume_z))
+
+    # if verbose:
+    #     print("subhalos need at least {0} DM".format(subhalo_len_lim) +
+    #           " particles to be plotted")
+
+    # examine number of DM particles
+    mask_ii = df["SubhaloLenType1"] > subhalo_len_lim
+    mask_i = np.logical_and(mask_i, mask_ii)
+    observable_mask = df['apparent_' + redder_band] < 24
+
+    plt.plot(df['apparent_' + redder_band][mask_i], g_i, "b.", alpha=0.3)
+    plt.plot(df['apparent_' + redder_band][observable_mask], g_i, "r.",
+             alpha=0.7)
     plt.ylabel(bluer_band + " - " + redder_band)
     plt.xlabel(redder_band)
 
-    if clst is not None:
-        plt.title("Cluster {0}: Color-magnitude diagram for".format(clst) +
-                  " {0} subhalos".format(np.sum(mask_i)))
+    if clst is not None and not highlight_observable_subhalos:
+        plt.title("Cluster {0}: Color-magnitude diagram with".format(clst))
+
+    elif clst is not None and highlight_observable_subhalos:
+        plt.title("Cluster {0}: Color-magnitude diagram with".format(clst) +
+                  r" {0} subhalos with $i$ > {1}".format(np.sum(mask_i),
+                                                         highlight_mag_limit) +
+                  " assuming cosmological z = {}".format(assume_z)
+                  )
 
     if save is True:
         assert clst is not None, "arg for clst missing"
-        plt.savefig(savePath + "/cm_diagram{0}.png".format(clst),
+        plt.savefig(savePath + "/" + fileprefix + "{0}.eps".format(clst),
                     bbox_inches="tight")
     plt.close()
     return

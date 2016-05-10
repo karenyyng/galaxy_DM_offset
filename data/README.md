@@ -7,6 +7,10 @@
     in Illustris, there is an ID to identify to which Cluster / Group each
     subhalo belongs to. 
 
+# Particle types 
+* type 1 - DM particles 
+* type 4 - stellar particles 
+
 # Which file to look at for computing offsets      
 * `test_peak_df_129.h5`    
     * contains peak info: coordinates, indices in KDE grid, peak density etc. 

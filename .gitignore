@@ -11,4 +11,9 @@
 *.fls
 *.fdb_latexmk
 *.out
-
+*.pdf 
+*.eps
+*.png
+*.pkl
+*.csv
+*.tar.gz
