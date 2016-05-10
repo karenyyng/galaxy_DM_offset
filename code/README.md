@@ -5,15 +5,20 @@ if you want to work in a subdirectory of this directory.
 $ ln -s ../ks_KDE.r .
 ```
 
-# File organization 
-* python modules are placed at this directory
-* `analyses` contains scripts / notebooks that generate plots for paper
-* `EDA` are some exploratory data analyses that investigates aspects of
+# Folder organization 
+* python modules are placed at current directory
+* `analyses` contains scripts / notebooks that generate plots / results for paper
+* `prototypes` contains code for me to see if my module functions work or not 
+* `EDA` contains some exploratory data analyses that investigates aspects of
 Illustris data 
-* `prototypes` are code for me to see if my module functions work or not 
-* `tests` contain mainly working unit tests / tests that need to be implemented properly
+* `tests` contain unit tests / integration tests 
 
-# diagnostics of whether your installation works
+## Python modules 
+* `compute_distance.py` - helper functions for analyzing the outputs after
+    feature engineering 
+
+
+# Diagnostics of whether your `ks` R package installation works
 ```
 $ Rscript ks_KDE.r  # checks if R and R packages was installed properly
 ```

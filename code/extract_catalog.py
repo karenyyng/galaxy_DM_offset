@@ -185,10 +185,11 @@ def add_info(h5, info, h5_key="df", h5_subkey="info"):
 # ----------helper functions for getting DM particle data --------------------
 def get_DM_particles(clsts, partDMh5, h5part_coord_key="PartType1_Coordinates",
                      partDMhaloIxLoc_h5file="DM_particles_clst_loc.h5",
-                     dataPath="../data/",verbose=False):
+                     dataPath="../data/",verbose=False,
+                     shift_coords_for_hist=True):
     """This reads particle data from the h5 file stream, wraps and
-
     the coordinates of the particles.
+
     Parameters
     ----------
     clsts : list of integer(s), first clst has an ID of 0
@@ -202,6 +203,9 @@ def get_DM_particles(clsts, partDMh5, h5part_coord_key="PartType1_Coordinates",
         last DM particle of each halo
     dataPath : str (optional)
         where the data files are stored and is appended before file names
+    shift_coords_for_hist: bool (optional), default = True
+        whether if the spatial coordinates of histogram bins should be shifted
+        to be > 0
 
     Returns
     ------
@@ -214,19 +218,19 @@ def get_DM_particles(clsts, partDMh5, h5part_coord_key="PartType1_Coordinates",
         * then the min. coordinates are subtracted to make sure all coordinates are
         positive so we can make histograms with matplotlib
     """
-    # make sure we do not write to the file by using read-only mode
+    # Make sure we do not write to the file by using read-only mode
     part_halos = h5py.File(dataPath + partDMhaloIxLoc_h5file, "r")
 
-    # add 0 as first element of list so we can specify the range of location
+    # Add 0 as first element of list so we can specify the range of location
     # with the syntax below correctly
-    # we retrieve the end indices of all the particles within a cluster
+    # We retrieve the end indices of all the particles within a cluster
     haloEndIx = [0] + list(part_halos["loc"][...])
-    # extract coordinates from relevant parts of the h5 file
+    # Extract coordinates from relevant parts of the h5 file
     coords = {clstNo: partDMh5[h5part_coord_key][:, haloEndIx[clstNo]:
                                                  haloEndIx[clstNo + 1]]
               for clstNo in clsts}
 
-    # wrap and center coordinates then put it in a dictionary
+    # Wrap and center coordinates then put it in a dictionary
     coords = {clstNo: {"coords":
                        np.array(map(lambda x:
                                     wrap_and_center_coord(x,
@@ -237,17 +241,21 @@ def get_DM_particles(clsts, partDMh5, h5part_coord_key="PartType1_Coordinates",
                                     ))}
               for clstNo, crd in coords.iteritems()}
 
-    # compute min. coords and make (0, 0) to be min. coords for 2D histogram
-    # put the min. coords in the correct dictionary
+    # Compute min. coords and make (0, 0) to be min. coords for 2D histogram
+    # Put the min. coords in the correct dictionary
     # so we can shift all coordinates to original frame for the correct cluster
     # later on
     for clstNo, cl_dict in coords.iteritems():
-        cl_dict["min_coords"] = \
-            np.min(cl_dict["coords"], axis=1)\
-              .reshape(cl_dict["coords"].shape[0], 1)
+        if shift_coords_for_hist:
+            cl_dict["min_coords"] = \
+                np.min(cl_dict["coords"], axis=1)\
+                .reshape(cl_dict["coords"].shape[0], 1)
 
-        cl_dict["coords"] = (cl_dict["coords"] -
-                             cl_dict["min_coords"]).transpose()
+            cl_dict["coords"] = (cl_dict["coords"] -
+                                cl_dict["min_coords"]).transpose()
+        else:
+            cl_dict["coords"] = cl_dict["coords"].transpose()
+
 
     return coords
 
@@ -281,6 +289,7 @@ def check_particle_parent_clst(particle_halo_id, clsts=129,
                 return loc
         count += 1
     return loc
+
 
 
 

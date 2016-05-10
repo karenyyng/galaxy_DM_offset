@@ -2,6 +2,7 @@
 """
 from __future__ import (print_function,
                         division, absolute_import)
+import logging
 import pandas as pd
 import os
 
@@ -9,11 +10,16 @@ from datetime import datetime
 datetime_stamp = datetime.now().strftime("%D").replace('/', '_')
 
 # =========== Decide what to output ============================
+
 dataPath = "../../data/"
-total_clstNo = 3
+start_clstNo = 13
+total_clstNo = 5
+logging_filename = "star_logging_{0}_{1}.log".format(total_clstNo,
+                                                     datetime_stamp)
+
 # =========== Decide what to output ============================
-assert total_clstNo <=128 and total_clstNo >= 0, \
-    "0 <= total_clstNo <= 128"
+assert total_clstNo <=128 and total_clstNo > 0, \
+    "0 < total_clstNo <= 128"
 output_fhat_filename = \
     "test_stars_fhat_clst{0}_{1}.h5".format(total_clstNo, datetime_stamp)
 StoreFile = \
@@ -21,6 +27,7 @@ StoreFile = \
 if os.path.isfile(dataPath + StoreFile):
     os.remove(dataPath + StoreFile)
 store = pd.HDFStore(dataPath + StoreFile)
+logging.basicConfig(filename=logging_filename, level=logging.INFO)
 
 import numpy as np
 import sys
@@ -44,7 +51,8 @@ pos_cols = ["SubhaloPos{0}".format(i) for i in range(3)]
 metadata = OrderedDict({})
 
 # no. of clsters - want these as strings, not int!
-metadata["clstNo"] = [str(i) for i in range(128-total_clstNo, 128)]  #  range(129)
+metadata["clstNo"] = [str(i) for i in range(start_clstNo,
+                                            start_clstNo + total_clstNo)]  #  range(129)
 
 # cuts
 cut_kwargs = {"DM_cut": 1e3, "star_cut": 5e2}
@@ -58,15 +66,15 @@ metadata["weights"] = OrderedDict({
     })
 
 # projections
-nside = 1  # nsides of HEALpix are powers of 2, pix for 16 nsides = 3072 / 2
+nside = 2  # nsides of HEALpix are powers of 2, pix for 16 nsides = 3072 / 2
 metadata["los_axis"] = [str(1)]  # use z-axis as los axis
 
 # Want to use string as key, not floats!
-metadata["xi"], metadata["phi"] = getg.angles_given_HEALpix_nsides(nside)
+metadata["phi"], metadata["xi"] = getg.angles_given_HEALpix_nsides(nside)
 metadata["xi"] = ['{0:1.10f}'.format(xi) for xi in metadata["xi"]]
 metadata["phi"] = ['{0:1.10f}'.format(phi) for phi in metadata["phi"]]
 
-print (
+logging.info (
     "{} projections per cluster are constructed".format(len(metadata["xi"])))
 
 # ============== set up output file structure  ===========
@@ -84,8 +92,9 @@ h5_fstream = \
 # ============== prepare data based on the metadata ===========
 clst_metadata = OrderedDict({})
 for clstNo in metadata["clstNo"]:
-    print ("processing clst {0} ".format(int(clstNo) + 1) +
-           "out of {0}".format(len(metadata["clstNo"])))
+    logging.info("Processing clst {0} ".format(int(clstNo)) +
+                 "out of the range {0} to {1}".format(metadata['clstNo'][0],
+                                                      metadata['clstNo'][-1]))
     peak_df = pd.DataFrame()
     clst_metadata["clstNo"] = clstNo
     df = ext_cat.extract_clst(original_f, clstNo)
@@ -115,8 +124,8 @@ for clstNo in metadata["clstNo"]:
                                                clst_metadata["phi"],
                                                los_axis=los_axis)
 
-                    col = np.arange(data.shape[1]) != int(los_axis)
-                    data = data[:, col]
+                    cols = np.arange(data.shape[1]) != int(los_axis)
+                    data = data[:, cols]
 
                     fhat = KDE.do_KDE_and_get_peaks(data, weights)
                     # This is not needed since the offset will be computed
@@ -127,7 +136,7 @@ for clstNo in metadata["clstNo"]:
                         getg.convert_dict_peaks_to_df(fhat, clst_metadata)
                     store.append("peak_df", peak_df)
 
-                    # clst_metadata[cut + 'richness'] = richness
+                    # clst_metadata[cut + '_richness'] = richness['min']
                     getg.convert_dict_dens_to_h5(fhat, clst_metadata,
                                                  h5_fstream)
 

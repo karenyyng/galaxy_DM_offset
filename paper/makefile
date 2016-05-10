@@ -1,5 +1,6 @@
 PROJECT=galaxyDMoffset
 OUTPUTDIR=/Users/karenyng/Documents/Illustris_analysis/paper
+FIGURES := $(shell echo ./figures/finalized/*)
 
 # You want latexmk to *always* run, because make does not have all the info.
 # Also, include non-file targets in .PHONY so they are run regardless of any
@@ -32,7 +33,7 @@ all: $(PROJECT).pdf
 # -interactive=nonstopmode keeps the pdflatex backend from stopping at a
 # missing file reference and interactively asking you for an alternative.
 
-$(PROJECT).pdf:$(PROJECT).tex illustris_main_text.tex
+$(PROJECT).pdf:$(PROJECT).tex illustris_main_text.tex illustris_appendix.tex $(FIGURES)
 	latexmk -pdf -pdflatex="pdflatex -interaction=nonstopmode " -use-make  $(PROJECT).tex 
 
 # make sure that .aux files are not removed since they tell latex 

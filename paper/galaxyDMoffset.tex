@@ -1,11 +1,6 @@
 \documentclass[usenatbib]{mn2e}
+\usepackage{float}
 \usepackage[pdftex]{graphicx}
-\newcommand{\be}{\begin{equation}}
-\newcommand{\ee}{\end{equation}}
-\newcommand{\bea}{\begin{eqnarray}}
-\newcommand{\eea}{\end{eqnarray}}
-\newcommand{\bc}{\begin{center}}
-\newcommand{\ec}{\end{center}}
 \newcommand{\ol}[1]{ {\overline{#1}}}
 \newcommand{\lu}{\,h^{-1}{\rm kpc}}
 \renewcommand{\vec}[1]{ {\bmath #1} } 
@@ -72,7 +67,10 @@
 \usepackage[]{algorithm2e}
 \usepackage[update,prepend]{epstopdf}
 \epstopdfsetup{outdir=./figures/finalized/}
-\graphicspath{{./figures/finalized}{figures/drafts/}}
+% the search path of the figures for this latex file 
+% REMEMBER to add / at the END of the path
+\graphicspath{{figures/finalized/}}
+% \graphicspath{{./figures/finalized}{figures/drafts/}}
 
 \newcommand{\mc}[1]{\multicolumn{1}{c}{#1}} % handy shortcut macro
 %-----------------------------------------------------------------------
@@ -130,6 +128,12 @@ Illustris simulation}
 \end{keywords}
 
 \input{illustris_main_text}
+
+\bibliographystyle{mn2e}
+\bibliography{galaxyDMoffset}
+% \bibliography{R_package}
+\appendix
+\input{illustris_appendix}
 
 \clearpage\bsp\label{lastpage} 
 \end{document}
