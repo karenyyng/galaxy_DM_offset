@@ -84,6 +84,25 @@ peak of DM respectively.
 Finally, we provide the distribution and investigate which quantities that are most
 correlated with of $\Delta s$.
 
+\begin{figure*}
+	\includegraphics[width=\linewidth]{clusterMassDist.eps}
+	\caption{ {\bf Left figure:} Mass distribution of the group / cluster sized 
+		DM halos for different halo selection schemes. Mass estimates obtained by the
+		FOF algorithm are labeled as  M$_{\text{FoF}}$.
+		Masses centered on the most bound particle within a radius those the 
+		average density is 200 or 500 times the critical density of the universe are 
+		labeled as M$_{200c}$ and M$_{500c}$ respectively. 
+		Discrepancies between the different
+		measures of mass of the clusters indicate the presence of spatially
+		separated substructures for the clusters (See Fig. 
+		\ref{fig:select_peak_visualization}). {\bf Right figure:} 
+		Mass-richness relationship of galaxy clusters and groups with 
+		$M_{\rm FoF} > 10^{13} M_{\sun}$ . We require clusters to have more than 50 member 
+		galaxies that are above observation limit, i.e. apparent $i \leq 24$ when 
+		we assume a cosmological redshift
+of $z=0.4$, as shown by the richness cut. \label{fig:mass_richness}}
+\end{figure*}
+
 % Basic setup 
 The organization of this paper is as follows:
 In section \ref{sec:illustris_sim}, we will describe the physical properties of 
@@ -107,6 +126,8 @@ km~s$^{-1}$~Mpc$^{-1}$.
 
 \section{THE ILLUSTRIS SIMULATION DATA} 
 \label{sec:illustris_sim}
+
+
 The Illustris simulation that we made use of contains some of the most
 realistic, simulated galaxies to date. We obtained our data from 
 snapshot number 135 of the Illustris-1 simulation ($z=0$). The Illustris-1
@@ -137,13 +158,14 @@ While \texttt{Subfind} was used to identify the affinity of particles
 
 The observation bands available in the Illustris data include the $u, g, r, i,
 z$ bands. 
+
 \begin{figure}
 	\centering
 	\includegraphics[width=\linewidth]{Fig1_color_magnitude_diagram.png}
 	\caption{Color-magnitude diagram of one of the galaxy clusters that is selected for 
 		analysis. This cluster is the 9th most massive. 
 		The apparent magnitude is calculated assuming that 
-		the cosmological redshift (distance) is $z = 0.4$. 
+		the cosmological redshift (distance) is $z = 0.3$. 
 		We can see a clear red-sequence.
 		\label{fig:color_magnitude_diagram}
 	} 
@@ -154,23 +176,6 @@ This is because of the relatively large statistical uncertainty from if we try
 to analyze clusters with less than 50 member galaxies. 
 
 
-\begin{figure*}
-	\includegraphics[width=\linewidth]{clusterMassDist.eps}
-	\caption{ {\bf Left figure:} Mass distribution of the group / cluster sized 
-		DM halos for different halo selection schemes. Mass estimates obtained by the
-		FOF algorithm are labeled as  M$_{\text{FoF}}$.
-		Masses centered on the most bound particle within a radius those the 
-		average density is 200 or 500 times the critical density of the universe are 
-		labeled as M$_{200c}$ and M$_{500c}$ respectively. 
-		Discrepancies between the different
-		measures of mass of the clusters indicate the presence of spatially
-		separated substructures for the clusters (See Fig ? ). {\bf Right figure:} 
-		Mass-richness relationship of galaxy clusters and groups with 
-		$M_{\rm FoF} > 10^{13} M_{\sun}$ . We require clusters to have more than 50 member 
-		galaxies that are above observation limit, i.e. apparent $i \leq 24$ when 
-		we assume a cosmological redshift
-of $z=0.4$, as shown by the richness cut. \label{fig:mass_richness}}
-\end{figure*}
 
 % LSST goes as deep as 27.5
 
@@ -250,8 +255,6 @@ The viewing angles of the projections are defined by an elevation angle
 $\xi$ and an azimuthal angle $\phi$. 
 The number of projections that we employed is FILL IN A NUMBER.
 
-
-
 \begin{table*}
 \begin{center}
 \begin{minipage}{180mm} 
@@ -288,12 +291,6 @@ For example, the star formation rates of cluster galaxies are known to be
 suppressed by the high concentration of intracluster medium. (CITE)
 One of the most common weighting schemes employed for galaxy data is to weight
 by the luminosity in a particular band.
-
-% \begin{figure*}
-% 	\includegraphics[width=.95\linewidth]{figures/ph_fig_richnessAndColorMagnitudes.pdf}
-% 	\caption{/
-% 		\label{fig:config}}
-% \end{figure*}
 
 \section{METHODS}\label{sec:methods}
 
@@ -443,7 +440,7 @@ The band in which we picked the BCG for presentation is the $i$-band.
 	\caption{Comparison of peak finding performances of different methods. Panels
 		from the top row contain data drawn from a single Gaussian mixture. The
 	second row panels contain data from two Gaussian mixtures. }
-		% \label{fig:config}}
+		\label{fig:toy_data_mixtures}}
 \end{figure*}
 
 
@@ -451,7 +448,7 @@ The band in which we picked the BCG for presentation is the $i$-band.
 \subsection{Comparison of the methods from test data}
 In order to examine the performance of commonly used point-estimates of the
 distribution of the galaxy data, we test them on data drawn from Gaussian mixtures with
-known mean and variance. (See \ref{})\\
+known mean and variance. (See \ref{fig:toy_data_mixtures})\\
 We compare the properties and performance of each of the
 methods for finding the peaks of the galaxy and dark matter. 
 The main factors that affect the performance of the methods depend heavily on
@@ -483,7 +480,7 @@ Hoag et al. (in prep) has performed simulation for inferring the optimal size
 for a Gaussian smoothing kernel. 
 In the strong lensing regime, Hoag et al. found a resolution of 11 arcseconds
 can best maximize the fit. This kernel translates to a physical size of [TODO]
-kpc assuming a cosmological redshift of [TODO] $z = 0.4$.
+kpc assuming a cosmological redshift of [TODO] $z = 0.3$.
 To infer the 2D projected density from Illustris-1, 
 we constructed (smoothed) histograms of the DM
 particles of each selected galaxy cluster. 
