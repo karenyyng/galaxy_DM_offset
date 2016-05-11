@@ -93,8 +93,8 @@ def plot_color_mag_diag(df, bluer_band, redder_band, band_limit,
 
     elif clst is not None and highlight_observable_subhalos:
         plt.title("Cluster {0}: ".format(clst) +
-                  r"with {0} subhalos with $i$ > {1}".format(np.sum(mask_i),
-                                                         highlight_mag_limit) +
+                  r"with {0} subhalos with $i$ < {1}".format(
+                      np.sum(observable_mask), highlight_mag_limit) +
                   "\n assuming cosmological z = {}".format(assume_z)
                   )
 
