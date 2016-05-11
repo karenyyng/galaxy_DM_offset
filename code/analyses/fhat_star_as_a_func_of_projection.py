@@ -12,10 +12,11 @@ datetime_stamp = datetime.now().strftime("%D").replace('/', '_')
 # =========== Decide what to output ============================
 
 dataPath = "../../data/"
-start_clstNo = 13
 total_clstNo = 5
-logging_filename = "star_logging_{0}_{1}.log".format(total_clstNo,
-                                                     datetime_stamp)
+clstID_h5filepath = dataPath + "rich_cluster_ID.h5"
+# start_clstNo = 13
+logging_filename = "star_logging_{0}_{1}.log".format(
+    total_clstNo, datetime_stamp)
 
 # =========== Decide what to output ============================
 assert total_clstNo <=128 and total_clstNo > 0, \
@@ -43,7 +44,9 @@ verbose = True
 import h5py
 original_f = h5py.File(dataPath +
                        "Illustris-1_fof_subhalo_myCompleteHaloCatalog_00135" +
-                       ".hdf5")
+                       ".hdf5", "r")
+
+clstID_h5file = h5py.File(clstID_h5filepath, "r")
 
 # ================ make science related decisions ===========================
 
@@ -51,8 +54,9 @@ pos_cols = ["SubhaloPos{0}".format(i) for i in range(3)]
 metadata = OrderedDict({})
 
 # no. of clsters - want these as strings, not int!
-metadata["clstNo"] = [str(i) for i in range(start_clstNo,
-                                            start_clstNo + total_clstNo)]  #  range(129)
+metadata["clstNo"] = \
+    clstID_h5file["rich_cluster_ID"][:total_clstNo]
+    # [str(i) for i in range(start_clstNo, start_clstNo + total_clstNo)]  #  range(129)
 
 # cuts
 cut_kwargs = {"DM_cut": 1e3, "star_cut": 5e2}
