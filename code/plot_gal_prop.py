@@ -17,9 +17,10 @@ def plot_color_mag_diag(df, bluer_band, redder_band, band_limit,
                         highlight_mag_limit=24,
                         plot=False, save=False, subhalo_len_lim=1e3,
                         savePath="../plots/", clst=None, verbose=True,
-                        convert_to_apparent_mag=False, assume_z=0.3,
+                        convert_to_apparent_mag=True, assume_z=0.3,
                         highlight_observable_subhalos=True,
-                        fileprefix="color_magnitude_diagram_clst"
+                        fileprefix="color_magnitude_diagram_clst",
+                        closePlot=False, showPlot=True
                         ):
     """
     :parameters:
@@ -49,12 +50,13 @@ def plot_color_mag_diag(df, bluer_band, redder_band, band_limit,
     # compute the color first
     bcg_i = df[redder_band].min()
     mask_i = df[redder_band] < bcg_i + band_limit
-    g_i = df[bluer_band][mask_i] - df[redder_band][mask_i]
+    g_i = df[bluer_band] - df[redder_band]
 
     if convert_to_apparent_mag and verbose:
         print ("Converting apparent magnitude to absolute magnitude\n")
         print ("assuming the cosmological redshift is z = {}".format(assume_z))
 
+    if convert_to_apparent_mag:
         # convert the magnitude to absolute magnitude
         Illustris_cosmo = cal_astro.get_Illustris_cosmology()
         df['apparent_' + redder_band] = \
@@ -72,27 +74,41 @@ def plot_color_mag_diag(df, bluer_band, redder_band, band_limit,
     mask_i = np.logical_and(mask_i, mask_ii)
     observable_mask = df['apparent_' + redder_band] < 24
 
-    plt.plot(df['apparent_' + redder_band][mask_i], g_i, "b.", alpha=0.3)
-    plt.plot(df['apparent_' + redder_band][observable_mask], g_i, "r.",
-             alpha=0.7)
-    plt.ylabel(bluer_band + " - " + redder_band)
-    plt.xlabel(redder_band)
+    if convert_to_apparent_mag:
+        plt.plot(df['apparent_' + redder_band][mask_i],
+                 g_i[mask_i], "k.", alpha=0.2)
+        plt.plot(df['apparent_' + redder_band][observable_mask],
+                 g_i[observable_mask], "b.",
+                alpha=0.5)
+    else:
+        plt.plot(df[redder_band][mask_i], g_i[mask_i], "k.", alpha=0.3)
+
+    label_bluer_band = bluer_band.replace("_", "-")
+    label_redder_band = redder_band.replace("_", "-")
+    plt.ylabel(label_bluer_band + " - " + label_redder_band)
+    plt.xlabel(label_redder_band)
 
     if clst is not None and not highlight_observable_subhalos:
         plt.title("Cluster {0}: Color-magnitude diagram with".format(clst))
 
     elif clst is not None and highlight_observable_subhalos:
-        plt.title("Cluster {0}: Color-magnitude diagram with".format(clst) +
-                  r" {0} subhalos with $i$ > {1}".format(np.sum(mask_i),
+        plt.title("Cluster {0}: ".format(clst) +
+                  r"with {0} subhalos with $i$ > {1}".format(np.sum(mask_i),
                                                          highlight_mag_limit) +
-                  " assuming cosmological z = {}".format(assume_z)
+                  "\n assuming cosmological z = {}".format(assume_z)
                   )
 
     if save is True:
         assert clst is not None, "arg for clst missing"
         plt.savefig(savePath + "/" + fileprefix + "{0}.eps".format(clst),
                     bbox_inches="tight")
-    plt.close()
+
+    if showPlot:
+        plt.show()
+
+    if closePlot:
+        plt.close()
+
     return
 
 
