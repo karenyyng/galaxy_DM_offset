@@ -14,7 +14,7 @@ import calculate_astrophy_quantities as cal_astro
 
 
 def plot_color_mag_diag(df, bluer_band, redder_band, band_limit,
-                        highlight_mag_limit=24,
+                        title_mag_limit=24.4,
                         plot=False, save=False, subhalo_len_lim=1e3,
                         savePath="../plots/", clst=None, verbose=True,
                         convert_to_apparent_mag=True, assume_z=0.3,
@@ -29,7 +29,7 @@ def plot_color_mag_diag(df, bluer_band, redder_band, band_limit,
     red_band = string, df colname
     band_limit = float,
         how many band magnitude fainter than BCG do we want to show
-    highlight_mag = float,
+    title_mag_limit = float,
         the band limit below which we highlight because subhalos like those
         should be observable
     particleLim = int,
@@ -72,7 +72,7 @@ def plot_color_mag_diag(df, bluer_band, redder_band, band_limit,
     # examine number of DM particles
     mask_ii = df["SubhaloLenType1"] > subhalo_len_lim
     mask_i = np.logical_and(mask_i, mask_ii)
-    observable_mask = df['apparent_' + redder_band] < 24
+    observable_mask = df['apparent_' + redder_band] < title_mag_limit
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
@@ -94,14 +94,16 @@ def plot_color_mag_diag(df, bluer_band, redder_band, band_limit,
     ax.set_ylabel(label_bluer_band + " - " + label_redder_band)
     ax.set_xlabel(label_redder_band)
 
+    ax.set_ylim(0, 0.5)
+
     if clst is not None and not highlight_observable_subhalos:
         ax.set_title("Cluster {0}: Color-magnitude diagram with".format(clst))
 
     elif clst is not None and highlight_observable_subhalos:
         ax.set_title("Cluster {0}: ".format(clst) +
                   r"with {0} subhalos with $i$ < {1}".format(
-                      np.sum(observable_mask), highlight_mag_limit) +
-                  "\n assuming cosmological z = {}".format(assume_z)
+                      np.sum(observable_mask), title_mag_limit) +
+                  "\n assuming cosmological z = {}".format(assume_z),
                   )
 
     if save is True:
