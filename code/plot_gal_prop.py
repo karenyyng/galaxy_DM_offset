@@ -74,25 +74,31 @@ def plot_color_mag_diag(df, bluer_band, redder_band, band_limit,
     mask_i = np.logical_and(mask_i, mask_ii)
     observable_mask = df['apparent_' + redder_band] < 24
 
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.tick_params(labeltop='off', labelright='off')
+    ax.yaxis.set_ticks_position('left')
+    ax.xaxis.set_ticks_position('bottom')
+
     if convert_to_apparent_mag:
-        plt.plot(df['apparent_' + redder_band][mask_i],
-                 g_i[mask_i], "k.", alpha=0.2)
-        plt.plot(df['apparent_' + redder_band][observable_mask],
-                 g_i[observable_mask], "b.",
-                alpha=0.5)
+        ax.plot(df['apparent_' + redder_band][mask_i],
+                 g_i[mask_i], "bo", fillstyle='none')
+        # ax.plot(df['apparent_' + redder_band][observable_mask],
+        #          g_i[observable_mask], "bo", fillstyle='none',
+        #         alpha=0.5)
     else:
-        plt.plot(df[redder_band][mask_i], g_i[mask_i], "k.", alpha=0.3)
+        ax.plot(df[redder_band][mask_i], g_i[mask_i], "k.", alpha=0.3)
 
     label_bluer_band = bluer_band.replace("_", "-")
     label_redder_band = redder_band.replace("_", "-")
-    plt.ylabel(label_bluer_band + " - " + label_redder_band)
-    plt.xlabel(label_redder_band)
+    ax.set_ylabel(label_bluer_band + " - " + label_redder_band)
+    ax.set_xlabel(label_redder_band)
 
     if clst is not None and not highlight_observable_subhalos:
-        plt.title("Cluster {0}: Color-magnitude diagram with".format(clst))
+        ax.set_title("Cluster {0}: Color-magnitude diagram with".format(clst))
 
     elif clst is not None and highlight_observable_subhalos:
-        plt.title("Cluster {0}: ".format(clst) +
+        ax.set_title("Cluster {0}: ".format(clst) +
                   r"with {0} subhalos with $i$ < {1}".format(
                       np.sum(observable_mask), highlight_mag_limit) +
                   "\n assuming cosmological z = {}".format(assume_z)
