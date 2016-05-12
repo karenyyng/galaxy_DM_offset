@@ -26,4 +26,8 @@ $ pip install -r /code/package_version.txt
 ```
 You are advised to install the package prerequisites to a python virtual environment.
 
+# Figures 
+Jupyter notebook for making 
 
+* [Fig. 1](https://github.com/karenyyng/galaxy_DM_offset/blob/master/code/analyses/fig1_mass_richness_cuts.ipynb)
+* [Fig. 2](https://github.com/karenyyng/galaxy_DM_offset/blob/master/code/analyses/fig2_color_magnitude_diagram.ipynb)
