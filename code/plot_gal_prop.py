@@ -100,10 +100,11 @@ def plot_color_mag_diag(df, bluer_band, redder_band, band_limit,
         ax.set_title("Cluster {0}: Color-magnitude diagram with".format(clst))
 
     elif clst is not None and highlight_observable_subhalos:
-        ax.set_title("Cluster {0}: ".format(clst) +
-                  r"with {0} subhalos with $i$ < {1}".format(
-                      np.sum(observable_mask), title_mag_limit) +
-                  "\n assuming cosmological z = {}".format(assume_z),
+        ax.set_title("Cluster {0} ".format(clst) +
+                  r"with {0} subhalos with ".format(np.sum(observable_mask)) +
+                     "\napparent $i$ < {0}".format(title_mag_limit) +
+                  " assuming cosmological z = {}".format(assume_z),
+                     fontsize=14
                   )
 
     if save is True:
