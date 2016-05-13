@@ -321,7 +321,7 @@ def construct_h5_file_for_saving_fhat(metadata, dens_h5,
     # add metadata to the largest entry of each group!
     lvl1.attrs['info'] = metadata.keys()[0]  # clstNo
     lvl2.attrs['info'] = metadata.keys()[1]  # cuts
-    lvl3.attrs['info'] = metadata.keys()[2]  #
+    lvl3.attrs['info'] = metadata.keys()[2]  # etc
     lvl4.attrs['info'] = metadata.keys()[3]
     lvl5.attrs['info'] = metadata.keys()[4]
     lvl5[np.unique(metadata["phi"])[-1]].attrs['info'] = metadata.keys()[5]

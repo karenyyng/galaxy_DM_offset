@@ -215,8 +215,12 @@ def construct_h5_file_for_saving_fhat(metadata, dens_h5,
                                 print(
                                     "ValueError raised due to creating existing groups")
 
-                            for kernel_width in metadata["kernel_width"]:
-                                lvl6.create_group(str(kernel_width))
+                            for sig_fraction in metadata["sig_fraction"]:
+                                lvl7 = lvl6.create_group(str(sig_fraction))
+
+                                for kernel_width in metadata["kernel_width"]:
+                                    lvl7.create_group(str(kernel_width))
+
 
 
     # write out the metadata to the smallest value entry of each group:
@@ -226,7 +230,8 @@ def construct_h5_file_for_saving_fhat(metadata, dens_h5,
     lvl4.attrs['info'] = "los_axis"
     lvl5.attrs['info'] = "xi"
     lvl6.attrs['info'] = "phi"
-    lvl6[metadata["kernel_width"][0]].attrs['info'] = "kernel_width"
+    lvl7.attrs['info'] = "sig_fraction"
+    lvl7[metadata['kernel_width'][-1]].attrs['info'] = "kernel_width"
 
     return h5_fstream
 

@@ -72,7 +72,7 @@ star_gpBy, star_gpBy_keys = \
 
 DM_resolution = 2.  # kpc
 DM_metadata["kernel_width"] = np.array([0, 50]) / DM_resolution
-sig_fraction = 0.2
+DM_metadata["sig_fraction"] = 0.2
 
 # ============== set up output file structure  ===========
 
@@ -189,7 +189,7 @@ for i, clstNo in enumerate(DM_metadata["clstNo"]):
                         fhat["good_threshold"], _ = \
                             getDM.apply_peak_num_threshold(
                                 fhat_stars["peaks_dens"],
-                                fhat, sig_fraction=sig_fraction
+                                fhat, sig_fraction=DM_metadata["sig_fraction"]
                             )
                         threshold_mask = \
                             fhat["peaks_dens"] > fhat['good_threshold']

@@ -196,6 +196,20 @@ def test_construct_h5_file_for_saving_fhat():
     return
 
 
+def test_galaxies_closest_to_peak():
+    col = [0, 1]
+    df = pd.DataFrame([[i, i] for i in np.arange(10)], columns=col)
+    peak_coords = [(3.25, 3.5), (1., 1.5)]
+
+    dist, ixes = galaxies_closest_to_peak(df, col, peak_coords,
+                                          k_nearest_neighbor=1)
+    # KDTree.query returns an integer if k_nearest_neighbor = 1
+    assert ixes[0] == 3
+    assert ixes[1] == 1
+
+    return
+
+
 # def test_rot_projection_of_project_coords():
 #     # to avoid numerical error due to 0 becomes very small number
 #     # we use allclose to check answers instead
@@ -227,21 +241,6 @@ def test_construct_h5_file_for_saving_fhat():
 #                                           radian=False),
 #                            np.array(ans[i]))
 #     return
-
-
-def test_galaxies_closest_to_peak():
-    col = [0, 1]
-    df = pd.DataFrame([[i, i] for i in np.arange(10)], columns=col)
-    peak_coords = [(3.25, 3.5), (1., 1.5)]
-
-    dist, ixes = galaxies_closest_to_peak(df, col, peak_coords,
-                                          k_nearest_neighbor=1)
-    # KDTree.query returns an integer if k_nearest_neighbor = 1
-    assert ixes[0] == 3
-    assert ixes[1] == 1
-
-    return
-
 
 # def test_angles_given_HEALpix_nsides():
 #     """regression test"""
