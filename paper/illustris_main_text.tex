@@ -85,7 +85,7 @@ Finally, we provide the distribution and investigate which quantities that are m
 correlated with of $\Delta s$.
 
 \begin{figure*}
-	\includegraphics[width=\linewidth]{clusterMassDist.eps}
+	\includegraphics[width=\linewidth]{fig1_mass_richness.eps}
 	\caption{ {\bf Left figure:} Mass distribution of the group / cluster sized 
 		DM halos for different halo selection schemes. Mass estimates obtained by the
 		FOF algorithm are labeled as  M$_{\text{FoF}}$.
@@ -98,9 +98,10 @@ correlated with of $\Delta s$.
 		\ref{fig:select_peak_visualization}). {\bf Right figure:} 
 		Mass-richness relationship of galaxy clusters and groups with 
 		$M_{\rm FoF} > 10^{13} M_{\sun}$ . We require clusters to have more than 50 member 
-		galaxies that are above observation limit, i.e. apparent $i \leq 24$ when 
+		galaxies that are above observation limit, i.e. apparent $i \leq 24.4$ when 
 		we assume a cosmological redshift
-of $z=0.4$, as shown by the richness cut. \label{fig:mass_richness}}
+of $z=0.3$, as shown by the richness cut. A total of 43 clusters have 
+richness $> 50$ under this cut. \label{fig:mass_richness}}
 \end{figure*}
 
 % Basic setup 
@@ -154,19 +155,21 @@ dark matter structures. These galaxy-size halos are also referred to as
 subhalos, the dark matter host of what we refer to as galaxies in Illustris-1. 
 
 Data matter data:
-While \texttt{Subfind} was used to identify the affinity of particles 
+While {\bf \texttt{Subfind}} was used to identify the affinity of particles 
 
 The observation bands available in the Illustris data include the $u, g, r, i,
 z$ bands. 
 
 \begin{figure}
 	\centering
-	\includegraphics[width=\linewidth]{Fig1_color_magnitude_diagram.png}
+	\includegraphics[width=\linewidth]{fig2_color_magnitude_diagram9.eps}
 	\caption{Color-magnitude diagram of one of the galaxy clusters that is selected for 
 		analysis. This cluster is the 9th most massive. 
 		The apparent magnitude is calculated assuming that 
 		the cosmological redshift (distance) is $z = 0.3$. 
-		We can see a clear red-sequence.
+		We can see a clear overdense region that corresponds to a red-sequence.
+		The color-magnitude diagrams of the other clusters can be found in the
+		Jupyter notebook at \href{https://github.com/karenyyng/galaxy_DM_offset/blob/master/code/analyses/fig2_color_magnitude_diagram.ipynb}{https://goo.gl/TJmI6s}.
 		\label{fig:color_magnitude_diagram}
 	} 
 \end{figure}
@@ -217,7 +220,7 @@ Data &  Selection strategy  & Sensitivity & Relevant section  \\ \hline
 Field of view (FOV) & FOF halo finder& comparable to FOV of the Subaru
 Suprime camera &   \\ 
 Observed filter & $i$-band & consistent over the redder $r, i, z$ bands &   \\ 
-Richness of member galaxies & $i \leq 24$ and $z = 0.4$  & sensitive to
+Cluster richness  & $i \leq 24.4$ and $z = 0.3$  & sensitive to
 the assumed cosmological redshift of cluster and &    \\ 
 & & the assumed limiting magnitude of telescope &   \\
 Two-dimensional projections & even HealPix samples over half a sphere &
@@ -436,10 +439,10 @@ bands and found that they give consistent results for all selected clusters.
 The band in which we picked the BCG for presentation is the $i$-band. 
 
 \begin{figure*}
-	\includegraphics[width=.95\linewidth]{ph_fig_galaxycenter_mixtureTests.pdf}
+	\includegraphics[width=.95\linewidth]{fig3_toy_data_mixtures.eps}
 	\caption{Comparison of peak finding performances of different methods. Panels
 		from the top row contain data drawn from a single Gaussian mixture. The
-	second row panels contain data from two Gaussian mixtures. }
+	second row panels contain data from two Gaussian mixtures. 
 		\label{fig:toy_data_mixtures}}
 \end{figure*}
 
