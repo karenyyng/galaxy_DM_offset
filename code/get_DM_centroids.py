@@ -144,6 +144,7 @@ def retrieve_DM_metadata_from_gal_metadata(dataPath, gal_metadata_h5_file,
     from collections import OrderedDict
 
     metadata_df = pd.read_hdf(dataPath + gal_metadata_h5_file, h5key)
+
     if keys is None:
         keys = ["clstNo", "cut", "weights", "los_axis",  ("xi", "phi")]
 
@@ -177,6 +178,9 @@ def construct_h5_file_for_saving_fhat(metadata, dens_h5,
 
     :returns: hdf5 filestream
     """
+    import collections
+    if type(metadata) != collections.OrderedDict:
+        raise TypeError("metadata needs to be an OrderedDict.")
 
     import h5py
     h5_fstream = h5py.File(output_path + dens_h5,
@@ -215,6 +219,14 @@ def construct_h5_file_for_saving_fhat(metadata, dens_h5,
                                 lvl6.create_group(str(kernel_width))
 
 
+    # write out the metadata to the smallest value entry of each group:
+    lvl1.attrs['info'] = "clstNo"
+    lvl2.attrs['info'] = "cut"
+    lvl3.attrs['info'] = "weights"
+    lvl4.attrs['info'] = "los_axis"
+    lvl5.attrs['info'] = "xi"
+    lvl6.attrs['info'] = "phi"
+    lvl6[metadata["kernel_width"][0]].attrs['info'] = "kernel_width"
 
     return h5_fstream
 
@@ -241,6 +253,7 @@ def convert_dict_dens_to_h5(fhat, clst_metadata, h5_fstream, verbose=False):
                 h5_fstream[thispath] = fhat[k][i]
 
     return
+
 
 #  -stuff below this line are unstable but may be used if all else fails -----
 

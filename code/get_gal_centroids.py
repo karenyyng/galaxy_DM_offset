@@ -262,10 +262,25 @@ def convert_dict_peaks_to_df(fhat, metadata,
 def construct_h5_file_for_saving_fhat(metadata, dens_h5,
                                       output_path="../../data/"):
     """
+    constructs the skeleton of the hdf5 file using an OrderedDict to capture
+    its structure.
+
+    metadata is assumed to have the following keys:
+        * "clstNo"
+        * "cut"
+        * "weights"
+        * "los_axis"
+        * "xi"
+        * "phi"
     :metadata: OrderedDict, keys correspond to the projections
     :dens_h5: h5 file stream
     """
     import h5py
+    import collections
+
+    if type(metadata) != collections.OrderedDict:
+        raise TypeError("metadata needs to be an OrderedDict.")
+
     h5_fstream = h5py.File(output_path + dens_h5,
                            mode="a", compression="gzip",
                            compression_opts=9)
@@ -303,6 +318,13 @@ def construct_h5_file_for_saving_fhat(metadata, dens_h5,
                                 print(
                                     "ValueError raised due to creating existing groups")
 
+    # add metadata to the largest entry of each group!
+    lvl1.attrs['info'] = metadata.keys()[0]  # clstNo
+    lvl2.attrs['info'] = metadata.keys()[1]  # cuts
+    lvl3.attrs['info'] = metadata.keys()[2]  #
+    lvl4.attrs['info'] = metadata.keys()[3]
+    lvl5.attrs['info'] = metadata.keys()[4]
+    lvl5[np.unique(metadata["phi"])[-1]].attrs['info'] = metadata.keys()[5]
 
     return h5_fstream
 

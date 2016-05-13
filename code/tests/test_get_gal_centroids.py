@@ -9,8 +9,9 @@ from compare_peak_methods import draw_gaussian
 import pytest
 import numpy as np
 import pandas as pd
-import logging
-logging.basicConfig(filename="Debug_test_get_gal_centroids.log", level=logging.DEBUG)
+import h5py
+# import logging
+# logging.basicConfig(filename="Debug_test_get_gal_centroids.log", level=logging.DEBUG)
 
 
 @pytest.fixture
@@ -112,6 +113,89 @@ def test_get_BCG_offsets_without_cuts():
     return
 
 
+def test_same_projection_respects_spherical_symmetry():
+    from healpy import nside2npix
+    for i in range(3):
+        nside = 2 ** i
+        npix = nside2npix(nside)
+        phi_arr, xi_arr = angles_given_HEALpix_nsides(nside)
+        assert np.all(phi_arr < np.pi * 2) and np.all(xi_arr < np.pi), \
+                  "Mixed up phi and xi at angles_given_HEALpix_nsides(nside)"
+
+        projections = zip(phi_arr * 180. / np.pi,
+                          xi_arr * 180. / np.pi)
+        print ("nside = ", i)
+        print ("unique (phi, xi) = \n")
+        map(print, projections)
+        print ("\n------------------------------------\n")
+        assert len(xi_arr) == npix / 2
+
+
+def test_same_projection():
+    """
+    the angles are (phi, xi, phi1, xi1) where
+    phi is the azimuthal angle
+    xi is the elevation angle
+    """
+    coords_w_same_projection1 = np.array((0, 0, 180, 180)) * np.pi / 180.
+    # coords_w_same_projection2 = np.array((180, 0, 180, 180)) * np.pi / 180.
+    coords_not_of_same_projection1 = np.array((0, 90, 0, 0)) * np.pi / 180.
+    coords_not_of_same_projection2 = np.array((10, 30, 30, 60)) * np.pi / 180.
+
+    assert same_projection(*coords_w_same_projection1) == True
+    # assert same_projection(*coords_w_same_projection2) == True
+    assert same_projection(*coords_not_of_same_projection1) == False
+    assert same_projection(*coords_not_of_same_projection2) == False
+    return
+
+
+def test_construct_h5_file_for_saving_fhat():
+    import os
+    from collections import OrderedDict
+    metadata = OrderedDict({})
+    metadata["clstNo"] = np.arange(1, 3)
+    metadata["cut"] = {"min": "placeholder"}
+    metadata["weights"] = {"i_band": "placeholder"}
+    metadata["los_axis"] = [1]
+    metadata["xi"] = ["0.", "3.14"]
+    metadata["phi"] = ["0.", "3.14"]
+
+    filename = "test.h5"
+    output_path = "./"
+    construct_h5_file_for_saving_fhat(metadata, filename,
+                                      output_path=output_path)
+
+    test_h5 = h5py.File(output_path + filename)
+    path = "2"
+    assert test_h5[path].attrs["info"] == "clstNo", \
+        "problem saving metadata correctly for clstNo"
+
+    path += "/min"
+    assert test_h5[path].attrs["info"] == "cut", \
+        "problem saving metadata correctly for cut"
+
+    path += "/i_band"
+    assert test_h5[path].attrs["info"] == "weights", \
+        "problem saving metadata correctly for weights"
+
+    path += "/1"
+    assert test_h5[path].attrs["info"] == "los_axis", \
+        "problem saving metadata correctly for los_axis"
+
+    path += "/3.14"
+    assert test_h5[path].attrs["info"] == "xi", \
+        "problem saving metadata correctly for xi"
+
+    path += "/3.14"
+    assert test_h5[path].attrs["info"] == "phi", \
+        "problem saving metadata correctly for phi"
+
+    test_h5.close()
+    os.system("rm ./test.h5")
+
+    return
+
+
 # def test_rot_projection_of_project_coords():
 #     # to avoid numerical error due to 0 becomes very small number
 #     # we use allclose to check answers instead
@@ -170,41 +254,6 @@ def test_galaxies_closest_to_peak():
 #     assert np.allclose(xi, test_xi)
 #     assert np.allclose(phi, test_phi)
 
-
-def test_same_projection_respects_spherical_symmetry():
-    from healpy import nside2npix
-    for i in range(3):
-        nside = 2 ** i
-        npix = nside2npix(nside)
-        phi_arr, xi_arr = angles_given_HEALpix_nsides(nside)
-        assert np.all(phi_arr < np.pi * 2) and np.all(xi_arr < np.pi), \
-                  "Mixed up phi and xi at angles_given_HEALpix_nsides(nside)"
-
-        projections = zip(phi_arr * 180. / np.pi,
-                          xi_arr * 180. / np.pi)
-        print ("nside = ", i)
-        print ("unique (phi, xi) = \n")
-        map(print, projections)
-        print ("\n------------------------------------\n")
-        assert len(xi_arr) == npix / 2
-
-
-def test_same_projection():
-    """
-    the angles are (phi, xi, phi1, xi1) where
-    phi is the azimuthal angle
-    xi is the elevation angle
-    """
-    coords_w_same_projection1 = np.array((0, 0, 180, 180)) * np.pi / 180.
-    # coords_w_same_projection2 = np.array((180, 0, 180, 180)) * np.pi / 180.
-    coords_not_of_same_projection1 = np.array((0, 90, 0, 0)) * np.pi / 180.
-    coords_not_of_same_projection2 = np.array((10, 30, 30, 60)) * np.pi / 180.
-
-    assert same_projection(*coords_w_same_projection1) == True
-    # assert same_projection(*coords_w_same_projection2) == True
-    assert same_projection(*coords_not_of_same_projection1) == False
-    assert same_projection(*coords_not_of_same_projection2) == False
-    return
 
 
 # def test_get_py_peaks_and_density_weights():
