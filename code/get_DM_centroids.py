@@ -231,7 +231,7 @@ def construct_h5_file_for_saving_fhat(metadata, dens_h5,
     lvl5.attrs['info'] = "xi"
     lvl6.attrs['info'] = "phi"
     lvl7.attrs['info'] = "sig_fraction"
-    lvl7[metadata['kernel_width'][-1]].attrs['info'] = "kernel_width"
+    lvl7[str(metadata['kernel_width'][-1])].attrs['info'] = "kernel_width"
 
     return h5_fstream
 

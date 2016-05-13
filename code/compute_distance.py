@@ -139,6 +139,25 @@ def get_gpBy_DM_objects(DM_df,  no_of_DM_keys=8):
     return get_gpBy_star_objects(DM_df, no_of_gal_keys=no_of_DM_keys)
 
 
+def retrieve_metadata_from_fhat_as_path(h5_fhat):
+    """
+    :h5_fhat: hdf5 file stream to the fhat file
+    """
+    paths = []
+
+    # this traverses all the possible paths but
+    # our path size is small enough it is very fast
+    h5_fhat.visit(paths.append)
+    path = paths[-1].split('/')
+    metadata = []
+    this_p = ''
+    for p in path:
+        this_p += "/" + p
+        metadata.append(h5_fhat[this_p].attrs['info'])
+
+    return metadata
+
+
 def DM_h5path_to_groupbykey(h5path):
     """
     :h5path: string, hdf5 path to a certain object

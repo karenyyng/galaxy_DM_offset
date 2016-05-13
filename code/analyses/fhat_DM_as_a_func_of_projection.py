@@ -1,4 +1,4 @@
-"""Prototype script for final run.
+"""Prototype script for final run for the DM.
 Copied from `fhat_star_as_a_func_of_projection.py`
 
 This
@@ -72,7 +72,7 @@ star_gpBy, star_gpBy_keys = \
 
 DM_resolution = 2.  # kpc
 DM_metadata["kernel_width"] = np.array([0, 50]) / DM_resolution
-DM_metadata["sig_fraction"] = 0.2
+DM_metadata["sig_fraction"] = [0.2]
 
 # ============== set up output file structure  ===========
 
@@ -185,11 +185,14 @@ for i, clstNo in enumerate(DM_metadata["clstNo"]):
                         getKDE.find_peaks_from_py_diff(fhat)
                         getKDE.get_density_weights(fhat)
 
+                        # Bad code: should loop through
+                        # different sig_fraction
                         # Find a good threshold
                         fhat["good_threshold"], _ = \
                             getDM.apply_peak_num_threshold(
                                 fhat_stars["peaks_dens"],
-                                fhat, sig_fraction=DM_metadata["sig_fraction"]
+                                fhat,
+                                sig_fraction=float(DM_metadata["sig_fraction"][0])
                             )
                         threshold_mask = \
                             fhat["peaks_dens"] > fhat['good_threshold']

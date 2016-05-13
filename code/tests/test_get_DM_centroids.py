@@ -7,6 +7,7 @@ from get_DM_centroids import *
 
 
 def test_construct_h5_file_for_saving_fhat():
+    # TODO check if test.h5 exists already and remove it if yes
     import os
     from collections import OrderedDict
     metadata = OrderedDict({})
