@@ -35,8 +35,8 @@ def cut_reliable_galaxies(df, DM_cut=1e3, star_cut=1e2):
                                    df["SubhaloLenType4"] > star_cut))
 
 
-def cut_dim_galaxies(df, limiting_mag_band="i_band",
-                          limiting_mag=24):
+def cut_dim_galaxies(df, limiting_mag_band="apparent_i_band",
+                          limiting_mag=24.4):
     """ make observationally realistic cuts to galaxies
     :df: pandas dataframe containing subhalos of one cluster
     :limiting_mag_band: str, "*_band" that is part of the pandas dataframe
@@ -55,7 +55,13 @@ def prep_data_with_cuts_and_wts(df, cuts, cut_methods, cut_cols, wts,
                                 verbose=True):
     """
     :param df: pandas dataframe containing all subhalos for each cluster
-    :param cut_methods: function
+    :param cut_methods: dict, key is the name of the cut, value is a function
+        for judging whether a subhalo is included in the KDE
+    :param cut_cols: dict, key is the name of the cut that it is for, value is
+        a string that corresponds to the col in the df for judging whether a
+        subhalo pass the cut or not
+    :param wts: dict, key is the name of the col in the df, value is the
+        function that we will apply to the col in the df
 
     Returns
     -------
@@ -67,15 +73,18 @@ def prep_data_with_cuts_and_wts(df, cuts, cut_methods, cut_cols, wts,
         if cut_kwargs is not None:  # skip if cut_kwargs is None
             mask = cut_methods[cut_method_name](df, **cut_kwargs)
             richness[cut_method_name] = np.sum(mask)
-            print "# of subhalos after the " + \
-                "{1} cut = {0}".format(np.sum(mask), cut_method_name)
+            if verbose:
+                print "# of subhalos after the " + \
+                    "{1} cut = {0}".format(np.sum(mask), cut_method_name)
             # col = cut_cols[cut_method_name]
             thisdf = df[mask].copy()  # avoid funny behavior by hard copying
         else:
-            print "there is no cut. # of subhalos = {}".format(df.shape[0])
+            if verbose:
+                print "there is no cut. # of subhalos = {}".format(df.shape[0])
             thisdf = df
 
         for weight, wt_func in wts.iteritems():
+            # example weight could be i-band weighted
             if wt_func:  # if wt_func is not None
                 thisdf[weight + "_wt"] = wt_func(thisdf[weight])
             else:

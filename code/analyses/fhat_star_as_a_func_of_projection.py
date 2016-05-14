@@ -12,7 +12,7 @@ datetime_stamp = datetime.now().strftime("%D").replace('/', '_')
 # =========== Decide what to output ============================
 
 dataPath = "../../data/"
-total_clstNo = 5
+total_clstNo = 2
 clstID_h5filepath = dataPath + "rich_cluster_ID.h5"
 # start_clstNo = 13
 logging_filename = "star_logging_{0}_{1}.log".format(
@@ -54,13 +54,15 @@ pos_cols = ["SubhaloPos{0}".format(i) for i in range(3)]
 metadata = OrderedDict({})
 
 # no. of clsters - want these as strings, not int!
+# use the last n-th cluster instead of the first n-th because they
+# contain less particles and run faster
 metadata["clstNo"] = \
-    clstID_h5file["rich_cluster_ID"][:total_clstNo]
+    clstID_h5file["rich_cluster_ID"][-total_clstNo:]
     # [str(i) for i in range(start_clstNo, start_clstNo + total_clstNo)]  #  range(129)
 
 # cuts
 cut_kwargs = {"DM_cut": 1e3, "star_cut": 5e2}
-cut_methods = {"min": getg.cut_reliable_galaxies}
+cut_methods = {"min": getg.cut_reliable_galaxies}  # use cut_dim_galaxies!?
 cut_cols = {"min": pos_cols}
 metadata["cut"] = {"min": cut_kwargs}
 

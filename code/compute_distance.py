@@ -101,8 +101,6 @@ def compute_distance_between_DM_and_gal_peaks(
 
 # ----- convert output to original dictionary form for visualization -------
 
-# - [  ] should make it explicit which keys to do groupBy
-
 def retrieve_cluster_path(h5file, key_no):
     """
     :param h5file: hdf5 filestream, for fhat objects
@@ -141,7 +139,11 @@ def get_gpBy_DM_objects(DM_df,  no_of_DM_keys=8):
 
 def retrieve_metadata_from_fhat_as_path(h5_fhat):
     """
+    the metadata retrieved this way can be used for doing `groupby`
     :h5_fhat: hdf5 file stream to the fhat file
+
+    :returns: metadata, a list of strings that represent the metadata in the
+    correct order
     """
     paths = []
 
