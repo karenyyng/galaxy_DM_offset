@@ -10,10 +10,9 @@ rc("font", family="serif")
 
 
 def plot_DM_fhat(fhat, fhat_stars, clstNo, threshold=0.3,
-                 convert_kpc_over_h_to_kpc=True, fontsize=25,
-                 unit_conversion = 1. / .704, ax=None):
+                 convert_kpc_over_h_to_kpc=True, fontsize=13,
+                 unit_conversion = 1. / .704, ax=None, markersize=25):
 
-    markersize = 25
     if "log_est" not in fhat.keys():
         fhat["log_est"] = np.log(fhat["estimate"][:])
 
@@ -58,19 +57,20 @@ def plot_DM_fhat(fhat, fhat_stars, clstNo, threshold=0.3,
 
     offset_string = ["{0:0.0f}".format(i) for i in dist]
     offset_string = ', '.join(offset_string)
-    ax.set_title('Cluster {0}: offset(s) = {1} kpc'.format(clstNo, offset_string),
-              size=fontsize)
+    ax.set_title('Cluster {0}: offset(s) = {1} kpc'.format(
+        clstNo, offset_string), size=fontsize*1.2)
 
     # Make ticks bigger
     ax.tick_params(axis='both', which='both', labelsize=fontsize)
-    ax.set_xtickslabels(rotation=45)
+    # xtickslabels = ax.get_xticklabels()
+    # ax.set_xticklabels(xtickslabels, rotation=45)
 
-    lgd = ax.legend(fontsize=int(fontsize * 0.7), frameon=1,
-                    numpoints=1, bbox_to_anchor=(1.0, 1.4))
+    lgd = ax.legend(fontsize=int(fontsize * 1.1), frameon=1,
+                    numpoints=1, bbox_to_anchor=(1.0, 1.35))
     frame = lgd.get_frame()
     frame.set_facecolor('white')
     ax.set_xlabel('kpc', size=fontsize)
-    ax.ylabel('kpc', size=fontsize)
+    ax.set_ylabel('kpc', size=fontsize)
 
     return ax
 

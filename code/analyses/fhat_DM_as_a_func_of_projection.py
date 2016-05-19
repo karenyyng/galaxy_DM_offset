@@ -12,11 +12,11 @@ import pandas as pd
 import os
 from scipy import ndimage
 from datetime import datetime
-datetime_stamp = datetime.now().strftime("%D").replace('/', '_')
+datetime_stamp = '05_14_16' # datetime.now().strftime("%D").replace('/', '_')
 data_path = "../../data/"
 
 # ------- specify output file paths  -----------------------
-total_clstNo = 5
+total_clstNo = 2
 input_datetime_stamp = datetime_stamp  # what fhat_star file to read in
 logging_filename = "DM_logging_{0}_{1}.log".format(total_clstNo, datetime_stamp)
 logging.basicConfig(filename=logging_filename, level=logging.INFO)
@@ -57,12 +57,16 @@ DM_fstream = h5py.File(DM_h5file)
 # ================ make all decisions ===========================
 # Specify fhat_star input file paths
 input_star_file = \
-    "test_stars_peak_df_clst{}_{}.h5".format(total_clstNo, input_datetime_stamp)
+    "test_stars_peak_df_clst{}_{}.h5".format(
+        total_clstNo, input_datetime_stamp)
 logging.info ("input_star_file = " + input_star_file)
 input_h5_key = "peak_df"
 DM_metadata, star_peak_df = \
     getDM.retrieve_DM_metadata_from_gal_metadata(
         data_path, input_star_file, input_h5_key)
+
+# need the DM_metadata to be sorted
+DM_metadata['clstNo'] = sorted(DM_metadata['clstNo'])
 
 logging.info("ClstNo to be analyzed from reading metadata")
 logging.info("DM_metadata['clstNo'] = {}".format(DM_metadata['clstNo']))
@@ -72,6 +76,8 @@ star_gpBy, star_gpBy_keys = \
 
 DM_resolution = 2.  # kpc
 DM_metadata["kernel_width"] = np.array([0, 50]) / DM_resolution
+DM_metadata["kernel_width"] = ['{0:0.1f}'.format(stuff) for stuff in
+                               DM_metadata["kernel_width"] ]
 DM_metadata["sig_fraction"] = [0.2]
 
 # ============== set up output file structure  ===========
@@ -170,17 +176,16 @@ for i, clstNo in enumerate(DM_metadata["clstNo"]):
 
                         # Save the cluster metadata as strings
 
-                        kw = '{0:0.0f}'.format(kernel_width)
                         # clst_metadata["sig_fraction"] = \
                         #     '{0:0.2f}'.format(sig_fraction)
 
-                        clst_metadata["kernel_width"] = kw
+                        clst_metadata["kernel_width"] = kernel_width
                         logging.info ("gpBy_keys = {}, \n".format(gpBy_keys) +
-                                         "kernel_width = {}".format(kw))
-                        if kernel_width > 0.:
+                                         "kernel_width = {}".format(kernel_width))
+                        if float(kernel_width) > 0.:
                             fhat['estimate'] = \
                                 ndimage.gaussian_filter(fhat["estimate"],
-                                                        sigma=kernel_width)
+                                                        sigma=float(kernel_width))
 
                         getKDE.find_peaks_from_py_diff(fhat)
                         getKDE.get_density_weights(fhat)

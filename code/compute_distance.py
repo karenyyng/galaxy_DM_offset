@@ -101,14 +101,15 @@ def compute_distance_between_DM_and_gal_peaks(
 
 # ----- convert output to original dictionary form for visualization -------
 
-def retrieve_cluster_path(h5file, key_no):
+def retrieve_cluster_path(h5file):
     """
     :param h5file: hdf5 filestream, for fhat objects
     """
     path_lists = []
-    def append_corect_path(x, path_lists):
-        if len(x.split('/')) == key_no:
-            path_lists.append(x)
+    def append_corect_path(path_to_be_examined, path_lists):
+        if 'estimate' in path_to_be_examined:
+            p = '/'.join(path_to_be_examined.split('/')[:-1])
+            path_lists.append(p)
 
     h5file.visititems(lambda x, y: append_corect_path(x, path_lists))
     return path_lists
@@ -165,7 +166,9 @@ def DM_h5path_to_groupbykey(h5path):
     :h5path: string, hdf5 path to a certain object
     :returns: tuple of strings
     """
-    return tuple(h5path.split("/"))
+    path_list = h5path.split("/")
+    path_list[0] = int(path_list[0])
+    return tuple(path_list)
 
 
 def DM_h5path_to_star_groupbykey(DM_clstPath, keys_to_include):
@@ -173,8 +176,9 @@ def DM_h5path_to_star_groupbykey(DM_clstPath, keys_to_include):
     :DM_clstPath: TODO
     :returns: tuple of strings, star_gpBy_key
     """
-    return tuple(
-        convert_DM_path_to_star_path(DM_clstPath, keys_to_include).split("/"))
+    path = convert_DM_path_to_star_path(DM_clstPath, keys_to_include).split("/")
+    path[0] = int(path[0])
+    return tuple(path)
 
 
 def combine_DM_df_and_h5_to_dict(gpBy, h5fhat, h5path):
@@ -201,7 +205,7 @@ def combine_star_df_and_h5_to_dict(star_gpBy, star_h5fhat, DM_h5path,
     :param keys_to_include: int, how many keys to include in the groupby
     """
     gpbykeys = DM_h5path_to_star_groupbykey(DM_h5path, keys_to_include)
-    star_h5path = '/'.join(gpbykeys)
+    star_h5path = str(gpbykeys[0]) + '/' + '/'.join(gpbykeys[1:])
     # May want to convert some of the quantities back to float!?
     fhat = {k: v for k, v in star_gpBy.get_group(gpbykeys).iteritems()}
 

@@ -180,6 +180,9 @@ def construct_h5_file_for_saving_fhat(metadata, dens_h5,
     """
     import collections
     if type(metadata) != collections.OrderedDict:
+        # we don't need an OrderedDict in this current code structure
+        # but should make it more general... so we don't have
+        # to specify the keys explicitly below
         raise TypeError("metadata needs to be an OrderedDict.")
 
     import h5py
@@ -189,7 +192,7 @@ def construct_h5_file_for_saving_fhat(metadata, dens_h5,
 
     # Would implement this recursively if the data structure were more regular
     # also need to do error handling.
-    for clstNo in metadata["clstNo"]:
+    for clstNo in sorted(metadata["clstNo"]):
         lvl1 = h5_fstream.create_group(str(clstNo))
 
         for cuts in metadata["cut"]:
@@ -201,6 +204,7 @@ def construct_h5_file_for_saving_fhat(metadata, dens_h5,
                 for los_axis in metadata["los_axis"]:
                     lvl4 = lvl3.create_group(str(los_axis))
 
+                    # more groups are created than needed
                     for xi in np.unique(metadata["xi"]):
                         try:
                             lvl5 = lvl4.create_group(str(xi))
@@ -215,11 +219,11 @@ def construct_h5_file_for_saving_fhat(metadata, dens_h5,
                                 print(
                                     "ValueError raised due to creating existing groups")
 
-                            for sig_fraction in metadata["sig_fraction"]:
-                                lvl7 = lvl6.create_group(str(sig_fraction))
+                            # for sig_fraction in metadata["sig_fraction"]:
+                            #     lvl7 = lvl6.create_group(str(sig_fraction))
 
-                                for kernel_width in metadata["kernel_width"]:
-                                    lvl7.create_group(str(kernel_width))
+                            for kernel_width in metadata["kernel_width"]:
+                                lvl6.create_group(str(kernel_width))
 
 
 
@@ -230,8 +234,8 @@ def construct_h5_file_for_saving_fhat(metadata, dens_h5,
     lvl4.attrs['info'] = "los_axis"
     lvl5.attrs['info'] = "xi"
     lvl6.attrs['info'] = "phi"
-    lvl7.attrs['info'] = "sig_fraction"
-    lvl7[str(metadata['kernel_width'][-1])].attrs['info'] = "kernel_width"
+    # lvl7.attrs['info'] = "sig_fraction"
+    lvl6[str(metadata['kernel_width'][-1])].attrs['info'] = "kernel_width"
 
     return h5_fstream
 
@@ -348,9 +352,9 @@ def apply_peak_num_threshold(gal_peak_dens_list, fhat,
 
     while (np.sum(fhat["peaks_dens"][fhat["peaks_dens"] > good_threshold]) <
            acceptance):
-        good_threshold -= 0.01
+        good_threshold -= 0.05
 
-        if good_threshold < 0.01:
+        if good_threshold < 0.06:
             if verbose:
                 print (
                     "Warning: There is no good threshold for the input DM peaks.\n"

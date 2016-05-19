@@ -71,6 +71,7 @@ def prep_data_with_cuts_and_wts(df, cuts, cut_methods, cut_cols, wts,
     richness = OrderedDict({})
     for cut_method_name, cut_kwargs in cuts.iteritems():
         if cut_kwargs is not None:  # skip if cut_kwargs is None
+            # apply the cut_methods FUNCTION to dataframe
             mask = cut_methods[cut_method_name](df, **cut_kwargs)
             richness[cut_method_name] = np.sum(mask)
             if verbose:
@@ -339,7 +340,9 @@ def construct_h5_file_for_saving_fhat(metadata, dens_h5,
 
 
 def metakeys():
-    """keys with which our h5 files are organized"""
+    """keys with which our h5 files are organized
+    this is somewhat a documentation, not really for use
+    """
     return ["clstNo", "cut", "weights", "los_axis", "xi", "phi"]
 
 

@@ -30,6 +30,7 @@ if os.path.isfile(dataPath + StoreFile):
 store = pd.HDFStore(dataPath + StoreFile)
 logging.basicConfig(filename=logging_filename, level=logging.INFO)
 
+from collections import OrderedDict
 import numpy as np
 import sys
 sys.path.append("../")
@@ -37,7 +38,7 @@ sys.path.append("../")
 import extract_catalog as ext_cat
 import get_gal_centroids as getg
 import get_KDE as KDE
-from collections import OrderedDict
+import calculate_astrophy_quantities as cal_astro
 
 verbose = True
 # Do not import h5py before opening the store, it may crash
@@ -47,6 +48,7 @@ original_f = h5py.File(dataPath +
                        ".hdf5", "r")
 
 clstID_h5file = h5py.File(clstID_h5filepath, "r")
+
 
 # ================ make science related decisions ===========================
 
@@ -61,10 +63,19 @@ metadata["clstNo"] = \
     # [str(i) for i in range(start_clstNo, start_clstNo + total_clstNo)]  #  range(129)
 
 # cuts
-cut_kwargs = {"DM_cut": 1e3, "star_cut": 5e2}
-cut_methods = {"min": getg.cut_reliable_galaxies}  # use cut_dim_galaxies!?
-cut_cols = {"min": pos_cols}
-metadata["cut"] = {"min": cut_kwargs}
+# cut_kwargs = {"DM_cut": 1e3, "star_cut": 5e2}
+# cut_methods = {"min": getg.cut_reliable_galaxies}  # use cut_dim_galaxies!?
+# cut_cols = {"min": pos_cols}
+# metadata["cut"] = {"min": cut_kwargs}
+
+assumed_z = 0.3
+cut_kwargs = {"limiting_mag_band": "apparent_i_band",
+              "limiting_mag": 24.4
+              }
+
+cut_methods = {"mag": getg.cut_dim_galaxies}
+cut_cols = {"mag": "apparent_i_band"}
+metadata["cut"] = {"mag": cut_kwargs}
 
 # weights
 metadata["weights"] = OrderedDict({
@@ -72,7 +83,7 @@ metadata["weights"] = OrderedDict({
     })
 
 # projections
-nside = 2  # nsides of HEALpix are powers of 2, pix for 16 nsides = 3072 / 2
+nside = 1  # nsides of HEALpix are powers of 2, pix for 16 nsides = 3072 / 2
 metadata["los_axis"] = [str(1)]  # use z-axis as los axis
 
 # Want to use string as key, not floats!
@@ -89,27 +100,29 @@ logging.info (
 if os.path.isfile(dataPath + output_fhat_filename):
     os.remove(dataPath + output_fhat_filename)
 h5_fstream = \
-    getg.construct_h5_file_for_saving_fhat(metadata,
-                                           output_fhat_filename,
-                                           output_path=dataPath
-                                           )
-
+    getg.construct_h5_file_for_saving_fhat(
+        metadata, output_fhat_filename, output_path=dataPath)
 
 # ============== prepare data based on the metadata ===========
 clst_metadata = OrderedDict({})
 for clstNo in metadata["clstNo"]:
     logging.info("Processing clst {0} ".format(int(clstNo)) +
-                 "out of the range {0} to {1}".format(metadata['clstNo'][0],
-                                                      metadata['clstNo'][-1]))
+                 "out of the range {0} to {1}".format(
+                     metadata['clstNo'][-total_clstNo:],
+                     metadata['clstNo'][-1]))
     peak_df = pd.DataFrame()
     clst_metadata["clstNo"] = clstNo
     df = ext_cat.extract_clst(original_f, clstNo)
 
+    illustris_cosmo = cal_astro.get_Illustris_cosmology()
+    abs_mag = '_'.join(cut_kwargs['limiting_mag_band'].split('_')[1:])
+    df[cut_kwargs['limiting_mag_band']] = cal_astro.convert_abs_mag_to_apparent_mag(
+         df[abs_mag], illustris_cosmo, z=assumed_z)
+
     dfs_with_cuts, richness = \
-        getg.prep_data_with_cuts_and_wts(df, metadata["cut"],
-                                         cut_methods, cut_cols,
-                                         metadata["weights"],
-                                         verbose)
+        getg.prep_data_with_cuts_and_wts(
+            df, metadata["cut"], cut_methods, cut_cols,
+            metadata["weights"], verbose)
 
     for cut, thisdf in dfs_with_cuts.iteritems():
         clst_metadata["cut"] = cut
