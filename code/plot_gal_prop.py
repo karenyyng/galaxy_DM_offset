@@ -11,6 +11,8 @@ import numpy as np
 
 # my own modules
 import calculate_astrophy_quantities as cal_astro
+from matplotlib import rc
+rc("font", family="serif")
 
 
 def plot_color_mag_diag(df, bluer_band, redder_band, band_limit,
@@ -199,7 +201,8 @@ def plot_KDE_peaks(fhat, lvls=range(2, 100, 10), allPeaks=True,
                    fileDir="../plots/", fill=False, showContour=True,
                    ax=None, fig=None, xlabel_rotate_angle=45):
     """make a plot of the fhat along with other important info
-    :param fhat:
+    :param fhat: dictionary or hdf5 filestream,
+        that is generated from `do_KDE_and_get_peaks`
     """
 
     if ax is None:
@@ -207,7 +210,7 @@ def plot_KDE_peaks(fhat, lvls=range(2, 100, 10), allPeaks=True,
         ax = fig.add_subplot(111, aspect='equal')
 
     if showContour:
-        plot_cf_contour(fhat["estimate"],
+        plot_cf_contour(fhat["estimate"][:],
                         fhat["eval_points"][0], fhat["eval_points"][1],
                         lvls=lvls, clabel=clabel, fill=fill, ax=ax)
 
@@ -217,13 +220,13 @@ def plot_KDE_peaks(fhat, lvls=range(2, 100, 10), allPeaks=True,
 
     low_xlim, up_xlim = plt.xlim()
     low_ylim, up_ylim = plt.ylim()
-    plot_bandwidth_matrix(fhat["bandwidth_matrix_H"],
+    plot_bandwidth_matrix(fhat["bandwidth_matrix_H"][:],
                           up_xlim=up_xlim, up_ylim=up_ylim,
                           low_xlim=low_xlim, low_ylim=low_ylim)
 
     if allPeaks:
         cm = plt.cm.get_cmap('bwr')
-        for i in range(len(fhat["peaks_dens"])):
+        for i in range(len(fhat["peaks_dens"][:])):
             sc = ax.scatter(fhat["peaks_xcoords"][i],
                             fhat["peaks_ycoords"][i],
                             c=fhat["peaks_dens"][i],
@@ -238,8 +241,8 @@ def plot_KDE_peaks(fhat, lvls=range(2, 100, 10), allPeaks=True,
                 fillstyle='none', color='gold')
 
     ax.set_title("Clst {0}: ".format(clstNo) +
-                 "No of peaks found = {0}\n".format(len(fhat["peaks_dens"])) +
-                 "Total peak dens = {0:.3g}".format(np.sum(fhat["peaks_dens"])),
+                 "No of peaks found = {0}\n".format(len(fhat["peaks_dens"][:])) +
+                 "Total peak dens = {0:.3g}".format(np.sum(fhat["peaks_dens"][:])),
                  size=15)
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)

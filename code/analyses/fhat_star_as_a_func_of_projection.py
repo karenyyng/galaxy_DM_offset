@@ -23,11 +23,11 @@ assert total_clstNo <=128 and total_clstNo > 0, \
     "0 < total_clstNo <= 128"
 output_fhat_filename = \
     "test_stars_fhat_clst{0}_{1}.h5".format(total_clstNo, datetime_stamp)
-StoreFile = \
-    "test_stars_peak_df_clst{0}_{1}.h5".format(total_clstNo, datetime_stamp)
-if os.path.isfile(dataPath + StoreFile):
-    os.remove(dataPath + StoreFile)
-store = pd.HDFStore(dataPath + StoreFile)
+# StoreFile = \
+#     "test_stars_peak_df_clst{0}_{1}.h5".format(total_clstNo, datetime_stamp)
+# if os.path.isfile(dataPath + StoreFile):
+#     os.remove(dataPath + StoreFile)
+# store = pd.HDFStore(dataPath + StoreFile)
 logging.basicConfig(filename=logging_filename, level=logging.INFO)
 
 from collections import OrderedDict
@@ -116,7 +116,8 @@ for clstNo in metadata["clstNo"]:
 
     illustris_cosmo = cal_astro.get_Illustris_cosmology()
     abs_mag = '_'.join(cut_kwargs['limiting_mag_band'].split('_')[1:])
-    df[cut_kwargs['limiting_mag_band']] = cal_astro.convert_abs_mag_to_apparent_mag(
+    df[cut_kwargs['limiting_mag_band']] = \
+        cal_astro.convert_abs_mag_to_apparent_mag(
          df[abs_mag], illustris_cosmo, z=assumed_z)
 
     dfs_with_cuts, richness = \
@@ -147,16 +148,40 @@ for clstNo in metadata["clstNo"]:
                     data = data[:, cols]
 
                     fhat = KDE.do_KDE_and_get_peaks(data, weights)
+
+                    # store shrinking aperture info in fhat
+                    fhat['shrink_cent'] = getg.shrinking_apert(
+                        data, w=weights
+                    )
+
+                    fhat['centroid'] = getg.compute_weighted_centroids(
+                        data, w=weights
+                    )
+
+                    # get the BCG in a particular band after projecting their
+                    thisdf['spat1'] = data[:, cols[0]]
+                    thisdf['spat2'] = data[:, cols[1]]
+                    fhat['BCG'] = getg.get_BCG_location(
+                        thisdf, band=metadata['weights'].keys()[0],
+                        spat_key1='spat1', spat_key2='spat2'
+                    )
+
                     # This is not needed since the offset will be computed
                     # w.r.t. dark matter peak instead
                     # getg.compute_KDE_peak_offsets(fhat, original_f,
                     #                               clst_metadata["clstNo"])
-                    peak_df = \
-                        getg.convert_dict_peaks_to_df(fhat, clst_metadata)
-                    store.append("peak_df", peak_df)
+                    # peak_df = \
+                    #     getg.convert_dict_peaks_to_df(fhat, clst_metadata)
+                    # store.append("peak_df", peak_df)
 
-                    # clst_metadata[cut + '_richness'] = richness['min']
-                    getg.convert_dict_dens_to_h5(fhat, clst_metadata,
-                                                 h5_fstream)
+                    # output fhat
+                    output_keys = [
+                        'eval_points', "estimate", "bandwidth_matrix_H",
+                        "shrink_cent", "centroid", 'BCG', "peaks_dens",
+                        "peaks_xcoords", "peaks_ycoords"
+                    ]
+                    getg.convert_dict_dens_to_h5(
+                        fhat, clst_metadata,
+                        h5_fstream, fixed_size_data_keys=output_keys)
 
-store.close()
+# store.close()
