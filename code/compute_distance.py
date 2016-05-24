@@ -101,13 +101,14 @@ def compute_distance_between_DM_and_gal_peaks(
 
 # ----- convert output to original dictionary form for visualization -------
 
-def retrieve_cluster_path(h5file):
+def retrieve_cluster_path(h5file, property='estimate'):
     """
     :param h5file: hdf5 filestream, for fhat objects
+    :param property: string, the key to look for in the path
     """
     path_lists = []
     def append_corect_path(path_to_be_examined, path_lists):
-        if 'estimate' in path_to_be_examined:
+        if property in path_to_be_examined:
             p = '/'.join(path_to_be_examined.split('/')[:-1])
             path_lists.append(p)
 

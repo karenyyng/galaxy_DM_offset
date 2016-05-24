@@ -87,12 +87,14 @@ nside = 1  # nsides of HEALpix are powers of 2, pix for 16 nsides = 3072 / 2
 metadata["los_axis"] = [str(1)]  # use z-axis as los axis
 
 # Want to use string as key, not floats!
-metadata["phi"], metadata["xi"] = getg.angles_given_HEALpix_nsides(nside)
-metadata["xi"] = ['{0:1.10f}'.format(xi) for xi in metadata["xi"]]
-metadata["phi"] = ['{0:1.10f}'.format(phi) for phi in metadata["phi"]]
+phi_arr, xi_arr = getg.angles_given_HEALpix_nsides(nside)
+xi_arr = ['{0:1.10f}'.format(xi) for xi in xi_arr]
+phi_arr = ['{0:1.10f}'.format(phi) for phi in phi_arr]
+metadata['projection'] = zip(xi_arr, phi_arr)
 
 logging.info (
-    "{} projections per cluster are constructed".format(len(metadata["xi"])))
+    "{} projections per cluster are constructed".format(
+        len(metadata["projection"])))
 
 # ============== set up output file structure  ===========
 # check_metadata against illegal types
@@ -135,13 +137,12 @@ for clstNo in metadata["clstNo"]:
             for los_axis in metadata["los_axis"]:
                 clst_metadata["los_axis"] = los_axis
 
-                for i in range(len(metadata["xi"])):
-                    clst_metadata["xi"] = metadata["xi"][i]
-                    clst_metadata["phi"] = metadata["phi"][i]
+                for i in range(len(metadata["projection"])):
+                    clst_metadata["projection"] = metadata["projection"][i]
 
                     data = getg.project_coords(np.array(thisdf[pos_cols]),
-                                               clst_metadata["xi"],
-                                               clst_metadata["phi"],
+                                               clst_metadata["projection"][0],
+                                               clst_metadata["projection"][1],
                                                los_axis=los_axis)
 
                     cols = np.arange(data.shape[1]) != int(los_axis)
