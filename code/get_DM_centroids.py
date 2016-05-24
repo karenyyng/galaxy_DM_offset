@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import get_KDE
 from scipy.spatial import KDTree
+import compute_distance as compDist
 
 
 def make_histogram_with_some_resolution(data, resolution=2.0,
@@ -130,6 +131,35 @@ def match_DM_peaks_with_gal_peaks(fhat, fhat_stars, threshold=0.3,
     return dist, match
 
 
+def retrieve_DM_metadata_from_gal_h5file(gal_fhat_h5file):
+    """This retrieves the gal metadata from the appropriate h5 file
+    * matches the DM metadata from the gal_metadata so we can compute the
+    correct offsets. There are no cuts / weights for the DM particles.
+
+    :gal_fhat_h5file: hdf5 file stream for the star fhat data
+    :returns: DM_metadata, this is a ordered dictionary
+    """
+    from collections import OrderedDict
+
+    metadata_keys = \
+        compDist.retrieve_metadata_from_fhat_as_path(gal_fhat_h5file)
+    metadata_dict = OrderedDict({})
+    metadata_vals = compDist.retrieve_cluster_path(gal_fhat_h5file)
+    metadata_vals = np.array([p.split('/') for p in metadata_vals]).transpose()
+    metadata_vals = \
+        [np.unique(p) for p in metadata_vals[:-1]] + list(metadata_vals[-1:])
+
+    for i, k in enumerate(metadata_keys):
+        if k == 'clstNo':
+            metadata_dict[k] = [int(v) for v in metadata_vals[i]]
+        else:
+            metadata_dict[k] = metadata_vals[i]
+
+    metadata_dict['projection'] = [eval(p) for p in metadata_dict['projection']]
+
+    return metadata_dict
+
+
 def retrieve_DM_metadata_from_gal_metadata(dataPath, gal_metadata_h5_file,
                                            h5key="peak_df", keys=None):
     """This retrieves the gal metadata from the appropriate h5 file
@@ -192,7 +222,7 @@ def construct_h5_file_for_saving_fhat(metadata, dens_h5,
 
     # Would implement this recursively if the data structure were more regular
     # also need to do error handling.
-    for clstNo in sorted(metadata["clstNo"]):
+    for clstNo in sorted(np.unique(metadata["clstNo"])):
         lvl1 = h5_fstream.create_group(str(clstNo))
 
         for cuts in metadata["cut"]:
@@ -205,25 +235,29 @@ def construct_h5_file_for_saving_fhat(metadata, dens_h5,
                     lvl4 = lvl3.create_group(str(los_axis))
 
                     # more groups are created than needed
-                    for xi in np.unique(metadata["xi"]):
+                    for projection in metadata["projection"]:
                         try:
-                            lvl5 = lvl4.create_group(str(xi))
+                            lvl5 = lvl4.create_group(str(projection))
                         except ValueError:
                             print(
                                 "ValueError raised due to creating existing groups")
 
-                        for phi in np.unique(metadata["phi"]):
+                        # for phi in np.unique(metadata["phi"]):
+                        #     try:
+                        #         lvl6 = lvl5.create_group(str(phi))
+                        #     except ValueError:
+                        #         print(
+                        #             "ValueError raised due to creating existing groups")
+
+                        #     # for sig_fraction in metadata["sig_fraction"]:
+                        #     #     lvl7 = lvl6.create_group(str(sig_fraction))
+
+                        for kernel_width in np.unique(metadata["kernel_width"]):
                             try:
-                                lvl6 = lvl5.create_group(str(phi))
+                                lvl5.create_group(str(kernel_width))
                             except ValueError:
                                 print(
                                     "ValueError raised due to creating existing groups")
-
-                            # for sig_fraction in metadata["sig_fraction"]:
-                            #     lvl7 = lvl6.create_group(str(sig_fraction))
-
-                            for kernel_width in metadata["kernel_width"]:
-                                lvl6.create_group(str(kernel_width))
 
 
 
@@ -232,21 +266,24 @@ def construct_h5_file_for_saving_fhat(metadata, dens_h5,
     lvl2.attrs['info'] = "cut"
     lvl3.attrs['info'] = "weights"
     lvl4.attrs['info'] = "los_axis"
-    lvl5.attrs['info'] = "xi"
-    lvl6.attrs['info'] = "phi"
+    lvl5.attrs['info'] = "projection"
     # lvl7.attrs['info'] = "sig_fraction"
-    lvl6[str(metadata['kernel_width'][-1])].attrs['info'] = "kernel_width"
+    lvl5[str(metadata['kernel_width'][-1])].attrs['info'] = "kernel_width"
 
     return h5_fstream
 
 
-def convert_dict_dens_to_h5(fhat, clst_metadata, h5_fstream, verbose=False):
+def convert_dict_dens_to_h5(fhat, clst_metadata, h5_fstream, verbose=False,
+                            fixed_size_data_keys=[
+                                "eval_points", "estimate", "peaks_xcoords",
+                                "peaks_ycoords", "peaks_dens"
+                            ]):
     import get_gal_centroids as getgal
 
-    fixed_size_data_keys = ["eval_points", "estimate"]
     path = getgal.h5path_from_clst_metadata(clst_metadata)
     if verbose:
         print (path)
+        print (clst_metadata)
 
     for k in fixed_size_data_keys:
         if k != "eval_points":

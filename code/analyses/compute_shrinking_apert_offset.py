@@ -1,3 +1,8 @@
+"""
+test the effects of different weights on shrinking aperture offsets
+"""
+
+
 # ------------ read in df to be appended------------------
 import pandas as pd
 storage_h5 = "../../data/offset_stat_129.h5"
