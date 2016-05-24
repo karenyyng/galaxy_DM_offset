@@ -11,12 +11,13 @@ import logging
 import pandas as pd
 import os
 from scipy import ndimage
-from datetime import datetime
-datetime_stamp = datetime.now().strftime("%D").replace('/', '_')  # '05_14_16'
+# from datetime import datetime
+# datetime_stamp = datetime.now().strftime("%D").replace('/', '_')
+datetime_stamp = '05_23_16'
 data_path = "../../data/"
 
 # ------- specify output file paths  -----------------------
-total_clstNo = 2
+total_clstNo = 43
 input_datetime_stamp = datetime_stamp  # what fhat_star file to read in
 logging_filename = "DM_logging_{0}_{1}.log".format(
     total_clstNo, datetime_stamp)
@@ -264,7 +265,7 @@ for i, clstNo in enumerate(DM_metadata["clstNo"]):
 
                         logging.info ("Putting fhat into h5")
                         getDM.convert_dict_dens_to_h5(fhat, clst_metadata,
-                                                      h5_fstream, verbose=True)
+                                                      h5_fstream, verbose=False)
 
 logging.info ("Done with all loops.")
 h5_fstream.close()

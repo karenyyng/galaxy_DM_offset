@@ -100,6 +100,11 @@ def compute_distance_between_DM_and_gal_peaks(
 
 
 # ----- convert output to original dictionary form for visualization -------
+def append_corect_path(path_to_be_examined, path_lists, property="estimate"):
+    if property in path_to_be_examined:
+        p = '/'.join(path_to_be_examined.split('/')[:-1])
+        path_lists.append(p)
+
 
 def retrieve_cluster_path(h5file, property='estimate'):
     """
@@ -107,10 +112,6 @@ def retrieve_cluster_path(h5file, property='estimate'):
     :param property: string, the key to look for in the path
     """
     path_lists = []
-    def append_corect_path(path_to_be_examined, path_lists):
-        if property in path_to_be_examined:
-            p = '/'.join(path_to_be_examined.split('/')[:-1])
-            path_lists.append(p)
 
     h5file.visititems(lambda x, y: append_corect_path(x, path_lists))
     return path_lists
@@ -151,9 +152,17 @@ def retrieve_metadata_from_fhat_as_path(h5_fhat):
 
     # this traverses all the possible paths but
     # our path size is small enough it is very fast
-    h5_fhat.visit(paths.append)
-    path = paths[-1].split('/')
+    h5_fhat.visititems(lambda x, y: append_corect_path(x, paths))
+    last_clstNo = sorted(np.unique([int(p.split('/')[0]) for p in paths]))[-1]
+
+    correct_paths = []
+    h5_fhat[str(last_clstNo)].visititems(
+        lambda x, y: append_corect_path(x, correct_paths)
+    )
+
+    path = [str(last_clstNo)] + correct_paths[-1].split('/')
     metadata = []
+
     this_p = ''
     for p in path:
         this_p += "/" + p

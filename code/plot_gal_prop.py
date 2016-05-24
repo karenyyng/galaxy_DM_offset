@@ -199,7 +199,11 @@ def plot_KDE_peaks(fhat, lvls=range(2, 100, 10), allPeaks=True,
                    clabel=False, showData=False, xlabel="x (kpc / h)",
                    ylabel="y (kpc / h)", showDomPeak=True,
                    fileDir="../plots/", fill=False, showContour=True,
-                   ax=None, fig=None, xlabel_rotate_angle=45):
+                   ax=None, fig=None, xlabel_rotate_angle=45,
+                   legend_box_anchor=(1., 1.4), unit_conversion=1.,
+                   convert_kpc_to_kpc_over_h=False, flip_y=-1.,
+                   legend_markerscale=0.8,
+                   ):
     """make a plot of the fhat along with other important info
     :param fhat: dictionary or hdf5 filestream,
         that is generated from `do_KDE_and_get_peaks`
@@ -209,9 +213,10 @@ def plot_KDE_peaks(fhat, lvls=range(2, 100, 10), allPeaks=True,
         fig = plt.figure()
         ax = fig.add_subplot(111, aspect='equal')
 
+    # flip histogram to match the DM contours
     if showContour:
         plot_cf_contour(fhat["estimate"][:],
-                        fhat["eval_points"][0], fhat["eval_points"][1],
+                        fhat["eval_points"][0], fhat["eval_points"][1] * flip_y,
                         lvls=lvls, clabel=clabel, fill=fill, ax=ax)
 
     if plotDataPoints:
@@ -222,13 +227,15 @@ def plot_KDE_peaks(fhat, lvls=range(2, 100, 10), allPeaks=True,
     low_ylim, up_ylim = plt.ylim()
     plot_bandwidth_matrix(fhat["bandwidth_matrix_H"][:],
                           up_xlim=up_xlim, up_ylim=up_ylim,
-                          low_xlim=low_xlim, low_ylim=low_ylim)
+                          low_xlim=low_xlim, low_ylim=low_ylim,
+                          ax=ax,
+                          flip_y=flip_y)
 
     if allPeaks:
         cm = plt.cm.get_cmap('bwr')
         for i in range(len(fhat["peaks_dens"][:])):
             sc = ax.scatter(fhat["peaks_xcoords"][i],
-                            fhat["peaks_ycoords"][i],
+                            fhat["peaks_ycoords"][i] * flip_y,
                             c=fhat["peaks_dens"][i],
                             cmap=cm, vmin=0, vmax=1.0, edgecolor='k',
                             s=35, marker='s')
@@ -236,12 +243,13 @@ def plot_KDE_peaks(fhat, lvls=range(2, 100, 10), allPeaks=True,
 
     if showDomPeak:
         ax.plot(fhat["peaks_xcoords"][0],
-                fhat["peaks_ycoords"][0],
+                fhat["peaks_ycoords"][0] * flip_y,
                 's', mew=4., markersize=9, label='dominant KDE peak',
                 fillstyle='none', color='gold')
 
     ax.set_title("Clst {0}: ".format(clstNo) +
-                 "No of peaks found = {0}\n".format(len(fhat["peaks_dens"][:])) +
+                 "No of gal. peaks found = {0}\n".format(
+                     len(fhat["peaks_dens"][:])) +
                  "Total peak dens = {0:.3g}".format(np.sum(fhat["peaks_dens"][:])),
                  size=15)
     ax.set_xlabel(xlabel)
@@ -257,7 +265,8 @@ def plot_KDE_peaks(fhat, lvls=range(2, 100, 10), allPeaks=True,
         # fig = plt.gcf()
         fig.gca().add_artist(R200_circl)
 
-    ax.legend(loc='best', frameon=False, numpoints=1)
+    ax.legend(loc='upper right', frameon=True, numpoints=1,
+              bbox_to_anchor=legend_box_anchor, markerscale=legend_markerscale)
 
     if save and clstNo is not None:
         plt.savefig(fileDir + fileName + str(clstNo) + ".png",
@@ -301,8 +310,8 @@ def plot_data_and_peak(df, peaks, R200C=None, save=False, title=None,
     return None
 
 
-def plot_bandwidth_matrix(mtx, up_xlim, up_ylim, low_xlim, low_ylim,
-                          debug=False):
+def plot_bandwidth_matrix(mtx, up_xlim, up_ylim, low_xlim, low_ylim, ax,
+                          debug=False, flip_y=False):
     """
     :params mtx: numpy array
         represents symmteric positive definite matrix
@@ -323,11 +332,14 @@ def plot_bandwidth_matrix(mtx, up_xlim, up_ylim, low_xlim, low_ylim,
         print( "matrix is {0}".format(mtx))
         print( "width: {0}, height: {1}, angle {2}".format(width, height,
                                                            angle))
+    if flip_y:
+        angle = -angle
     ell = Ellipse(xy=np.array([mux, muy]), width=width, height=height,
                   angle=angle, color="m", edgecolor='none')
+    ax.text(mux - width, muy - 1.1 * height, 'kernel size')
     ax = plt.gca()
     ax.add_artist(ell)
 
-    return
+    return ell
 
 

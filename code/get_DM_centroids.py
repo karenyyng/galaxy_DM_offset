@@ -155,7 +155,8 @@ def retrieve_DM_metadata_from_gal_h5file(gal_fhat_h5file):
         else:
             metadata_dict[k] = metadata_vals[i]
 
-    metadata_dict['projection'] = [eval(p) for p in metadata_dict['projection']]
+    metadata_dict['projection'] = [eval(p) for p in
+                                   np.unique(metadata_dict['projection'])]
 
     return metadata_dict
 

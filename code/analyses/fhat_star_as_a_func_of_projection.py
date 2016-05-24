@@ -12,7 +12,7 @@ datetime_stamp = datetime.now().strftime("%D").replace('/', '_')
 # =========== Decide what to output ============================
 
 dataPath = "../../data/"
-total_clstNo = 2
+total_clstNo = 43
 clstID_h5filepath = dataPath + "rich_cluster_ID.h5"
 # start_clstNo = 13
 logging_filename = "star_logging_{0}_{1}.log".format(
