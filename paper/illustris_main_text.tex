@@ -16,12 +16,13 @@ interactions can be enhanced, including the long-suspected self-interaction of D
 particles (hereafter, SIDM). 
 Many papers have used the DM density peaks to give constraints on 
 the self-interaction cross
-sections of dark matter (\citealt{Markevitch2003}, Mertel , Dawson, Jee etc.). 
+sections of dark matter (\citealt{Markevitch2004}, \citealt{Bradac2006b}, Mertel , Dawson, Jee etc.). 
 
 % Why we want to compare galaxies with the DM distribution? 
 
 % What are the observational methods for summarizing dark matter distribution?
-Weak and strong lensing for finding out the dark matter distribution. 
+Weak and strong lensing are the most reliable methods for mapping the dark 
+matter distribution in a galaxy cluster. 
 Common to all the methods are the estimation of the density peaks. 
 
 
@@ -35,7 +36,7 @@ Commonly used one-point statistic of galaxy clusters include:
 1) papers reported using centroids but did not state what centroid that they
 used 
 2) papers used center of mass 
-3) papers that used peaks  
+3) papers that used peaks \citep{Robertson2016} 
 % What are the reported offsets?
 Offsets between different statistical measures of the galaxy and the DM
 population are not going to be zero.
@@ -76,7 +77,7 @@ summarizing the member galaxy population of a galaxy cluster, 3)
 give estimates for the offsets between the summary statistics of the galaxy  
 population and the DM population, which we call 
 \begin{equation}
-	\Delta s \equiv |\vec{s}_{\rm gal} - \vec{s}_{\rm DM}|.
+	\Delta s \equiv \vec{s}_{\rm gal} - \vec{s}_{\rm DM}.
 \end{equation}
 where $\bf{s}_{gal}$ and $\bf{s}_{DM}$ are the two dimensional (2D) spatial
 locations of the summary statistic of the galaxy population, and the density
@@ -101,7 +102,7 @@ correlated with of $\Delta s$.
 		galaxies that are above observation limit, i.e. apparent $i \leq 24.4$ when 
 		we assume a cosmological redshift
 of $z=0.3$, as shown by the richness cut. A total of 43 clusters have 
-richness $> 50$ under this cut. \label{fig:mass_richness}}
+survived this cut. \label{fig:mass_richness}}
 \end{figure*}
 
 % Basic setup 
@@ -261,7 +262,7 @@ The number of projections that we employed is FILL IN A NUMBER.
 \begin{table*}
 \begin{center}
 \begin{minipage}{180mm} 
-	\caption{Comparison between various methods for estimating one-point
+	\caption{Comparison between various methods for estimating the one-point
 		statistics of the galaxies of a cluster 
 \label{tab:centroid_comparison}} 
 	\begin{tabular}{@{}lccccc@{}}
@@ -325,9 +326,10 @@ Goal: to identify the ``center'' of the light distribution. Here the adopted
 tracers for the light distribution are the member galaxies of the cluster 
 and groups.
 
-At no point do we claim that point estimates are sufficient statistics for
+We do not claim that point estimates are sufficient statistics for
 best representing the physical states of galaxy clusters nor the effect of
-self-interacting dark matter.
+self-interacting dark matter. However, we try to understand the impact of the
+different choices of point estimates on the estimate of $\Delta s$. 
 We compare four ways to identify the light/galaxy centers:
 \begin{enumerate}
 \item Centroids
@@ -336,6 +338,19 @@ We compare four ways to identify the light/galaxy centers:
 \item Brightest cluster galaxy (BCG)
 
 \end{enumerate}
+
+We try to avoid any manual methods for identifying peaks for
+reproducibility and comparison purposes. Since all the methods listed in this
+paper are automated, it is possible for other studies to reuse our code for 
+comparisons. 
+There are a number of decisions ($\sim [TODO] ADD NUMBER$) that one needs to make to 
+determine the summary statistics. We will try to address the sensitivity of the offset
+due to each decision. 
+Furthermore, a major advantage for automation is that it allows us  
+to scale up our analysis by applying
+the same methods across the different snapshots of the Illustris simulations to
+examine the variability of $\Delta s$ across time. 
+
 
 \subsubsection{Centroids or center of mass}
 \label{Unweighted}
@@ -373,7 +388,7 @@ galaxies that survived our brightness cut.
 
 Specifically, we made use of the KDE function in
 the statistical package {\bf \texttt{ks}} (CITE Duong) in the R statistical 
-computing environment (CITE R Core Team 2014).
+computing environment (CITE R Core Team 2014). 
 Cross validation eliminates free parameters in the KDE and minimizes
 the asymptotic mean-integrated squared error (AMISE) for a best fit to the
 data. Although the smoothed cross validation technique takes $O(n^3)$
@@ -434,13 +449,14 @@ cluster galaxy population by several orders of magnitude. (CITE?)
 However, star formation can result
 in galaxies brighter in the bluer photometric bands.
 To avoid star formation from biasing our algorithm for identifying the
-BCG, we find at the brightest galaxies in redder bands such as the $r, i, z$
+BCG, we find at the brightest galaxies in redder bands i.e. the $r, i, z$
 bands and found that they give consistent results for all selected clusters. 
 The band in which we picked the BCG for presentation is the $i$-band. 
 
 \begin{figure*}
 	\includegraphics[width=.95\linewidth]{fig3_toy_data_mixtures.eps}
-	\caption{Comparison of peak finding performances of different methods. Panels
+	\caption{[TODO] ADD LEGEND TO THE PLOT. 
+		Comparison of peak finding performances of different methods. Panels
 		from the top row contain data drawn from a single Gaussian mixture. The
 	second row panels contain data from two Gaussian mixtures. 
 		\label{fig:toy_data_mixtures}}
@@ -499,32 +515,48 @@ size.
 
 \subsection{Finding offsets} 
 We computed the projected offsets between the galaxy density peaks inferred from the
-cross-validated KDE and the maximum dark matter density peaks.
+cross-validated KDE peaks of the galaxy data and the maximum DM density peaks.
 
-\label{sec:results}
+% It is possible to also  
+
 
 
 
 
 \section{RESULTS} 
+\label{sec:results}
 
 
 
 \subsection{Visual inspection of galaxy clusters}
+From the high resolution visualization of the DM maps (2 kpc histograms) in 
+\ref{fig:select_peak_visualization}, we can tell that some clusters clearly
+possess multiple subclusters. However, there are also several clusters with
+only one main component that has several peaks (galaxies) in the central region. 
+This illustrates why finding a `center' or peak of a cluster is an ill-defined 
+notion. Furthermore, we show a lower-resolution visualization of the DM surface
+map in Fig. [TODO] compared to the higher resolution map, we can see a clear
+shift in the peak location. This illustrates that peak / center finding is also
+subject to noise from the data.
+
+
+
 
 \begin{figure*} 
 	\centering
 	% \includegraphics[width=\linewidth]{clusterMassDist.eps}
-	\includegraphics[width=.95\linewidth]{ph_fig_galaxycenter_IllustrisClusters.pdf}
-	\includegraphics[width=.95\linewidth]{ph_fig_DMcenter_IllustrisClusters.pdf}
+	% \includegraphics[width=.95\linewidth]{ph_fig_galaxycenter_IllustrisClusters.pdf}
+	% \includegraphics[width=.95\linewidth]{ph_fig_DMcenter_IllustrisClusters.pdf}
 	\caption{ {\bf Left figure:} Projected density distribution of DM	
-		particle data (orange to yellow density overlay). 
-		The identified density peaks are indicated by circles. 
+		particle data (density overlay). 
+		The identified density peaks are indicated by colored circles. 
 		{\bf Right figure:} Projected kernel density estimates (KDE) of member
-		galaxies of the same clusters. 
+		galaxies of the same clusters. The projections of the clusters are  
+		selected at random.		
 		\label{fig:select_peak_visualization}
 	}
 \end{figure*}
+
 
 \subsection{Smoothness of dark matter distribution}
 From the plots with peak identification, it can be shown that most clusters are
@@ -543,10 +575,36 @@ Ill-defined problem without a unique solution
 projections 
 \end{itemize}
 
+% \begin{figure*}
+% 	% \includegraphics[width=.95\linewidth]{distribution_of_offsets.eps}
+% 	\caption{The probability distribution of the estimated offsets between 
+% 		different summary statistics over 43 selected clusters for DM with 2 kpc 
+% 		resolution.  
+% 
+% 		\label{fig:est_offset_distrib_for_different_clusters_2kpc_resolution}}
+% \end{figure*}
+% 
+% \begin{figure*}
+% 	\caption{
+% 		The probability distribution of the estimated offsets between different
+% 		summary statistics over 43 selected clusters for DM with 50 kpc 
+% 		resolution.  
+% 
+% 		\label{fig:est_offset_distrib_for_different_clusters_50kpc_resolution}}
+% \end{figure*}
+% 
+% \begin{figure*}
+% 	% \includegraphics[width=.95\linewidth]{distribution_of_offsets.eps}
+% 	\caption{The probability distribution of the estimated offsets for different
+% 		projections.
+% 		\label{fig:est_offset_distrib_for_different_projections}}
+% \end{figure*}
 
 \subsubsection{Correlations between the offsets and properties of the cluster / groups}
 \begin{itemize}
 \item relaxedness
+\item mass 
+\item richness  
 \end{itemize}
 
 
@@ -560,6 +618,19 @@ projections
 Central galaxy paradigm (CGP)
 
 
+% As there are no well-established procedure for summarizing the peak or the
+% center of a cluster, nor there is a good m 
+There are many aspects of the analysis that is not covered by this study that
+are performed for analyzing observational data, such as 
+
+\begin{itemize}
+		\item galaxy membership identification along the line of sight
+		\item removal of foreground galaxies  
+	\end{itemize}
+	that are important for calculating the $\sigma_{\rm SIDM}$ with using a
+	galaxy-DM offset. 
+
+
 \subsection{Galaxy-DM Offset in Merging Galaxy Clusters}
 
 \section{SUMMARY}
@@ -571,14 +642,28 @@ We showed that
 			due to the small number of data points. When dealing with small number of
 			cluster samples, the uncertainties of the peak locations should not be
 			ignored.
+		\item the resolution of the DM distribution can / cannot affect
+			$\Delta s$.   
+		\item the large number of decisions that goes into computing the offsets
+			from simulations make it hard if not impossible for comparison between studies. 
+			We call researchers in this field to make their software and analysis code openly
+			available.
 \end{itemize}
 
 
 
 
 \section{ACKNOWLEDGEMENTS}
-Part of the work before the conception of this paper was discussed during the AstroHack week
-2014.
+Our software setup is available through a Docker image on DockerHub while the
+main code are version controlled via Git and GitHub. 
+Part of the work before the conception of this paper was discussed during 
+the AstroHack week 2014. KN would like to thank Phil
+Marshall and Jake Vanderplas for preliminary discussions for analyzing galaxy clusters. 
+Part of this work was performed under HST grant (TODO ask Dave for grant
+number). 
+
+
+
 % alternative ways of characterizing differences between DM and galaxy
 % distributions.
 
