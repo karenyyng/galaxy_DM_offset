@@ -11,7 +11,10 @@ def plot_DM_fhat(fhat, fhat_stars, clstNo, threshold=0.3,
                  convert_kpc_over_h_to_kpc=True, fontsize=13,
                  unit_conversion = 1. / .704, ax=None, markersize=25,
                  log_scale=True, legend_box_anchor=(1.0, 1.2),
-                 legend_markerscale=0.7):
+                 legend_markerscale=0.7, kernel_width=1):
+    """
+    :param kernel_width: float, the number times the histogram size = 2 kpc
+    """
 
     rc("font", family="serif")
     if log_scale and "log_est" not in fhat.keys():
@@ -70,7 +73,9 @@ def plot_DM_fhat(fhat, fhat_stars, clstNo, threshold=0.3,
     offset_string = ["{0:0.0f}".format(i) for i in dist]
     offset_string = ', '.join(offset_string)
     ax.set_title('Cluster {0}: gal-DM offset(s) = {1} kpc'.format(
-        clstNo, offset_string), size=fontsize*1.2)
+        clstNo, offset_string) +
+        ", \n kernel size= {0} kpc".format(kernel_width * 2.)
+        , size=fontsize*1.2)
 
     # Make ticks bigger
     ax.tick_params(axis='both', which='both', labelsize=fontsize)
@@ -84,6 +89,14 @@ def plot_DM_fhat(fhat, fhat_stars, clstNo, threshold=0.3,
     frame.set_facecolor('white')
     ax.set_xlabel('kpc', size=fontsize)
     ax.set_ylabel('kpc', size=fontsize)
+
+    # plot the smoothing scale
+    xlims = ax.get_xlim()
+    ylims = ax.get_ylim()
+    lower_x_bar = xlims[1] - np.diff(xlims) * 0.2
+    y_bar_location = ylims[0] + np.diff(ylims) * 0.20
+    ax.plot((lower_x_bar, lower_x_bar + kernel_width * 2),
+            (y_bar_location, y_bar_location), 'w', linewidth=5)
 
     return ax
 
