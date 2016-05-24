@@ -12,11 +12,21 @@
 * type 4 - stellar particles 
 
 # Which file to look at for computing offsets      
-* `test_peak_df_129.h5`    
+* `test_{PARTICLE_TYPE}_peak_df_129.h5`    
     * contains peak info: coordinates, indices in KDE grid, peak density etc. 
     * contains metadata for the run: cuts, weights etc.
-* `test_fhat_129.h5`    
-    * contains the KDE density maps - this file is big
+* `test_{PARTICLE_TYPE}_fhat_129.h5`    
+    * contains the KDE density maps - this file is bigger 
+    * the metadata of what is stored at each level of the hierarchy can be
+        found by using 
+
+        ```Python
+        from __future__ import print_function
+        h5file = h5py.File("FILENAME") 
+        path_list = []
+        h5file.visit(path_list.append)
+        h5file[path_list[-1]].attrs['info']
+        ```
 
 # How to open the peak_df
 More convenient way, just use `pd.read_hdf`:      

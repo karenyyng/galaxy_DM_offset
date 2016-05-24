@@ -6,9 +6,8 @@ import numpy as np
 import pandas as pd
 from get_KDE import *
 from compute_distance import compute_euclidean_dist
-import calculate_astrophy_quantities as cal_astrophy
-
-import logging
+# import calculate_astrophy_quantities as cal_astrophy
+# import logging
 
 # logging.basicConfig(filename="Debug_get_gal_centroids.log",
 #                     level=logging.DEBUG)
@@ -35,8 +34,8 @@ def cut_reliable_galaxies(df, DM_cut=1e3, star_cut=1e2):
                                    df["SubhaloLenType4"] > star_cut))
 
 
-def cut_dim_galaxies(df, limiting_mag_band="i_band",
-                          limiting_mag=24):
+def cut_dim_galaxies(df, limiting_mag_band="apparent_i_band",
+                          limiting_mag=24.4):
     """ make observationally realistic cuts to galaxies
     :df: pandas dataframe containing subhalos of one cluster
     :limiting_mag_band: str, "*_band" that is part of the pandas dataframe
@@ -55,7 +54,13 @@ def prep_data_with_cuts_and_wts(df, cuts, cut_methods, cut_cols, wts,
                                 verbose=True):
     """
     :param df: pandas dataframe containing all subhalos for each cluster
-    :param cut_methods: function
+    :param cut_methods: dict, key is the name of the cut, value is a function
+        for judging whether a subhalo is included in the KDE
+    :param cut_cols: dict, key is the name of the cut that it is for, value is
+        a string that corresponds to the col in the df for judging whether a
+        subhalo pass the cut or not
+    :param wts: dict, key is the name of the col in the df, value is the
+        function that we will apply to the col in the df
 
     Returns
     -------
@@ -65,17 +70,22 @@ def prep_data_with_cuts_and_wts(df, cuts, cut_methods, cut_cols, wts,
     richness = OrderedDict({})
     for cut_method_name, cut_kwargs in cuts.iteritems():
         if cut_kwargs is not None:  # skip if cut_kwargs is None
+            # apply the cut_methods FUNCTION to dataframe
             mask = cut_methods[cut_method_name](df, **cut_kwargs)
             richness[cut_method_name] = np.sum(mask)
-            print "# of subhalos after the " + \
-                "{1} cut = {0}".format(np.sum(mask), cut_method_name)
+            if verbose:
+                print "# of subhalos after the " + \
+                    "{1} cut = {0}".format(np.sum(mask), cut_method_name)
             # col = cut_cols[cut_method_name]
             thisdf = df[mask].copy()  # avoid funny behavior by hard copying
         else:
-            print "there is no cut. # of subhalos = {}".format(df.shape[0])
+            if verbose:
+                print "there is no cut. # of subhalos = {}".format(
+                    df.shape[0])
             thisdf = df
 
         for weight, wt_func in wts.iteritems():
+            # example weight could be i-band weighted
             if wt_func:  # if wt_func is not None
                 thisdf[weight + "_wt"] = wt_func(thisdf[weight])
             else:
@@ -147,10 +157,11 @@ def compute_KDE_R200Coffsets(offset, f, clstNo):
     return offset / R200C
 
 
-def compute_shrinking_aperture_offset(df, f, clstNo, cut_method, cut_kwargs,
-                                      w=None, verbose=True,
-                                      col=["SubhaloPos0", "SubhaloPos1"],
-                                      projection=None, output='both'):
+def compute_shrinking_aperture_offset(
+        df, f, clstNo, cut_method, cut_kwargs,
+        w=None, verbose=True,
+        col=["SubhaloPos0", "SubhaloPos1"],
+        projection=None, output='both'):
     """
     :param df: pandas dataframe for each cluster
     :param cut_method: function
@@ -230,10 +241,10 @@ def find_gal_peak_ixes_in_DM_fhat(star_peaks_xcoord, star_peaks_ycoord, fhat):
 
 
 # ---------- Utilities for converting dictionaries to h5 objects -------
-def convert_dict_peaks_to_df(fhat, metadata,
-                             save=False, output_path="../data/",
-                             peak_h5="fhat_peak.h5", peak_info_keys=None,
-                             ):
+def convert_dict_peaks_to_df(
+    fhat, metadata, save=False, output_path="../data/",
+    peak_h5="fhat_peak.h5", peak_info_keys=None,
+    ):
     """
     :param fhat_list: list of python dictionary obtained from
         `convert_rfhat_to_dict`
@@ -262,10 +273,25 @@ def convert_dict_peaks_to_df(fhat, metadata,
 def construct_h5_file_for_saving_fhat(metadata, dens_h5,
                                       output_path="../../data/"):
     """
+    constructs the skeleton of the hdf5 file using an OrderedDict to capture
+    its structure.
+
+    metadata is assumed to have the following keys:
+        * "clstNo"
+        * "cut"
+        * "weights"
+        * "los_axis"
+        * "xi"
+        * "phi"
     :metadata: OrderedDict, keys correspond to the projections
     :dens_h5: h5 file stream
     """
     import h5py
+    import collections
+
+    if type(metadata) != collections.OrderedDict:
+        raise TypeError("metadata needs to be an OrderedDict.")
+
     h5_fstream = h5py.File(output_path + dens_h5,
                            mode="a", compression="gzip",
                            compression_opts=9)
@@ -289,26 +315,35 @@ def construct_h5_file_for_saving_fhat(metadata, dens_h5,
 
                     # should probably create 'xi_phi' as one group
                     # or make sure there is no empty group
-                    for xi in np.unique(metadata["xi"]):
+                    for projection in metadata["projection"]:
                         try:
-                            lvl5 = lvl4.create_group(str(xi))
+                            lvl5 = lvl4.create_group(str(projection))
                         except ValueError:
                             print(
                                 "ValueError raised due to creating existing groups")
 
-                        for phi in np.unique(metadata["phi"]):
-                            try:
-                                lvl5.create_group(str(phi))
-                            except ValueError:
-                                print(
-                                    "ValueError raised due to creating existing groups")
+                        # for phi in np.unique(metadata["phi"]):
+                        #     try:
+                        #         lvl5.create_group(str(phi))
+                        #     except ValueError:
+                        #         print(
+                        #             "ValueError raised due to creating existing groups")
 
+    # add metadata to the largest entry of each group!
+    lvl1.attrs['info'] = metadata.keys()[0]  # clstNo
+    lvl2.attrs['info'] = metadata.keys()[1]  # cuts
+    lvl3.attrs['info'] = metadata.keys()[2]  # weights
+    lvl4.attrs['info'] = metadata.keys()[3]  # los_axis
+    lvl5.attrs['info'] = metadata.keys()[4]  # projection
+    # lvl5[np.unique(metadata["phi"])[-1]].attrs['info'] = metadata.keys()[5]
 
     return h5_fstream
 
 
 def metakeys():
-    """keys with which our h5 files are organized"""
+    """keys with which our h5 files are organized
+    this is somewhat a documentation, not really for use
+    """
     return ["clstNo", "cut", "weights", "los_axis", "xi", "phi"]
 
 
@@ -337,7 +372,7 @@ def retrieve_fhat_from_gp(gp_keys, gp_vals, h5_fhat_fstream):
     path = ''.join(path)
 
     fhat_keys = ["estimate", "bandwidth_matrix_H", "eval_points"]
-    fhat = {key: h5_fhat_fstream[path + key][...] for key in fhat_keys}
+    fhat = {key: h5_fhat_fstream[path + key][:] for key in fhat_keys}
 
     peak_keys = ["peaks_dens", "peaks_xcoords", "peaks_ycoords"]
     for k in peak_keys:
@@ -351,12 +386,23 @@ def h5path_from_clst_metadata(clst_metadata):
     return ''.join(path)
 
 
-def convert_dict_dens_to_h5(fhat, clst_metadata, h5_fstream):
+def convert_dict_dens_to_h5(fhat, clst_metadata, h5_fstream,
+                            fixed_size_data_keys=[
+                                "eval_points", "estimate", "bandwidth_matrix_H",
+                                "shrink_cent", "centroid", 'BCG'
+                            ]):
     """
-    WORKS
+    :param fhat: dictionary, key is cluster property, value is the value
+    :param clst_metadata: OrderedDict,
+        key is key for the metadata, value is the
+        attribute values
+    :param h5_fstream: hdf5 file stream
+    :param
+
+    :note: stateful, stuff gets written to the hdf5 file
+    :returns: None
     """
 
-    fixed_size_data_keys = ["eval_points", "estimate", "bandwidth_matrix_H"]
     path = h5path_from_clst_metadata(clst_metadata)
 
     for k in fixed_size_data_keys:
@@ -374,19 +420,21 @@ def find_3D_peaks():
 def get_subhalo_mass(df):
     return np.array(df)
 
-# -----------other centroid methods ------------------------------------
+# -----------other centroid methods -----------------------------
 def shrinking_apert(data, center_coord=None, r0=None, debug=False, w=None):
     """
     :param center_coord: list of floats or array of floats
     :param data: numpy array
-        with shape[1] == center_coord.shape[0]
+        with shape[1] == center_coord.shape[0] == len(w)
         shape[0] = number of observations
     :param r0: float, aperture to consider in the data
-
+    :param debug: bool, output debugging messages or not
+    :param w: float in numpy array like form, or in pandas dataframe,
+       denotes the weights for each galaxy data point
     :returns: numpy array,
         with same shape as center_coord
-    :note: I want to write this procedure so that it would work in both 2D and
-    3D
+    :note: I want to write this procedure so that it would work
+        in both 2D and 3D
     """
 
     data, normalization = normalize_data(data)
@@ -394,7 +442,8 @@ def shrinking_apert(data, center_coord=None, r0=None, debug=False, w=None):
     if w is None:
         w = np.ones(len(data))
     elif len(w) != len(data):
-        raise ValueError("length mismatch between data `data` and weights `w`")
+        raise ValueError(
+            "length mismatch between data `data` and weights `w`")
 
     if center_coord is not None:
         c1 = np.array(center_coord)
@@ -492,8 +541,15 @@ def compute_weighted_centroids(x, w=None):
     return np.sum(x * w, axis=0) / np.sum(w)
 
 
-def get_BCG_ix(df, DM_cut=1e3, star_cut=1e2,
-               bands=None, verbose=False, brightest_only=True):
+def get_BCG_location(df, band=None, spat_key1="SubhaloPos0",
+                     spat_key2="SubhaloPos1"):
+    ix = np.argmin(df[band])
+    spat_cols = [spat_key1, spat_key2]
+    return np.array(df[spat_cols].iloc[ix])
+
+
+def get_BCG_ixes(df, DM_cut=1e3, star_cut=1e2,
+                 bands=None, verbose=False, brightest_only=True):
     """
     :param df: pandas dataframe, contains all subhalos of each cluster
     :param DM_cut: (optional) integer,
@@ -587,6 +643,22 @@ def galaxies_closest_to_peak(df, list_of_coord_keys, peak_coords,
 
 
 # --------- compute confidence region for each method ------------------
+
+def angles_give_same_projections(phi_arr, xi_arr):
+    """
+    :param phi_arr: np array of floats, in RADIANS, azimuthal angle, 0 to 2 * np.pi
+    :param xi_arr: np array of floats, in RADIANS, elevation angle, 0 to np.pi
+
+    :returns: an array of bools
+    """
+    from itertools import combinations
+
+    # The number of comparisons needed is nC2
+    combo = np.array([c for c in combinations(range(len(xi_arr)), 2)])
+    return np.array([same_projection(phi_arr[pair[0]], xi_arr[pair[0]],
+                                     phi_arr[pair[1]], xi_arr[pair[1]])
+                    for pair in combo]), np.array(combo)
+
 
 def get_shrinking_apert_conf_reg(data_realizations):
     """
@@ -834,17 +906,3 @@ def same_projection(phi1, xi1, phi2, xi2):
 
 
 
-def angles_give_same_projections(phi_arr, xi_arr):
-    """
-    :param phi_arr: np array of floats, in RADIANS, azimuthal angle, 0 to 2 * np.pi
-    :param xi_arr: np array of floats, in RADIANS, elevation angle, 0 to np.pi
-
-    :returns: an array of bools
-    """
-    from itertools import combinations
-
-    # The number of comparisons needed is nC2
-    combo = np.array([c for c in combinations(range(len(xi_arr)), 2)])
-    return np.array([same_projection(phi_arr[pair[0]], xi_arr[pair[0]],
-                                     phi_arr[pair[1]], xi_arr[pair[1]])
-                    for pair in combo]), np.array(combo)

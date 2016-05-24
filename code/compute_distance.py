@@ -100,17 +100,18 @@ def compute_distance_between_DM_and_gal_peaks(
 
 
 # ----- convert output to original dictionary form for visualization -------
+def append_corect_path(path_to_be_examined, path_lists, property="estimate"):
+    if property in path_to_be_examined:
+        p = '/'.join(path_to_be_examined.split('/')[:-1])
+        path_lists.append(p)
 
-# - [  ] should make it explicit which keys to do groupBy
 
-def retrieve_cluster_path(h5file, key_no):
+def retrieve_cluster_path(h5file, property='estimate'):
     """
     :param h5file: hdf5 filestream, for fhat objects
+    :param property: string, the key to look for in the path
     """
     path_lists = []
-    def append_corect_path(x, path_lists):
-        if len(x.split('/')) == key_no:
-            path_lists.append(x)
 
     h5file.visititems(lambda x, y: append_corect_path(x, path_lists))
     return path_lists
@@ -139,12 +140,45 @@ def get_gpBy_DM_objects(DM_df,  no_of_DM_keys=8):
     return get_gpBy_star_objects(DM_df, no_of_gal_keys=no_of_DM_keys)
 
 
+def retrieve_metadata_from_fhat_as_path(h5_fhat):
+    """
+    the metadata retrieved this way can be used for doing `groupby`
+    :h5_fhat: hdf5 file stream to the fhat file
+
+    :returns: metadata, a list of strings that represent the metadata in the
+    correct order
+    """
+    paths = []
+
+    # this traverses all the possible paths but
+    # our path size is small enough it is very fast
+    h5_fhat.visititems(lambda x, y: append_corect_path(x, paths))
+    last_clstNo = sorted(np.unique([int(p.split('/')[0]) for p in paths]))[-1]
+
+    correct_paths = []
+    h5_fhat[str(last_clstNo)].visititems(
+        lambda x, y: append_corect_path(x, correct_paths)
+    )
+
+    path = [str(last_clstNo)] + correct_paths[-1].split('/')
+    metadata = []
+
+    this_p = ''
+    for p in path:
+        this_p += "/" + p
+        metadata.append(h5_fhat[this_p].attrs['info'])
+
+    return metadata
+
+
 def DM_h5path_to_groupbykey(h5path):
     """
     :h5path: string, hdf5 path to a certain object
     :returns: tuple of strings
     """
-    return tuple(h5path.split("/"))
+    path_list = h5path.split("/")
+    path_list[0] = int(path_list[0])
+    return tuple(path_list)
 
 
 def DM_h5path_to_star_groupbykey(DM_clstPath, keys_to_include):
@@ -152,8 +186,9 @@ def DM_h5path_to_star_groupbykey(DM_clstPath, keys_to_include):
     :DM_clstPath: TODO
     :returns: tuple of strings, star_gpBy_key
     """
-    return tuple(
-        convert_DM_path_to_star_path(DM_clstPath, keys_to_include).split("/"))
+    path = convert_DM_path_to_star_path(DM_clstPath, keys_to_include).split("/")
+    path[0] = int(path[0])
+    return tuple(path)
 
 
 def combine_DM_df_and_h5_to_dict(gpBy, h5fhat, h5path):
@@ -180,7 +215,7 @@ def combine_star_df_and_h5_to_dict(star_gpBy, star_h5fhat, DM_h5path,
     :param keys_to_include: int, how many keys to include in the groupby
     """
     gpbykeys = DM_h5path_to_star_groupbykey(DM_h5path, keys_to_include)
-    star_h5path = '/'.join(gpbykeys)
+    star_h5path = str(gpbykeys[0]) + '/' + '/'.join(gpbykeys[1:])
     # May want to convert some of the quantities back to float!?
     fhat = {k: v for k, v in star_gpBy.get_group(gpbykeys).iteritems()}
 

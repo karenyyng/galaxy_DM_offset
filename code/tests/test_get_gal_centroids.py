@@ -9,8 +9,9 @@ from compare_peak_methods import draw_gaussian
 import pytest
 import numpy as np
 import pandas as pd
-import logging
-logging.basicConfig(filename="Debug_test_get_gal_centroids.log", level=logging.DEBUG)
+import h5py
+# import logging
+# logging.basicConfig(filename="Debug_test_get_gal_centroids.log", level=logging.DEBUG)
 
 
 @pytest.fixture
@@ -112,65 +113,6 @@ def test_get_BCG_offsets_without_cuts():
     return
 
 
-# def test_rot_projection_of_project_coords():
-#     # to avoid numerical error due to 0 becomes very small number
-#     # we use allclose to check answers instead
-#     inputs = [(0, 0, 1), (1, 0, 0), (0, 1, 0)]
-#     ans = np.array([(0, 1, 0), (0, 0, -1), (-1, 0, 0)])
-#
-#     for i, input_ele in enumerate(inputs):
-#         # not projecting anything so los_axis = 4
-#         # test ans from feeding each row of input
-#         assert np.allclose(project_coords(input_ele, 90, 90, 4, radian=False),
-#                            np.array(ans[i]))
-#
-#     # test vectorization
-#     test_outputs = project_coords(inputs, 90, 90, 4, radian=False)
-#
-#     assert np.allclose(ans, test_outputs)
-#     return
-#
-#
-# def test_project_to_lower_dim_of_project_coords():
-#     """
-#     :tasks: should test values that are not multiples of 90
-#     """
-#     los_axes = [2, 1, 0]
-#     inputs = [(0, 0, 1), (1, 0, 0), (0, 1, 0)]
-#     ans = [(0, 1, 0), (0, 0, -1), (0, 0, 0)]
-#     for i, input_ele in enumerate(inputs):
-#         assert np.allclose(project_coords(input_ele, 90, 90, los_axes[i],
-#                                           radian=False),
-#                            np.array(ans[i]))
-#     return
-
-
-def test_galaxies_closest_to_peak():
-    col = [0, 1]
-    df = pd.DataFrame([[i, i] for i in np.arange(10)], columns=col)
-    peak_coords = [(3.25, 3.5), (1., 1.5)]
-
-    dist, ixes = galaxies_closest_to_peak(df, col, peak_coords,
-                                          k_nearest_neighbor=1)
-    # KDTree.query returns an integer if k_nearest_neighbor = 1
-    assert ixes[0] == 3
-    assert ixes[1] == 1
-
-    return
-
-
-# def test_angles_given_HEALpix_nsides():
-#     """regression test"""
-#     xi = np.array([ 0.84106867,  0.84106867,  1.57079633,  1.57079633,
-#                     2.30052398, 2.30052398]),
-#     phi = np.array([ 0.78539816,  2.35619449,  0.        ,  1.57079633,
-#                     0.78539816, 2.35619449])
-#
-#     test_xi, test_phi = angles_given_HEALpix_nsides(1)
-#     assert np.allclose(xi, test_xi)
-#     assert np.allclose(phi, test_phi)
-
-
 def test_same_projection_respects_spherical_symmetry():
     from healpy import nside2npix
     for i in range(3):
@@ -205,6 +147,113 @@ def test_same_projection():
     assert same_projection(*coords_not_of_same_projection1) == False
     assert same_projection(*coords_not_of_same_projection2) == False
     return
+
+
+def test_construct_h5_file_for_saving_fhat():
+    # TODO check if test.h5 exists already and remove it if yes
+    import os
+    from collections import OrderedDict
+    metadata = OrderedDict({})
+    metadata["clstNo"] = np.arange(1, 3)
+    metadata["cut"] = {"min": "placeholder"}
+    metadata["weights"] = {"i_band": "placeholder"}
+    metadata["los_axis"] = [1]
+    metadata["xi"] = ["0.", "3.14"]
+    metadata["phi"] = ["0.", "3.14"]
+
+    filename = "test.h5"
+    output_path = "./"
+    construct_h5_file_for_saving_fhat(metadata, filename,
+                                      output_path=output_path)
+
+    test_h5 = h5py.File(output_path + filename)
+    path = "2"
+    assert test_h5[path].attrs["info"] == "clstNo", \
+        "problem saving metadata correctly for clstNo"
+
+    path += "/min"
+    assert test_h5[path].attrs["info"] == "cut", \
+        "problem saving metadata correctly for cut"
+
+    path += "/i_band"
+    assert test_h5[path].attrs["info"] == "weights", \
+        "problem saving metadata correctly for weights"
+
+    path += "/1"
+    assert test_h5[path].attrs["info"] == "los_axis", \
+        "problem saving metadata correctly for los_axis"
+
+    path += "/3.14"
+    assert test_h5[path].attrs["info"] == "xi", \
+        "problem saving metadata correctly for xi"
+
+    path += "/3.14"
+    assert test_h5[path].attrs["info"] == "phi", \
+        "problem saving metadata correctly for phi"
+
+    test_h5.close()
+    os.system("rm ./test.h5")
+
+    return
+
+
+def test_galaxies_closest_to_peak():
+    col = [0, 1]
+    df = pd.DataFrame([[i, i] for i in np.arange(10)], columns=col)
+    peak_coords = [(3.25, 3.5), (1., 1.5)]
+
+    dist, ixes = galaxies_closest_to_peak(df, col, peak_coords,
+                                          k_nearest_neighbor=1)
+    # KDTree.query returns an integer if k_nearest_neighbor = 1
+    assert ixes[0] == 3
+    assert ixes[1] == 1
+
+    return
+
+
+# def test_rot_projection_of_project_coords():
+#     # to avoid numerical error due to 0 becomes very small number
+#     # we use allclose to check answers instead
+#     inputs = [(0, 0, 1), (1, 0, 0), (0, 1, 0)]
+#     ans = np.array([(0, 1, 0), (0, 0, -1), (-1, 0, 0)])
+#
+#     for i, input_ele in enumerate(inputs):
+#         # not projecting anything so los_axis = 4
+#         # test ans from feeding each row of input
+#         assert np.allclose(project_coords(input_ele, 90, 90, 4, radian=False),
+#                            np.array(ans[i]))
+#
+#     # test vectorization
+#     test_outputs = project_coords(inputs, 90, 90, 4, radian=False)
+#
+#     assert np.allclose(ans, test_outputs)
+#     return
+#
+#
+# def test_project_to_lower_dim_of_project_coords():
+#     """
+#     :tasks: should test values that are not multiples of 90
+#     """
+#     los_axes = [2, 1, 0]
+#     inputs = [(0, 0, 1), (1, 0, 0), (0, 1, 0)]
+#     ans = [(0, 1, 0), (0, 0, -1), (0, 0, 0)]
+#     for i, input_ele in enumerate(inputs):
+#         assert np.allclose(project_coords(input_ele, 90, 90, los_axes[i],
+#                                           radian=False),
+#                            np.array(ans[i]))
+#     return
+
+# def test_angles_given_HEALpix_nsides():
+#     """regression test"""
+#     xi = np.array([ 0.84106867,  0.84106867,  1.57079633,  1.57079633,
+#                     2.30052398, 2.30052398]),
+#     phi = np.array([ 0.78539816,  2.35619449,  0.        ,  1.57079633,
+#                     0.78539816, 2.35619449])
+#
+#     test_xi, test_phi = angles_given_HEALpix_nsides(1)
+#     assert np.allclose(xi, test_xi)
+#     assert np.allclose(phi, test_phi)
+
 
 
 # def test_get_py_peaks_and_density_weights():

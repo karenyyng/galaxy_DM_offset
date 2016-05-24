@@ -9,8 +9,8 @@ $ ln -s ../ks_KDE.r .
 * python modules are placed at current directory
 * `analyses` contains scripts / notebooks that generate plots / results for paper
 * `prototypes` contains code for me to see if my module functions work or not 
-* `EDA` contains some exploratory data analyses that investigates aspects of
-Illustris data 
+* `EDA` contains some exploratory data analyses that investigates different aspects of
+the Illustris data 
 * `tests` contain unit tests / integration tests 
 
 ## Python modules 

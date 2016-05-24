@@ -6,40 +6,55 @@ import sys
 sys.path.append("../")
 import compute_distance as get_dist
 
-rc("font", family="serif")
-
 
 def plot_DM_fhat(fhat, fhat_stars, clstNo, threshold=0.3,
-                 convert_kpc_over_h_to_kpc=True, fontsize=25,
-                 unit_conversion = 1. / .704):
+                 convert_kpc_over_h_to_kpc=True, fontsize=13,
+                 unit_conversion = 1. / .704, ax=None, markersize=25,
+                 log_scale=True, legend_box_anchor=(1.0, 1.2),
+                 legend_markerscale=0.7, kernel_width=1):
+    """
+    :param kernel_width: float, the number times the histogram size = 2 kpc
+    """
 
-    markersize = 25
-    if "log_est" not in fhat.keys():
-        fhat["log_est"] = np.log(fhat["estimate"][:])
+    rc("font", family="serif")
+    if log_scale and "log_est" not in fhat.keys():
+        log_est = np.log(fhat["estimate"][:])
+    else:
+        log_est = np.power(fhat["estimate"][:], 1./ 4.)
 
-    plt.subplot('111', axisbg='black', aspect='equal')
+    if ax is None:
+        fig = plt.figure()
+        ax = fig.add_subplot('111', axisbg='black', aspect='equal')
 
-    # Plot DM particle histograms
-    plt.imshow(fhat["log_est"].transpose(), cmap=plt.cm.afmhot,
-               extent=[
+    if type(fhat) == dict:
+        extent = [
                     fhat["eval_points"][0][0], fhat["eval_points"][0][-1],
                     fhat["eval_points"][1][-1], fhat["eval_points"][1][0],
                     ]
+    else:
+        extent = [
+                    fhat["eval_points0"][0], fhat["eval_points0"][-1],
+                    fhat["eval_points1"][-1], fhat["eval_points1"][0],
+                ]
+    # Plot DM particle histograms
+    ax.imshow(log_est.transpose(), cmap=plt.cm.afmhot,
+               extent=extent
                )
 
-    ((dist, matched_DM_ixes), sign_gal_peak_no, sign_DM_peak_no, gd_threshold) = \
+    ((dist, matched_DM_ixes), sign_gal_peak_no,
+     sign_DM_peak_no, gd_threshold) = \
         get_dist.compute_distance_between_DM_and_gal_peaks(fhat_stars, fhat)
 
     # Plot DM peaks
     # Peaks that are associated with the galaxy peaks are in blue.
     # Peaks that are not associated with the galaxy peaks are in cyan.
-    plt.plot(fhat["peaks_xcoords"][:sign_DM_peak_no],
+    ax.plot(fhat["peaks_xcoords"][:sign_DM_peak_no],
              fhat["peaks_ycoords"][:sign_DM_peak_no],
              "o", color='cyan', fillstyle="none", mew=3,
              ms=markersize, label="candidate DM peaks")
 
-    plt.plot(fhat["peaks_xcoords"][matched_DM_ixes],
-             fhat["peaks_ycoords"][matched_DM_ixes],
+    ax.plot(fhat["peaks_xcoords"][:][matched_DM_ixes],
+            fhat["peaks_ycoords"][:][matched_DM_ixes],
              "o", color='blue', fillstyle="none", mew=3,
              ms=markersize, label="matched DM peaks")
 
@@ -49,28 +64,41 @@ def plot_DM_fhat(fhat, fhat_stars, clstNo, threshold=0.3,
     if convert_kpc_over_h_to_kpc:
         print("Converting unit of kpc / h to kpc for galaxy data using ")
         print (unit_conversion)
-        plt.plot(fhat_stars["peaks_xcoords"][:sign_gal_peak_no] * unit_conversion,
-                 fhat_stars["peaks_ycoords"][:sign_gal_peak_no] * unit_conversion,
-                 'o', color='m', fillstyle="none", mew=3, ms=markersize,
-                 label="significant I band luminosity peaks")
+        ax.plot(
+            fhat_stars["peaks_xcoords"][:sign_gal_peak_no] * unit_conversion,
+            fhat_stars["peaks_ycoords"][:sign_gal_peak_no] * unit_conversion,
+            'o', color='m', fillstyle="none", mew=3, ms=markersize,
+            label="significant I band luminosity peaks")
 
     offset_string = ["{0:0.0f}".format(i) for i in dist]
     offset_string = ', '.join(offset_string)
-    plt.title('Cluster {0}: offset(s) = {1} kpc'.format(clstNo, offset_string),
-              size=fontsize)
+    ax.set_title('Cluster {0}: gal-DM offset(s) = {1} kpc'.format(
+        clstNo, offset_string) +
+        ", \n kernel size= {0} kpc".format(kernel_width * 2.)
+        , size=fontsize*1.2)
 
     # Make ticks bigger
-    plt.tick_params(axis='both', which='both', labelsize=fontsize)
-    plt.xticks(rotation=45)
+    ax.tick_params(axis='both', which='both', labelsize=fontsize)
+    # xtickslabels = ax.get_xticklabels()
+    # ax.set_xticklabels(xtickslabels, rotation=45)
 
-    lgd = plt.legend(fontsize=int(fontsize * 0.7), frameon=1,
-                     numpoints=1, bbox_to_anchor=(1.0, 1.4))
+    lgd = ax.legend(fontsize=int(fontsize * 1.1), frameon=1,
+                    numpoints=1, bbox_to_anchor=legend_box_anchor,
+                    loc='upper right', markerscale=legend_markerscale)
     frame = lgd.get_frame()
     frame.set_facecolor('white')
-    plt.xlabel('kpc', size=fontsize)
-    plt.ylabel('kpc', size=fontsize)
+    ax.set_xlabel('kpc', size=fontsize)
+    ax.set_ylabel('kpc', size=fontsize)
 
-    return
+    # plot the smoothing scale
+    xlims = ax.get_xlim()
+    ylims = ax.get_ylim()
+    lower_x_bar = xlims[1] - np.diff(xlims) * 0.2
+    y_bar_location = ylims[0] + np.diff(ylims) * 0.20
+    ax.plot((lower_x_bar, lower_x_bar + kernel_width * 2),
+            (y_bar_location, y_bar_location), 'w', linewidth=5)
+
+    return ax
 
 
 
