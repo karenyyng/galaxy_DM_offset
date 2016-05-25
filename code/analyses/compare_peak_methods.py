@@ -6,13 +6,15 @@ Author: Karen Ng <karenyng@ucdavis.edu>
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 from collections import OrderedDict
-import matplotlib.pyplot as plt
 import cPickle
 import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib import rc
 import sys
 sys.path.append("../")
 import get_gal_centroids as get_gal
 from plot_gal_prop import plot_cf_contour
+rc("font", family="serif")
 
 
 # plot styles
@@ -254,48 +256,51 @@ def plot_grid_spec(gauss_data, bimodal_data, dumb_data, f, figsize=(13, 13),
 
     plt.figure(figsize=figsize)
     rowNo = 3
-    colNo = 2
+    colNo1 = 1
+    colNo2 = 2
     hspace = 0.1
 
     # plot the left two columns
-    gs1 = gridspec.GridSpec(rowNo, colNo)
+    gs1 = gridspec.GridSpec(rowNo, colNo1)
     gs1.update(left=0.05, right=0.44, wspace=0.01, hspace=hspace)
     axArr1 = [[plt.subplot(gs1[i, j], aspect='equal')
-               for j in range(colNo)] for i in range(rowNo)]
+               for j in range(colNo1)] for i in range(rowNo)]
 
     # plot the right two columns
-    gs2 = gridspec.GridSpec(rowNo, colNo)
+    gs2 = gridspec.GridSpec(rowNo, colNo2)
     gs2.update(left=0.51, right=0.98, wspace=0.4, hspace=hspace)
     axArr2 = [[plt.subplot(gs2[i, j])
-               for j in range(colNo)] for i in range(rowNo)]
+               for j in range(colNo2)] for i in range(rowNo)]
 
-    plt.setp([axArr1[j][1].get_yticklabels()
-              for j in range(rowNo)], visible=False)
+    # plt.setp([axArr1[j][0].get_yticklabels()
+    #           for j in range(rowNo)], visible=False)
 
-    for j in range(rowNo):
-        axArr1[j][1].xaxis.set_major_locator(
-            MaxNLocator(nbins=5, prune="lower"))
+    # for j in range(rowNo):
+    #     axArr1[j][0].xaxis.set_major_locator(
+    #         MaxNLocator(nbins=5, prune="lower"))
 
     # first row of plots
     xlim, ylim = plot_gauss_data(gauss_data["data"], ax=axArr1[0][0])
-    plot_gauss_contour(gauss_data["KDE"],
-                       gauss_data["shrink"],
-                       gauss_data["cent"],
-                       ax=axArr1[0][1], xlim=xlim,
-                       ylim=ylim)
+    # plot_gauss_contour(gauss_data["KDE"],
+    #                    gauss_data["shrink"],
+    #                    gauss_data["cent"],
+    #                    ax=axArr1[0][1], xlim=xlim,
+    #                    ylim=ylim)
     plot_gauss_zoomed_contours(gauss_data["KDE"],
                                gauss_data["shrink"],
                                gauss_data["cent"],
                                ax=axArr2[0][0])
 
     # second row of plots
-    xlim, ylim = plot_one_big_one_small_gaussian(bimodal_data["data"],
-                                                 ax=axArr1[1][0])
-    plot_one_big_one_small_gaussian_contour(bimodal_data["KDE"],
-                                            bimodal_data["shrink"],
-                                            bimodal_data["cent"],
-                                            xlim=xlim, ylim=ylim,
-                                            ax=axArr1[1][1])
+    xlim, ylim = plot_one_big_one_small_gaussian(
+        bimodal_data["data"], ax=axArr1[1][0],
+        xlim=(-2, 4), ylim=(-2, 4)
+    )
+    # plot_one_big_one_small_gaussian_contour(bimodal_data["KDE"],
+    #                                         bimodal_data["shrink"],
+    #                                         bimodal_data["cent"],
+    #                                         xlim=xlim, ylim=ylim,
+    #                                         ax=axArr1[1][1])
     plot_one_big_one_small_gaussian_zoomed_contour(
                                                    bimodal_data["KDE"],
                                                    bimodal_data["shrink"],
@@ -303,13 +308,14 @@ def plot_grid_spec(gauss_data, bimodal_data, dumb_data, f, figsize=(13, 13),
                                                    ax=axArr2[1][0])
 
     # third row of plots
-    xlim, ylim = plot_dumbbell_data(dumb_data["data"], ax=axArr1[2][0])
-    plot_dumbbell_contour(dumb_data["KDE1"],
-                          dumb_data["KDE2"],
-                          dumb_data["shrink"],
-                          dumb_data["cent"],
-                          ax=axArr1[2][1],
-                          xlim=xlim, ylim=ylim)
+    xlim, ylim = plot_dumbbell_data(dumb_data["data"], ax=axArr1[2][0],
+                                    xlim=(-4, 4), ylim=(-4, 4))
+    # plot_dumbbell_contour(dumb_data["KDE1"],
+    #                       dumb_data["KDE2"],
+    #                       dumb_data["shrink"],
+    #                       dumb_data["cent"],
+    #                       ax=axArr1[2][1],
+    #                       xlim=xlim, ylim=ylim)
     plot_dumbbell_zoomed_contour(dumb_data["KDE1"],
                                  dumb_data["KDE2"],
                                  dumb_data["shrink"],
@@ -361,6 +367,10 @@ def plot_error_as_a_func_of_data_pts(f, data_set,
     ax.set_ylabel("68% confidence region", size=15)
     if show_xlabel:
         ax.set_xlabel("Number of data points", size="small")
+
+    ax.tick_params(labeltop='off', labelright='off')
+    ax.yaxis.set_ticks_position('left')
+    ax.xaxis.set_ticks_position('bottom')
     return
 
 
@@ -401,12 +411,14 @@ def plot_gauss_data(gauss_data, ax=None, xlim=None,
 
     ax.plot(gauss_data[:][0][:, 0], gauss_data[:][0][:, 1], 'k.', alpha=0.3)
     ax.plot(1, 1, 'kx', mew=2, ms=10, label='Mean of Gaussian')
-    ax.legend(loc='best', frameon=False)
 
     if xlim is not None:
         ax.set_xlim(xlim)
     if ylim is not None:
         ax.set_ylim(ylim)
+    ax.tick_params(labeltop='off', labelright='off')
+    ax.yaxis.set_ticks_position('left')
+    ax.xaxis.set_ticks_position('bottom')
 
     return ax.get_xlim(), ax.get_ylim()
 
@@ -453,6 +465,10 @@ def plot_gauss_contour(KDE_peak_dens, shrink_peak_dens,
         ax.set_xlim(xlim)
     if ylim is not None:
         ax.set_ylim(ylim)
+
+    ax.tick_params(labeltop='off', labelright='off')
+    ax.yaxis.set_ticks_position('left')
+    ax.xaxis.set_ticks_position('bottom')
 
     return
 
@@ -517,6 +533,9 @@ def plot_gauss_zoomed_contours(KDE_peak_dens1, shrink_peak_dens1,
     if xlim is not None:
         ax.set_xlim(xlim)
 
+    ax.tick_params(labeltop='off', labelright='off')
+    ax.yaxis.set_ticks_position('left')
+    ax.xaxis.set_ticks_position('bottom')
     # ax.legend(loc='lower right', frameon=False, fontsize='small')
     # ax.title("Zoomed-in view near the dominant peak",
     #          fontsize=15)
@@ -544,6 +563,10 @@ def plot_one_big_one_small_gaussian(
 
     ax.set_xlim(xlim)
     ax.set_ylim(ylim)
+
+    ax.tick_params(labeltop='off', labelright='off')
+    ax.yaxis.set_ticks_position('left')
+    ax.xaxis.set_ticks_position('bottom')
 
     return ax.get_xlim(), ax.get_ylim()
 
@@ -590,6 +613,10 @@ def plot_one_big_one_small_gaussian_contour(
         ax.set_xlim(xlim)
     if ylim is not None:
         ax.set_ylim(ylim)
+
+    ax.tick_params(labeltop='off', labelright='off')
+    ax.yaxis.set_ticks_position('left')
+    ax.xaxis.set_ticks_position('bottom')
 
     return
 
@@ -646,6 +673,9 @@ def plot_one_big_one_small_gaussian_zoomed_contour(
     if xlim is not None:
         ax.set_xlim(xlim)
 
+    ax.tick_params(labeltop='off', labelright='off')
+    ax.yaxis.set_ticks_position('left')
+    ax.xaxis.set_ticks_position('bottom')
     # ax.legend(loc='lower right', frameon=False, fontsize='small')
     return contours
 
@@ -660,22 +690,25 @@ def plot_dumbbell_data(
         ax = fig.add_subplot(111)
 
     ax.plot(dumb_data[:][0][:, 0], dumb_data[:][0][:, 1], '.', color='grey')
-    ax.plot(2, 2, "ko", mew=2,
+    ax.plot(2, 2, "kx", mew=3,
             label="Mean of dominant Gaussian", fillstyle='none',
             markersize=markersize)
-    ax.plot(-2, -2, "x", color="k", mew=3,
+    ax.plot(-2, -2, "x", color="grey", mew=3,
+            markersize=markersize)
+    ax.plot(0, 0, "x", color="grey", mew=3,
             label="Mean of subdominant Gaussian",
             markersize=markersize)
-    ax.plot(0, 0, "x", color="k", mew=3,
-            label="Mean of subdominant Gaussian",
-            markersize=markersize)
-    # ax.legend(loc='best', frameon=False)
     # ax.title("Dumbbell data with 3 mixtures of Gaussians", size=15)
+    ax.legend(loc='lower right', frameon=True, bbox_to_anchor=(1., -0.4))
 
     if xlim is not None:
         ax.set_xlim(xlim)
     if ylim is not None:
         ax.set_ylim(ylim)
+
+    ax.tick_params(labeltop='off', labelright='off')
+    ax.yaxis.set_ticks_position('left')
+    ax.xaxis.set_ticks_position('bottom')
 
     return ax.get_xlim(), ax.get_ylim()
 
@@ -690,7 +723,7 @@ def plot_dumbbell_contour(
         plot_path="../../paper/figures/drafts/",
         plot_fig_name="confidence_regions_dumbbell.pdf", ax=None,
         r_colors=r_colors, b_colors=b_colors, g_colors=g_colors
-):
+    ):
 
     if ax is None:
         fig = plt.figure()
@@ -745,6 +778,10 @@ def plot_dumbbell_contour(
     ax.plot(0, 0, "x", color="grey", mew=3,
             label="Mean of subdominant Gaussian",
             markersize=markersize)
+
+    ax.tick_params(labeltop='off', labelright='off')
+    ax.yaxis.set_ticks_position('left')
+    ax.xaxis.set_ticks_position('bottom')
     # ax.legend(loc='lower right', frameon=False, fontsize='small')
 
     # ax.title('Confidence regions and best estimates of peak finding methods',
@@ -763,7 +800,7 @@ def plot_dumbbell_zoomed_contour(
         plot_path="../../paper/figures/drafts/",
         plot_fig_name="confidence_regions_dumbbell.pdf", ax=None,
         b_colors=b_colors, r_colors=r_colors, g_colors=g_colors
-):
+    ):
 
     if ax is None:
         fig = plt.figure()
@@ -802,7 +839,10 @@ def plot_dumbbell_zoomed_contour(
     ax.plot(2, 2, "kx", mew=2, label="Mean of dominant Gaussian",
             markersize=markersize)
 
-    # ax.legend(loc='lower right', frameon=False, fontsize='small')
+    ax.tick_params(labeltop='off', labelright='off')
+    ax.yaxis.set_ticks_position('left')
+    ax.xaxis.set_ticks_position('bottom')
+        # ax.legend(loc='lower right', frameon=False, fontsize='small')
     # ax.title("Zoomed-in view near the dominant peak",
     #          fontsize=15)
 
