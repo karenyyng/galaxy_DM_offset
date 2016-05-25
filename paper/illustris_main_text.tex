@@ -51,7 +51,7 @@ What centroids they have used
 Physical motivation for using the galaxy density peak 
 Observation footprints 
 
-Under the assumed Lambda Cold Dark Matter cosmology, it is unclear 
+Under the assumed Lambda Cold Dark Matter ($\Lambda$CDM) cosmology, it is unclear 
 that how large the distribution offset $\Delta \vec{s}$ should be. 
 % Why use simulation data to study the populations? 
 Other complications for studying galaxy clusters arise from observation
@@ -343,7 +343,7 @@ We try to avoid any manual methods for identifying peaks for
 reproducibility and comparison purposes. Since all the methods listed in this
 paper are automated, it is possible for other studies to reuse our code for 
 comparisons. 
-There are a number of decisions ($\sim [TODO] ADD NUMBER$) that one needs to make to 
+There are a number of decisions ($\sim $[TODO] ADD NUMBER) that one needs to make to 
 determine the summary statistics. We will try to address the sensitivity of the offset
 due to each decision. 
 Furthermore, a major advantage for automation is that it allows us  
@@ -455,10 +455,24 @@ The band in which we picked the BCG for presentation is the $i$-band.
 
 \begin{figure*}
 	\includegraphics[width=.95\linewidth]{fig3_toy_data_mixtures.eps}
-	\caption{[TODO] ADD LEGEND TO THE PLOT. 
-		Comparison of peak finding performances of different methods. Panels
-		from the top row contain data drawn from a single Gaussian mixture. The
-	second row panels contain data from two Gaussian mixtures. 
+	\caption{Comparison of peak finding performances of different methods by
+		drawing data point from known number of Gaussian mixture models. 
+		Panels from the top row contain data drawn from a single Gaussian mixture. The
+	panels from the middle row contain data from one dominant and one
+	subdominant Gaussian mixtures. 
+	The panels from the bottom row contain data drawn from one dominate Gaussian
+	mixture and two subdominant Gaussian mixtures. 
+	Due to the statistical nature of this exercise, we performed many samples to
+	create the (68\% and 95\%) confidence contours of the estimates in the middle
+	column. The rightmost column shows how the size (median contour radius) 
+	of the confidence regions vary as a
+	function of the number of drawn data points from the Gaussian mixtures. 
+	From the middle and the rightmost
+	column, we can tell that the KDE peak estimate is the most accurate but less
+	precise. For the bottom right plot, there is an outlier for the shrinking 
+	aperture method for 500 data
+	points. The outlier shows how the shrinking aperture method can have
+	radical behavior when there are substructures in the data.	
 		\label{fig:toy_data_mixtures}}
 \end{figure*}
 
