@@ -26,13 +26,15 @@ rc("font", family="serif")
 # r_colors = [(i / (len(lvls) + 1.), 0 / 255., 0 / 255.)
 #             for i in xrange(1, len(lvls) + 1)]
 
-# Color palette are from http://colorbrewer2.org/
-g_colors = [(127./255, 191./255, 123./255), (27./255, 120/255., 55./255)]
+# Color-blind substitutes for RGB from
+# http://bconnelly.net/2013/10/creating-colorblind-friendly-figures/
+# (Vermillion), (Orange)
+r_colors = [(213./255, 94./255, 0./255), (230./255, 159/255., 0./255)]
 
-b_colors = [(103./255, 169./255, 207./255), (33./255, 102/255., 172./255)]
+# (Blue), (Sky Blue)
+b_colors = [(0./255, 114./255, 178./255), (86./255, 180./255., 233./255)]
 
-# This represents purple to be color-blind friendly
-r_colors = [(136./255, 86./255, 167./255), (129./255, 15./255, 124./255)]
+g_colors = [(0./255, 158./255, 115./255), (0./255, 100./255, 60./255)]
 
 # ------------------data sampling -----------------------------
 
@@ -252,7 +254,7 @@ def plot_grid_spec(gauss_data, bimodal_data, dumb_data, f, figsize=(13, 13),
     :param f: hdf5 hierarchical file stream
     """
     import matplotlib.gridspec as gridspec
-    from matplotlib.ticker import MaxNLocator
+    # from matplotlib.ticker import MaxNLocator
 
     plt.figure(figsize=figsize)
     rowNo = 3
@@ -355,11 +357,17 @@ def plot_error_as_a_func_of_data_pts(f, data_set,
     errs = compute_errors_from_data(f, data_set, methods=methods,
                                     data_size=data_size)
 
+    colors = {"KDE": b_colors[0],
+              "shrink": g_colors[0],
+              "cent": r_colors[0],
+              "KDE1": b_colors[0],
+              }
     for i, method in enumerate(methods):
+        color = colors[method]
         cf68 = [errs[str(size)][method].values()[0]
                 for size in data_size]
         ax.plot(data_size, cf68, 'x-',
-                mew=2, ms=10,
+                mew=2, ms=10, color=color,
                 label=method)
 
     ax.set_xlim(0, 550)
@@ -432,7 +440,6 @@ def plot_gauss_contour(KDE_peak_dens, shrink_peak_dens,
         fig = plt.figure()
         ax = fig.add_subplot(111, aspect='equal')
 
-    contours = {}
     plot_cf_contour(KDE_peak_dens["estimate"][:],
                     KDE_peak_dens["eval_points"][:][0],
                     KDE_peak_dens["eval_points"][:][1],
@@ -499,7 +506,7 @@ def plot_gauss_zoomed_contours(KDE_peak_dens1, shrink_peak_dens1,
 
     ax.plot(KDE_peak_dens1["peaks_xcoords"][:][0],
             KDE_peak_dens1["peaks_ycoords"][:][0],
-            'bx', mew=2, markersize=markersize,
+            'x', mew=2, markersize=markersize, color=b_colors[0],
             label="KDE peak best est")
 
     # plot shrinking aperture contour
@@ -510,7 +517,7 @@ def plot_gauss_zoomed_contours(KDE_peak_dens1, shrink_peak_dens1,
 
     ax.plot(shrink_peak_dens1["peaks_xcoords"][:][0],
             shrink_peak_dens1["peaks_ycoords"][:][0],
-            'gx', mew=2, markersize=markersize,
+            'x', mew=2, markersize=markersize, color=g_colors[0],
             label="Shrink peak best est")
 
     # plot centroid contour
@@ -521,7 +528,7 @@ def plot_gauss_zoomed_contours(KDE_peak_dens1, shrink_peak_dens1,
 
     ax.plot(cent_peak_dens1["peaks_xcoords"][:][0],
             cent_peak_dens1["peaks_ycoords"][:][0],
-            'rx', mew=2, markersize=markersize,
+            'x', mew=2, markersize=markersize, color=r_colors[0],
             label="Centroid peak best est")
 
     ax.plot(1, 1, "kx", mew=2, label="Mean of dominant Gaussian",
@@ -640,8 +647,8 @@ def plot_one_big_one_small_gaussian_zoomed_contour(
 
     ax.plot(KDE_peak_dens1["peaks_xcoords"][:][0],
             KDE_peak_dens1["peaks_ycoords"][:][0],
-            'bx', mew=2, markersize=markersize,
-            label="KDE peak best est")
+            'x', mew=2, markersize=markersize,
+            label="KDE peak best est", color=b_colors[0])
 
     # plot shrinking aperture contour
     contours["shrink"] = plot_cf_contour(shrink_peak_dens1["estimate"][:],
@@ -651,7 +658,7 @@ def plot_one_big_one_small_gaussian_zoomed_contour(
 
     ax.plot(shrink_peak_dens1["peaks_xcoords"][:][0],
             shrink_peak_dens1["peaks_ycoords"][:][0],
-            'gx', mew=2, markersize=markersize,
+            'x', mew=2, markersize=markersize, color=g_colors[0],
             label="Shrink peak best est")
 
     # plot centroid contour
@@ -662,7 +669,7 @@ def plot_one_big_one_small_gaussian_zoomed_contour(
 
     ax.plot(cent_peak_dens1["peaks_xcoords"][:][0],
             cent_peak_dens1["peaks_ycoords"][:][0],
-            'rx', mew=2, markersize=markersize,
+            'x', mew=2, markersize=markersize, color=r_colors[0],
             label="Centroid peak best est")
 
     ax.plot(2, 2, "kx", mew=2, label="Mean of dominant Gaussian",
@@ -822,8 +829,8 @@ def plot_dumbbell_zoomed_contour(
     # plot KDE subdominant peak contour
     ax.plot(KDE_peak_dens2["peaks_xcoords"][:][0],
             KDE_peak_dens2["peaks_ycoords"][:][0],
-            'bx', mew=2, markersize=markersize, fillstyle='none',
-            label="KDE peak best est")
+            'x', mew=2, markersize=markersize, fillstyle='none',
+            label="KDE peak best est", color=b_colors[0])
 
     # plot shrinking aperture contour
     contours["shrink"] = plot_cf_contour(shrink_peak_dens2["estimate"][:],
@@ -833,7 +840,7 @@ def plot_dumbbell_zoomed_contour(
 
     ax.plot(shrink_peak_dens2["peaks_xcoords"][:][0],
             shrink_peak_dens2["peaks_ycoords"][:][0],
-            'gx', mew=2, markersize=markersize,
+            'x', mew=2, markersize=markersize, color=g_colors[0],
             label="Shrink peak best est")
 
     ax.plot(2, 2, "kx", mew=2, label="Mean of dominant Gaussian",
@@ -842,7 +849,9 @@ def plot_dumbbell_zoomed_contour(
     ax.tick_params(labeltop='off', labelright='off')
     ax.yaxis.set_ticks_position('left')
     ax.xaxis.set_ticks_position('bottom')
-        # ax.legend(loc='lower right', frameon=False, fontsize='small')
+
+    ax.legend(loc='lower right', frameon=True, fontsize=10,
+              bbox_to_anchor=(1., -0.4))
     # ax.title("Zoomed-in view near the dominant peak",
     #          fontsize=15)
 
@@ -1014,125 +1023,125 @@ def plot_one_big_one_small_gaussian_500(
     return
 
 
-def plot_dumbbell_500_comparison(
-        dumbbell_data2,
-        shrink_peak_dens2,
-        KDE_peak_dens2,
-        KDE_peak_dens2b,
-        cent_peak_dens2,
-        figsidesize=7,
-        plot_path="../../paper/figures/drafts/",
-        plot_fig_name="confidence_regions_dumbbell_500.pdf", ax=None):
-    """ for plot in appendix, tweaked labels to look best on fig"""
-
-    if ax is None:
-        fig = plt.figure()
-        ax = fig.add_subplot(111, aspect='equal')
-
-    ax.figure(figsize=(figsidesize * 3, figsidesize))
-
-    # right most subplot
-    ax.subplot(133)
-    markersize = 10
-    # plot KDE dominant peak contour
-    plot_cf_contour(KDE_peak_dens2["estimate"],
-                    KDE_peak_dens2["eval_points"][0],
-                    KDE_peak_dens2["eval_points"][1],
-                    colors=b_colors)
-
-    # plot KDE subdominant peak contour
-    ax.plot(KDE_peak_dens2["peaks_xcoords"][0],
-            KDE_peak_dens2["peaks_ycoords"][0],
-            'bx', mew=2, markersize=markersize, fillstyle='none',
-            label="KDE peak best est")
-
-    # plot shrinking aperture contour
-    plot_cf_contour(shrink_peak_dens2["estimate"],
-                    shrink_peak_dens2["eval_points"][0],
-                    shrink_peak_dens2["eval_points"][1],
-                    colors=g_colors)
-
-    ax.plot(shrink_peak_dens2["peaks_xcoords"][0],
-            shrink_peak_dens2["peaks_ycoords"][0],
-            'gx', mew=2, markersize=markersize,
-            label="Shrink peak best est")
-
-    ax.plot(2, 2, "kx", mew=2, label="Mean of dominant Gaussian",
-            markersize=markersize)
-
-    ax.legend(loc='lower right', frameon=False)
-    ax.title("Zoomed-in view near the dominant peak",
-             fontsize=15)
-
-    ax.xlim(0.25, 3.0)
-    ax.ylim(0.25, 3.0)
-
-    # middle subplot
-    ax.subplot(132)
-    markersize = 6
-    ax.xlim(-6, 6)
-    ax.ylim(-6, 6)
-
-    plot_cf_contour(KDE_peak_dens2["estimate"],
-                    KDE_peak_dens2["eval_points"][0],
-                    KDE_peak_dens2["eval_points"][1],
-                    colors=b_colors)
-    ax.figtext(0.55, 0.53, 'KDE dominant\npeak confidence \nregion',
-               color='b')
-
-    plot_cf_contour(KDE_peak_dens2b["estimate"],
-                    KDE_peak_dens2b["eval_points"][0],
-                    KDE_peak_dens2b["eval_points"][1],
-                    colors=b_colors)
-    ax.figtext(0.49, 0.35, 'KDE subdominant peak\nconfidence region',
-               color='b')
-
-    plot_cf_contour(shrink_peak_dens2["estimate"],
-                    shrink_peak_dens2["eval_points"][0],
-                    shrink_peak_dens2["eval_points"][1],
-                    colors=g_colors)
-
-    ax.figtext(0.45, 0.65, 'Shrink apert peak\nconfidence region',
-               color='g')
-
-    plot_cf_contour(cent_peak_dens2["estimate"],
-                    cent_peak_dens2["eval_points"][0],
-                    cent_peak_dens2["eval_points"][1],
-                    colors=r_colors)
-    ax.figtext(0.43, 0.55, 'Centroid \nconfidence region', color='r')
-
-    markersize = 8
-    ax.plot(2, 2, "kx", mew=2,
-            label="Mean of dominant Gaussian",
-            markersize=markersize)
-    ax.plot(-2, -2, "x", color="grey", mew=3,
-            label="Mean of subdominant Gaussian",
-            markersize=markersize)
-    ax.plot(0, 0, "x", color="grey", mew=3,
-            label="Mean of subdominant Gaussian",
-            markersize=markersize)
-    ax.legend(loc='lower right', frameon=False)
-
-    ax.title('Confidence regions and best estimates of peak finding methods',
-             fontsize=13)
-
-    # first plot for the data
-    ax.subplot(131)
-    ax.plot(d["dumb"][0][:, 0], dumb_data[0][:, 1], '.', color='k',
-            alpha=0.3)
-    ax.plot(2, 2, "ko", mew=2,
-            label="Mean of dominant Gaussian", fillstyle='none',
-            markersize=markersize)
-    ax.plot(-2, -2, "x", color="k", mew=3,
-            label="Mean of subdominant Gaussian",
-            markersize=markersize)
-    ax.plot(0, 0, "x", color="k", mew=3,
-            label="Mean of subdominant Gaussian",
-            markersize=markersize)
-    ax.legend(loc='best', frameon=False)
-    ax.title("Dumbbell data with 3 mixtures of Gaussians", size=15)
-    ax.savefig(plot_path + plot_fig_name, bbox_inches='tight')
-    return
+# def plot_dumbbell_500_comparison(
+#         dumbbell_data2,
+#         shrink_peak_dens2,
+#         KDE_peak_dens2,
+#         KDE_peak_dens2b,
+#         cent_peak_dens2,
+#         figsidesize=7,
+#         plot_path="../../paper/figures/drafts/",
+#         plot_fig_name="confidence_regions_dumbbell_500.pdf", ax=None):
+#     """ for plot in appendix, tweaked labels to look best on fig"""
+#
+#     if ax is None:
+#         fig = plt.figure()
+#         ax = fig.add_subplot(111, aspect='equal')
+#
+#     ax.figure(figsize=(figsidesize * 3, figsidesize))
+#
+#     # right most subplot
+#     ax.subplot(133)
+#     markersize = 10
+#     # plot KDE dominant peak contour
+#     plot_cf_contour(KDE_peak_dens2["estimate"],
+#                     KDE_peak_dens2["eval_points"][0],
+#                     KDE_peak_dens2["eval_points"][1],
+#                     colors=b_colors)
+#
+#     # plot KDE subdominant peak contour
+#     ax.plot(KDE_peak_dens2["peaks_xcoords"][0],
+#             KDE_peak_dens2["peaks_ycoords"][0],
+#             'bx', mew=2, markersize=markersize, fillstyle='none',
+#             label="KDE peak best est")
+#
+#     # plot shrinking aperture contour
+#     plot_cf_contour(shrink_peak_dens2["estimate"],
+#                     shrink_peak_dens2["eval_points"][0],
+#                     shrink_peak_dens2["eval_points"][1],
+#                     colors=g_colors)
+#
+#     ax.plot(shrink_peak_dens2["peaks_xcoords"][0],
+#             shrink_peak_dens2["peaks_ycoords"][0],
+#             'gx', mew=2, markersize=markersize,
+#             label="Shrink peak best est")
+#
+#     ax.plot(2, 2, "kx", mew=2, label="Mean of dominant Gaussian",
+#             markersize=markersize)
+#
+#     ax.legend(loc='lower right', frameon=False)
+#     ax.title("Zoomed-in view near the dominant peak",
+#              fontsize=15)
+#
+#     ax.xlim(0.25, 3.0)
+#     ax.ylim(0.25, 3.0)
+#
+#     # middle subplot
+#     ax.subplot(132)
+#     markersize = 6
+#     ax.xlim(-6, 6)
+#     ax.ylim(-6, 6)
+#
+#     plot_cf_contour(KDE_peak_dens2["estimate"],
+#                     KDE_peak_dens2["eval_points"][0],
+#                     KDE_peak_dens2["eval_points"][1],
+#                     colors=b_colors)
+#     ax.figtext(0.55, 0.53, 'KDE dominant\npeak confidence \nregion',
+#                color='b')
+#
+#     plot_cf_contour(KDE_peak_dens2b["estimate"],
+#                     KDE_peak_dens2b["eval_points"][0],
+#                     KDE_peak_dens2b["eval_points"][1],
+#                     colors=b_colors)
+#     ax.figtext(0.49, 0.35, 'KDE subdominant peak\nconfidence region',
+#                color='b')
+#
+#     plot_cf_contour(shrink_peak_dens2["estimate"],
+#                     shrink_peak_dens2["eval_points"][0],
+#                     shrink_peak_dens2["eval_points"][1],
+#                     colors=g_colors)
+#
+#     ax.figtext(0.45, 0.65, 'Shrink apert peak\nconfidence region',
+#                color='g')
+#
+#     plot_cf_contour(cent_peak_dens2["estimate"],
+#                     cent_peak_dens2["eval_points"][0],
+#                     cent_peak_dens2["eval_points"][1],
+#                     colors=r_colors)
+#     ax.figtext(0.43, 0.55, 'Centroid \nconfidence region', color='r')
+#
+#     markersize = 8
+#     ax.plot(2, 2, "kx", mew=2,
+#             label="Mean of dominant Gaussian",
+#             markersize=markersize)
+#     ax.plot(-2, -2, "x", color="grey", mew=3,
+#             label="Mean of subdominant Gaussian",
+#             markersize=markersize)
+#     ax.plot(0, 0, "x", color="grey", mew=3,
+#             label="Mean of subdominant Gaussian",
+#             markersize=markersize)
+#     ax.legend(loc='lower right', frameon=False)
+#
+#     ax.title('Confidence regions and best estimates of peak finding methods',
+#              fontsize=13)
+#
+#     # first plot for the data
+#     ax.subplot(131)
+#     ax.plot(dumb_data["dumb"][0][:, 0], dumb_data[0][:, 1], '.', color='k',
+#             alpha=0.3)
+#     ax.plot(2, 2, "ko", mew=2,
+#             label="Mean of dominant Gaussian", fillstyle='none',
+#             markersize=markersize)
+#     ax.plot(-2, -2, "x", color="k", mew=3,
+#             label="Mean of subdominant Gaussian",
+#             markersize=markersize)
+#     ax.plot(0, 0, "x", color="k", mew=3,
+#             label="Mean of subdominant Gaussian",
+#             markersize=markersize)
+#     ax.legend(loc='best', frameon=False)
+#     ax.title("Dumbbell data with 3 mixtures of Gaussians", size=15)
+#     ax.savefig(plot_path + plot_fig_name, bbox_inches='tight')
+#     return
 
 
 def plot_dumbbell_comparison(
@@ -1259,101 +1268,101 @@ def plot_dumbbell_comparison(
     return
 
 
-def plot_gauss_500_comparison(gauss_data, shrink_peak_dens, KDE_peak_dens,
-                              cent_peak_dens,
-                              fig_path="../../paper/figures/drafts/",
-                              fig_name="gauss500.pdf",
-                              figsize=7, save=False):
-
-    ax.figure(figsize=(figsize * 3, figsize))
-    ax.subplot(131)
-    ax.plot(d["gauss"][0][:, 0], gauss_data[0][:, 1], 'k.', alpha=0.3)
-    ax.plot(1, 1, 'kx', mew=2, ms=10, label='Mean of Gaussian')
-    ax.legend(loc='best', frameon=False)
-
-    xlim = ax.xlim(-2, 4)
-    ylim = ax.ylim(-2, 4)
-
-    ax.subplot(132)
-
-    plot_cf_contour(KDE_peak_dens["estimate"],
-                    KDE_peak_dens["eval_points"][0],
-                    KDE_peak_dens["eval_points"][1],
-                    colors=b_colors)
-    ax.annotate('KDE peak\nconfidence region', (0.3, 0.62),
-                textcoords='axes fraction',
-                color='b')
-
-    plot_cf_contour(shrink_peak_dens["estimate"],
-                    shrink_peak_dens["eval_points"][0],
-                    shrink_peak_dens["eval_points"][1],
-                    colors=g_colors)
-    ax.annotate('Shrink. apert. peak\nconfidence region', (0.3, 0.25),
-                textcoords='axes fraction',
-                color='g')
-
-    plot_cf_contour(cent_peak_dens["estimate"],
-                    cent_peak_dens["eval_points"][0],
-                    cent_peak_dens["eval_points"][1],
-                    colors=r_colors)
-    ax.annotate('Centroid\nconfidence region', (0.6, 0.5),
-                textcoords='axes fraction',
-                color='r')
-    ax.plot(1, 1, "kx", mew=2, label="True center", markersize=5)
-    ax.xlim(0, 2.0)
-    ax.legend(loc='best', frameon=False)
-    # ax.title('Confidence region from one Gaussian at (1, 1)',
-    #           fontsize=15)
-    ax.xlim(xlim)
-    ax.ylim(ylim)
-
-    ax.subplot(133)
-    markersize = 10
-    # plot KDE dominant peak contour
-    plot_cf_contour(KDE_peak_dens["estimate"],
-                    KDE_peak_dens["eval_points"][0],
-                    KDE_peak_dens["eval_points"][1],
-                    colors=b_colors)
-
-    ax.plot(KDE_peak_dens["peaks_xcoords"][0],
-            KDE_peak_dens["peaks_ycoords"][0],
-            'bx', mew=2, markersize=markersize,
-            label="KDE peak best est")
-
-    # plot shrinking aperture contour
-    plot_cf_contour(shrink_peak_dens["estimate"],
-                    shrink_peak_dens["eval_points"][0],
-                    shrink_peak_dens["eval_points"][1],
-                    colors=g_colors)
-
-    ax.plot(shrink_peak_dens["peaks_xcoords"][0],
-            shrink_peak_dens["peaks_ycoords"][0],
-            'gx', mew=2, markersize=markersize,
-            label="Shrink peak best est")
-
-    # plot centroid contour
-    plot_cf_contour(cent_peak_dens["estimate"],
-                    cent_peak_dens["eval_points"][0],
-                    cent_peak_dens["eval_points"][1],
-                    colors=r_colors)
-
-    ax.plot(cent_peak_dens["peaks_xcoords"][0],
-            cent_peak_dens["peaks_ycoords"][0],
-            'rx', mew=2, markersize=markersize,
-            label="Centroid peak best est")
-
-    ax.plot(1, 1, "kx", mew=2, label="Mean of dominant Gaussian",
-            markersize=markersize)
-
-    ax.legend(loc='lower right', frameon=False)
-    ax.title("Zoomed-in view near the dominant peak",
-             fontsize=15)
-
-    if save:
-        print("saving figure to" + fig_path + fig_name)
-        ax.savefig(fig_path + fig_name, bbox_inches='tight')
-
-    return
+# def plot_gauss_500_comparison(gauss_data, shrink_peak_dens, KDE_peak_dens,
+#                               cent_peak_dens,
+#                               fig_path="../../paper/figures/drafts/",
+#                               fig_name="gauss500.pdf",
+#                               figsize=7, save=False):
+#
+#     ax.figure(figsize=(figsize * 3, figsize))
+#     ax.subplot(131)
+#     ax.plot(d["gauss"][0][:, 0], gauss_data[0][:, 1], 'k.', alpha=0.3)
+#     ax.plot(1, 1, 'kx', mew=2, ms=10, label='Mean of Gaussian')
+#     ax.legend(loc='best', frameon=False)
+#
+#     xlim = ax.xlim(-2, 4)
+#     ylim = ax.ylim(-2, 4)
+#
+#     ax.subplot(132)
+#
+#     plot_cf_contour(KDE_peak_dens["estimate"],
+#                     KDE_peak_dens["eval_points"][0],
+#                     KDE_peak_dens["eval_points"][1],
+#                     colors=b_colors)
+#     ax.annotate('KDE peak\nconfidence region', (0.3, 0.62),
+#                 textcoords='axes fraction',
+#                 color='b')
+#
+#     plot_cf_contour(shrink_peak_dens["estimate"],
+#                     shrink_peak_dens["eval_points"][0],
+#                     shrink_peak_dens["eval_points"][1],
+#                     colors=g_colors)
+#     ax.annotate('Shrink. apert. peak\nconfidence region', (0.3, 0.25),
+#                 textcoords='axes fraction',
+#                 color='g')
+#
+#     plot_cf_contour(cent_peak_dens["estimate"],
+#                     cent_peak_dens["eval_points"][0],
+#                     cent_peak_dens["eval_points"][1],
+#                     colors=r_colors)
+#     ax.annotate('Centroid\nconfidence region', (0.6, 0.5),
+#                 textcoords='axes fraction',
+#                 color='r')
+#     ax.plot(1, 1, "kx", mew=2, label="True center", markersize=5)
+#     ax.xlim(0, 2.0)
+#     ax.legend(loc='best', frameon=False)
+#     # ax.title('Confidence region from one Gaussian at (1, 1)',
+#     #           fontsize=15)
+#     ax.xlim(xlim)
+#     ax.ylim(ylim)
+#
+#     ax.subplot(133)
+#     markersize = 10
+#     # plot KDE dominant peak contour
+#     plot_cf_contour(KDE_peak_dens["estimate"],
+#                     KDE_peak_dens["eval_points"][0],
+#                     KDE_peak_dens["eval_points"][1],
+#                     colors=b_colors)
+#
+#     ax.plot(KDE_peak_dens["peaks_xcoords"][0],
+#             KDE_peak_dens["peaks_ycoords"][0],
+#             'bx', mew=2, markersize=markersize,
+#             label="KDE peak best est")
+#
+#     # plot shrinking aperture contour
+#     plot_cf_contour(shrink_peak_dens["estimate"],
+#                     shrink_peak_dens["eval_points"][0],
+#                     shrink_peak_dens["eval_points"][1],
+#                     colors=g_colors)
+#
+#     ax.plot(shrink_peak_dens["peaks_xcoords"][0],
+#             shrink_peak_dens["peaks_ycoords"][0],
+#             'gx', mew=2, markersize=markersize,
+#             label="Shrink peak best est")
+#
+#     # plot centroid contour
+#     plot_cf_contour(cent_peak_dens["estimate"],
+#                     cent_peak_dens["eval_points"][0],
+#                     cent_peak_dens["eval_points"][1],
+#                     colors=r_colors)
+#
+#     ax.plot(cent_peak_dens["peaks_xcoords"][0],
+#             cent_peak_dens["peaks_ycoords"][0],
+#             'rx', mew=2, markersize=markersize,
+#             label="Centroid peak best est")
+#
+#     ax.plot(1, 1, "kx", mew=2, label="Mean of dominant Gaussian",
+#             markersize=markersize)
+#
+#     ax.legend(loc='lower right', frameon=False)
+#     ax.title("Zoomed-in view near the dominant peak",
+#              fontsize=15)
+#
+#     if save:
+#         print("saving figure to" + fig_path + fig_name)
+#         ax.savefig(fig_path + fig_name, bbox_inches='tight')
+#
+#     return
 
 
 def plot_gauss_comparison(gauss_data, shrink_peak_dens, KDE_peak_dens,
