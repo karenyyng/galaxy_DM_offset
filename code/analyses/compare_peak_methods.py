@@ -34,6 +34,7 @@ r_colors = [(213./255, 94./255, 0./255), (230./255, 159/255., 0./255)]
 # (Blue), (Sky Blue)
 b_colors = [(0./255, 114./255, 178./255), (86./255, 180./255., 233./255)]
 
+# (Green), (Lighter green)
 g_colors = [(0./255, 158./255, 115./255), (0./255, 100./255, 60./255)]
 
 # ------------------data sampling -----------------------------
@@ -270,7 +271,7 @@ def plot_grid_spec(gauss_data, bimodal_data, dumb_data, f, figsize=(13, 13),
 
     # plot the right two columns
     gs2 = gridspec.GridSpec(rowNo, colNo2)
-    gs2.update(left=0.51, right=0.98, wspace=0.4, hspace=hspace)
+    gs2.update(left=0.45, right=0.98, wspace=0.3, hspace=hspace)
     axArr2 = [[plt.subplot(gs2[i, j])
                for j in range(colNo2)] for i in range(rowNo)]
 
@@ -331,7 +332,8 @@ def plot_grid_spec(gauss_data, bimodal_data, dumb_data, f, figsize=(13, 13),
                                      ax=axArr2[1][1])
     plot_error_as_a_func_of_data_pts(f, "dumb",
                                      ax=axArr2[2][1],
-                                     methods=["KDE1", "shrink", "cent"])
+                                     methods=["KDE1", "shrink", "cent"],
+                                     legend=True)
 
     plt.savefig(output_path + name, bbox_inches='tight')
 
@@ -342,7 +344,8 @@ def plot_error_as_a_func_of_data_pts(f, data_set,
                                      ax=None, methods=["KDE",
                                                        "shrink",
                                                        "cent"],
-                                     show_xlabel=False
+                                     show_xlabel=True,
+                                     legend=True
                                      ):
     if ax is None:
         fig = plt.figure()
@@ -374,34 +377,36 @@ def plot_error_as_a_func_of_data_pts(f, data_set,
     ax.set_ylim(0, ax.get_ylim()[-1] * 1.1)
     ax.set_ylabel("68% confidence region", size=15)
     if show_xlabel:
-        ax.set_xlabel("Number of data points", size="small")
+        ax.set_xlabel("Total no. of sampled data points\ndrawn from Gaussian mixture", size=12)
 
     ax.tick_params(labeltop='off', labelright='off')
     ax.yaxis.set_ticks_position('left')
     ax.xaxis.set_ticks_position('bottom')
+
+    ax.legend(loc='lower right', frameon=True, bbox_to_anchor=(.6, -0.55))
     return
 
 
 def compute_errors_from_data(f, data_set, methods,
                              data_size=[20, 50, 100, 500]):
-
-
     errs = {}
     for size in data_size:
         errs[str(size)] = {}
         gp = f[str(size) + "/" + data_set]
+
         for method in methods:
             errs[str(size)][method] = {}
-            contours = plot_cf_contour(gp[method]["estimate"][:],
-                                       gp[method]["eval_points"][:][0],
-                                       gp[method]["eval_points"][:][1])
+            est = gp[method]["estimate"][:]
+            eval_pts1 = gp[method]["eval_points"][:][0]
+            eval_pts2 = gp[method]["eval_points"][:][1]
+            contours = plot_cf_contour(est, eval_pts1, eval_pts2)
             plt.clf()
             plt.close()
             peaks = np.array([gp[method]["peaks_xcoords"][:][0],
                               gp[method]["peaks_ycoords"][:][0]])
             for k, ctr in contours.iteritems():
-                errs[str(size)][method][k] = calculate_error_from_contour(ctr,
-                                                                         peaks)
+                errs[str(size)][method][k] = \
+                    calculate_error_from_contour(ctr, peaks)
 
     return errs
 
@@ -830,7 +835,7 @@ def plot_dumbbell_zoomed_contour(
     ax.plot(KDE_peak_dens2["peaks_xcoords"][:][0],
             KDE_peak_dens2["peaks_ycoords"][:][0],
             'x', mew=2, markersize=markersize, fillstyle='none',
-            label="KDE peak best est", color=b_colors[0])
+            label="KDE peak estimate", color=b_colors[0])
 
     # plot shrinking aperture contour
     contours["shrink"] = plot_cf_contour(shrink_peak_dens2["estimate"][:],
@@ -841,17 +846,21 @@ def plot_dumbbell_zoomed_contour(
     ax.plot(shrink_peak_dens2["peaks_xcoords"][:][0],
             shrink_peak_dens2["peaks_ycoords"][:][0],
             'x', mew=2, markersize=markersize, color=g_colors[0],
-            label="Shrink peak best est")
+            label="Shrink peak estimate")
+
+    ax.plot(0, 0, "x", mew=2, label="Centroid best estimate",
+            markersize=markersize, color=r_colors[0])
 
     ax.plot(2, 2, "kx", mew=2, label="Mean of dominant Gaussian",
             markersize=markersize)
+
 
     ax.tick_params(labeltop='off', labelright='off')
     ax.yaxis.set_ticks_position('left')
     ax.xaxis.set_ticks_position('bottom')
 
-    ax.legend(loc='lower right', frameon=True, fontsize=10,
-              bbox_to_anchor=(1., -0.4))
+    ax.legend(loc='lower right', frameon=True, fontsize=12,
+              bbox_to_anchor=(1., -0.55))
     # ax.title("Zoomed-in view near the dominant peak",
     #          fontsize=15)
 
@@ -918,7 +927,7 @@ def plot_compare_one_big_one_small_gaussian(bimodal_data,
     ax.plot(KDE_peak_dens1["peaks_xcoords"][0],
             KDE_peak_dens1["peaks_ycoords"][0],
             'bx', mew=2, markersize=markersize,
-            label="KDE peak best est")
+            label="KDE peak estimate")
 
     # plot shrinking aperture contour
     plot_cf_contour(shrink_peak_dens1["estimate"],
@@ -929,7 +938,7 @@ def plot_compare_one_big_one_small_gaussian(bimodal_data,
     ax.plot(shrink_peak_dens1["peaks_xcoords"][0],
             shrink_peak_dens1["peaks_ycoords"][0],
             'gx', mew=2, markersize=markersize,
-            label="Shrink peak best est")
+            label="Shrink peak estimate")
 
     # plot centroid contour
     plot_cf_contour(cent_peak_dens1["estimate"],
@@ -940,7 +949,7 @@ def plot_compare_one_big_one_small_gaussian(bimodal_data,
     ax.plot(cent_peak_dens1["peaks_xcoords"][0],
             cent_peak_dens1["peaks_ycoords"][0],
             'rx', mew=2, markersize=markersize,
-            label="Centroid peak best est")
+            label="Centroid peak best estimate")
 
     ax.plot(2, 2, "kx", mew=2, label="Mean of dominant Gaussian",
             markersize=markersize)
@@ -1171,7 +1180,7 @@ def plot_dumbbell_comparison(
     ax.plot(KDE_peak_dens2["peaks_xcoords"][0],
             KDE_peak_dens2["peaks_ycoords"][0],
             'bx', mew=2, markersize=markersize, fillstyle='none',
-            label="KDE peak best est")
+            label="KDE peak estimate")
 
     # plot shrinking aperture contour
     plot_cf_contour(shrink_peak_dens2["estimate"],
@@ -1182,7 +1191,7 @@ def plot_dumbbell_comparison(
     ax.plot(shrink_peak_dens2["peaks_xcoords"][0],
             shrink_peak_dens2["peaks_ycoords"][0],
             'gx', mew=2, markersize=markersize,
-            label="Shrink peak best est")
+            label="Shrink peak estimate")
 
     ax.plot(2, 2, "kx", mew=2, label="Mean of dominant Gaussian",
             markersize=markersize)
