@@ -367,7 +367,8 @@ def plot_error_as_a_func_of_data_pts(f, data_set,
     ax.set_ylim(0, ax.get_ylim()[-1] * 1.1)
     ax.set_ylabel("68% confidence region", size=15)
     if show_xlabel and data_set == "dumb":
-        ax.set_xlabel("Total no. of sampled data points\ndrawn from Gaussian mixture", size=12)
+        ax.set_xlabel(
+            "Total no. of data points\ndrawn from Gaussian mixture(s)", size=12)
 
     ax.tick_params(labeltop='off', labelright='off')
     ax.yaxis.set_ticks_position('left')
