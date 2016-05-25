@@ -173,15 +173,7 @@ def compute_shrinking_aperture_offset(
         if output is 'both'
         list of [1st_spatial_peak_loc, 2nd_spatial_peak_loc, offset]
 
-        offset: offset is in unit of c kpc/h
-
-
-
-    :to do:
-        needs major revamp to restructure the outputs, i.e. fhat
-    :note:
-        can think of making this function even more general
-        by having the peak inference function passed in
+        offset: offset is in unit of kpc/h
     """
     if output not in ['both', 'peaks_only', 'offsets_only']:
         raise NotImplementedError("Implemented output types are " +
