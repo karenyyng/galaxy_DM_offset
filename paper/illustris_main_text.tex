@@ -341,14 +341,14 @@ We compare four ways to identify the light/galaxy centers:
 
 We try to avoid any manual methods for identifying peaks for
 reproducibility and comparison purposes. Since all the methods listed in this
-paper are automated, it is possible for other studies to reuse our code for 
-comparisons. 
+paper are automated with the source code openly available, 
+it is possible for future studies to reuse our code for comparisons. 
 There are a number of decisions ($\sim $[TODO] ADD NUMBER) that one needs to make to 
 determine the summary statistics. We will try to address the sensitivity of the offset
 due to each decision. 
 Furthermore, a major advantage for automation is that it allows us  
 to scale up our analysis by applying
-the same methods across the different snapshots of the Illustris simulations to
+the same methods across the different snapshots of the (Illustris) simulations to
 examine the variability of $\Delta s$ across time. 
 
 
@@ -382,7 +382,7 @@ bandwidth matrix for each cluster ($\Hmat$) for our 2D Gaussian kernel.
 	\sum_{i=1}^n \exp((\chi-{\bf x}_i)^T H^{-1} (\chi-{\bf x}_i)),
 \end{align}
 where the dimensionality is $d=2$ for our projected quantities,
-$X$ represents the uniform grid points for evaluation, and 
+$\chi$ represents the uniform grid points for evaluation, and 
 $\bf{x}_i$ contains the spatial coordinates for each of the identified member 
 galaxies that survived our brightness cut.
 
@@ -397,7 +397,9 @@ small enough for this method to finish quickly.
 
 After obtaining the KDE estimate, we employed both a first and second-order  
 finite differencing algorithm to find the local maxima.  
-The local maxima were then sorted according to the KDE density.  
+The local maxima were then sorted according to the KDE density. The density
+of the peaks are normalized as a fraction of the densest peak for that 
+cluster. 
 
 
 % TODO: talk about the 
@@ -418,14 +420,15 @@ several components.
 The estimate using the shrinking aperture algorithm can be biased by
 substructures. The only way to inform the algorithm about substructures would
 be to introduce another parameter to restrict the center of the aperture, or to
-partition the data.
+partition the data with another algorithm.
 Furthermore, the convergence rate for this iterative algorithm is not
 analytical and is dependent on the data. We present the
 convergence criteria for reference. 
 We note that the exact implementation may result in different performances.
 \begin{algorithm}
-	\caption{Shrinking aperture algorithm. See code at (TODO: ADD LINK TO CODE ON
-	GITHUB)}
+	\caption{Shrinking aperture algorithm. See code at
+		\href{https://goo.gl/98PwfS}{https://goo.gl/98PwfS}.
+	}
 	\KwData{subhalo that satisfy cuts as a galaxy}
 	 \hrulefill \\
 
@@ -438,14 +441,14 @@ We note that the exact implementation may result in different performances.
  		newCenter = mean value of new data along each spatial dimension 
 	}   \hrulefill
  \end{algorithm}
- See [TODO] LINK to BitBucket code repository for the Python implementation
+ See to BitBucket code repository for the Python implementation
  along with the unit test.
 
 
 \subsubsection{Brightest Cluster Galaxies (BCG)}
 The BCGs are formed by the merger of many smaller
-galaxies. The galaxy-cannibalism makes BCGs typically brighter than the rest the 
-cluster galaxy population by several orders of magnitude. (CITE?)
+galaxies. The galaxy-cannibalism makes BCGs typically brighter than the rest 
+the cluster galaxy population by several orders of magnitude. (CITE?)
 However, star formation can result
 in galaxies brighter in the bluer photometric bands.
 To avoid star formation from biasing our algorithm for identifying the
@@ -456,50 +459,55 @@ The band in which we picked the BCG for presentation is the $i$-band.
 \begin{figure*}
 	\includegraphics[width=.95\linewidth]{fig3_toy_data_mixtures.eps}
 	\caption{Comparison of peak finding performances of different methods by
-		drawing data point from known number of Gaussian mixture models. 
+		drawing data points (i.e. 20, 50, 100, 500) from known number of 
+		Gaussian mixtures. 
 		Panels from the top row contain data drawn from a single Gaussian mixture. The
-	panels from the middle row contain data from one dominant and one
-	subdominant Gaussian mixtures. 
-	The panels from the bottom row contain data drawn from one dominate Gaussian
-	mixture and two subdominant Gaussian mixtures. 
+		panels from the middle row contain data from two 
+		 Gaussian mixtures with weight ratio = 7:3. 
+	The panels from the bottom row contain data drawn from three Gaussian
+	mixtures with weight ratio = 55:35:10. 
+	The left column shows how 50 data points drawn from the fixed number of 
+	Gaussian mixtures look like. 
 	Due to the statistical nature of this exercise, we performed many samples to
-	create the (68\% and 95\%) confidence contours of the estimates in the middle
+	create the (68\% and 95\%) confidence contours of the estimates in the
+	zoomed-in view of the data in the middle
 	column. The rightmost column shows how the size (median contour radius) 
 	of the confidence regions vary as a
 	function of the number of drawn data points from the Gaussian mixtures. 
 	From the middle and the rightmost
 	column, we can tell that the KDE peak estimate is the most accurate but less
-	precise. For the bottom right plot, there is an outlier for the shrinking 
-	aperture method for 500 data
-	points. The outlier shows how the shrinking aperture method can have
-	radical behavior when there are substructures in the data.	
+	precise. 
 		\label{fig:toy_data_mixtures}}
 \end{figure*}
 
 
 
 \subsection{Comparison of the methods from test data}
-In order to examine the performance of commonly used point-estimates of the
-distribution of the galaxy data, we test them on data drawn from Gaussian mixtures with
-known mean and variance. (See \ref{fig:toy_data_mixtures})\\
-We compare the properties and performance of each of the
-methods for finding the peaks of the galaxy and dark matter. 
-The main factors that affect the performance of the methods depend heavily on
-statistical fluctuations of the drawn data. Namely, the performance of each
-method depends on: 1) the
-actual spatial distribution of the data, in this case, the parameters of the
-gaussian mixtures that we chose, 2) the number of data points that we draw from 
-the distribution.
-Due to the statistical nature of the data, it is not enough to just
+In order to examine the statistical properties of commonly used point-
+estimates of the distribution of the galaxy data, we test them on data drawn 
+from Gaussian mixtures with known mean and variance. (See Fig.
+\ref{fig:toy_data_mixtures}). The main factors that affect the performance of 
+the methods are sensitive to the statistical fluctuations of the drawn data, 
+e.g. the
+spatial distribution of the data, including 1) the density profile and 2) the
+location(s) of subdominant mixtures,
+, and 3) the number of data points that we draw.
+It is also not enough to just
 compare the performance by applying each method for one realization of the
-data. We also provide the 68\% and the 95\% confidence regions from the
-different methods for different Monte Carlo realizations.
-In general, the 
-
-
-The details and implementation can be found in our Bitbucket Git repository.
-
-
+data. We provide the 68\% and the 95\% confidence regions by applying the
+each method for many Monte Carlo realizations.
+In general, the peaks identified from the KDE density is closer to the 
+peak of the dominant mixture (more accurate) than 
+both the weighted centroid method and the shrinking aperture method.
+For example, in the bottom middle panel, it is clear that the green contours
+that represents the confidence region for the shrinking aperture peak is
+biased due to the substructure, whereas the confidence region for the centroid 
+is so biased that it is
+outside the field of view of that panel.
+For the bottom right plot, there is also a catastrophic outlier for the shrinking 
+aperture method for 500 data
+points. The outlier shows how the shrinking aperture method can have
+radical behavior when there are subclusters in the data.	
 
 \subsection{Modeling the DM map in Illustris-1 and the lensing kernel}
 The most established method of inferring the projected dark matter spatial 
