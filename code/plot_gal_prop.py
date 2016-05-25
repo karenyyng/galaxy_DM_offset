@@ -250,7 +250,8 @@ def plot_KDE_peaks(fhat, lvls=range(2, 100, 10), allPeaks=True,
     ax.set_title("Clst {0}: ".format(clstNo) +
                  "No of gal. peaks found = {0}\n".format(
                      len(fhat["peaks_dens"][:])) +
-                 "Total peak dens = {0:.3g}".format(np.sum(fhat["peaks_dens"][:])),
+                 "Total peak dens = {0:.3g}".format(
+                     np.sum(fhat["peaks_dens"][:])),
                  size=15)
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)

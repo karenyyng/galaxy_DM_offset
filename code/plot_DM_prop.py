@@ -11,7 +11,8 @@ def plot_DM_fhat(fhat, fhat_stars, clstNo, threshold=0.3,
                  convert_kpc_over_h_to_kpc=True, fontsize=13,
                  unit_conversion = 1. / .704, ax=None, markersize=25,
                  log_scale=True, legend_box_anchor=(1.0, 1.2),
-                 legend_markerscale=0.7, kernel_width=1):
+                 legend_markerscale=0.7, kernel_width=1,
+                 xlabel_rotate_angle=45):
     """
     :param kernel_width: float, the number times the histogram size = 2 kpc
     """
@@ -97,6 +98,11 @@ def plot_DM_fhat(fhat, fhat_stars, clstNo, threshold=0.3,
     y_bar_location = ylims[0] + np.diff(ylims) * 0.20
     ax.plot((lower_x_bar, lower_x_bar + kernel_width * 2),
             (y_bar_location, y_bar_location), 'w', linewidth=5)
+
+    # rotate tick label
+    map(lambda x: x.set_rotation(xlabel_rotate_angle),
+        ax.get_xticklabels())
+
 
     return ax
 

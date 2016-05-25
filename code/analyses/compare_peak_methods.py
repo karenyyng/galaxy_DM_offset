@@ -16,20 +16,10 @@ import get_gal_centroids as get_gal
 from plot_gal_prop import plot_cf_contour
 rc("font", family="serif")
 
-
-# plot styles
-# lvls = [68]  #, 95]
-# g_colors = [(0 / 255., i / (len(lvls) + 1.), 0 / 255.)
-#             for i in xrange(1, len(lvls) + 1)]
-# b_colors = [(0 / 255., 0 / 255., i / (len(lvls) + 1.))
-#             for i in xrange(1, len(lvls) + 1)]
-# r_colors = [(i / (len(lvls) + 1.), 0 / 255., 0 / 255.)
-#             for i in xrange(1, len(lvls) + 1)]
-
 # Color-blind substitutes for RGB from
 # http://bconnelly.net/2013/10/creating-colorblind-friendly-figures/
 # (Vermillion), (Orange)
-r_colors = [(213./255, 94./255, 0./255), (230./255, 159/255., 0./255)]
+r_colors = [(213./255, 94./255, 0./255), (230./255, 159./255., 0./255)]
 
 # (Blue), (Sky Blue)
 b_colors = [(0./255, 114./255, 178./255), (86./255, 180./255., 233./255)]
@@ -376,7 +366,7 @@ def plot_error_as_a_func_of_data_pts(f, data_set,
     ax.set_xlim(0, 550)
     ax.set_ylim(0, ax.get_ylim()[-1] * 1.1)
     ax.set_ylabel("68% confidence region", size=15)
-    if show_xlabel:
+    if show_xlabel and data_set == "dumb":
         ax.set_xlabel("Total no. of sampled data points\ndrawn from Gaussian mixture", size=12)
 
     ax.tick_params(labeltop='off', labelright='off')
@@ -424,6 +414,7 @@ def plot_gauss_data(gauss_data, ax=None, xlim=None,
 
     ax.plot(gauss_data[:][0][:, 0], gauss_data[:][0][:, 1], 'k.', alpha=0.3)
     ax.plot(1, 1, 'kx', mew=2, ms=10, label='Mean of Gaussian')
+    print ("no. of data points = ", len(gauss_data[:][0][:, 0]))
 
     if xlim is not None:
         ax.set_xlim(xlim)

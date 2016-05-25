@@ -345,14 +345,17 @@ def apply_density_threshold(total_peak_dens, fhat, threshold=0.9):
     return threshold, np.sum(fhat["peaks_dens"][peaks_mask])
 
 
-def find_num_of_significant_peaks(peak_dens_list, threshold=0.5):
-    return np.sum(peak_dens_list > threshold)
+def find_num_of_significant_peaks(peak_dens_list, threshold=0.1):
+    return np.sum(peak_dens_list[1:] > threshold)
 
 
 def apply_peak_num_threshold(gal_peak_dens_list, fhat,
                              multiple_of_candidate_peaks=2,
                              sig_fraction=0.2, verbose=True):
     """
+    Set the number of candidate DM peak to be a multiple of the significant
+    galaxy peaks.
+
     Parameters
     -----------
     gal_peak_dens_list : list of floats of relative the KDE peak dens to the
