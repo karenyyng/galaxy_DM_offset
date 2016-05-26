@@ -537,7 +537,7 @@ size.
 
 \subsection{Finding offsets} 
 We computed the projected offsets between the galaxy density peaks inferred from the
-cross-validated KDE peaks of the galaxy data and the maximum DM density peaks.
+cross-validated KDE peaks of the galaxy data and the closest DM density peak.
 
 % It is possible to also  
 
@@ -562,23 +562,27 @@ shift in the peak location. This illustrates that peak / center finding is also
 subject to noise from the data.
 
 
-
-
-\begin{figure*} 
-	\centering
-	% \includegraphics[width=\linewidth]{clusterMassDist.eps}
+\begin{figure*}
+	\begin{center}
+	\includegraphics[width=0.9\linewidth]{Fig4_clst1_48_225.eps}
+	\includegraphics[width=0.9\linewidth]{Fig4_clst1_48_135.eps}
+	\includegraphics[width=0.9\linewidth]{Fig4_clst12_48_135.eps}
 	% \includegraphics[width=.95\linewidth]{ph_fig_galaxycenter_IllustrisClusters.pdf}
 	% \includegraphics[width=.95\linewidth]{ph_fig_DMcenter_IllustrisClusters.pdf}
-	\caption{ {\bf Left figure:} Projected density distribution of DM	
+	\caption{ Visualization of clusters (each row is for the same projection
+		of the same cluster). {\bf Left column:} Projected density distribution of DM	
 		particle data (density overlay). 
 		The identified density peaks are indicated by colored circles. 
-		{\bf Right figure:} Projected kernel density estimates (KDE) of member
-		galaxies of the same clusters. The projections of the clusters are  
-		selected at random.		
+		{\bf Middle column:} The same DM projection but with treated with a 50 
+		kpc smoothing kernel (kernel size indicated by white dot on lower right of the figure.) 
+		{\bf Right column:} Projected galaxy kernel density estimates (KDE) of 
+		the $i$-band luminosity map for the member
+		galaxies of the same clusters. See TODO:URL for the visualization for more
+		clusters inside a Jupyter notebook.
 		\label{fig:select_peak_visualization}
 	}
+\end{center}
 \end{figure*}
-
 
 \subsection{Smoothness of dark matter distribution}
 From the plots with peak identification, it can be shown that most clusters are
