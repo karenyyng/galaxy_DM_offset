@@ -11,8 +11,8 @@ def plot_DM_fhat(fhat, fhat_stars, clstNo, threshold=0.3,
                  convert_kpc_over_h_to_kpc=True, fontsize=13,
                  unit_conversion = 1. / .704, ax=None, markersize=25,
                  log_scale=True, legend_box_anchor=(1.0, 1.2),
-                 legend_markerscale=0.7, kernel_width=1,
-                 xlabel_rotate_angle=45, verbose=False):
+                 legend_markerscale=0.7, kernel_width=1, flip_y=-1.,
+                 xlabel_rotate_angle=45, verbose=False, origin='upper'):
     """
     :param kernel_width: float, the number times the histogram size = 2 kpc
     """
@@ -39,7 +39,7 @@ def plot_DM_fhat(fhat, fhat_stars, clstNo, threshold=0.3,
                 ]
     # Plot DM particle histograms
     ax.imshow(log_est.transpose(), cmap=plt.cm.afmhot,
-               extent=extent
+               extent=extent, origin='upper'
                )
 
     ((dist, matched_DM_ixes), sign_gal_peak_no,
@@ -94,6 +94,10 @@ def plot_DM_fhat(fhat, fhat_stars, clstNo, threshold=0.3,
     ax.set_xlabel('kpc', size=fontsize)
     ax.set_ylabel('kpc', size=fontsize)
 
+    # flip back the axes
+    ylabels = [label * flip_y for label in ax.get_yticks().tolist()]
+    ax.set_yticklabels(ylabels)
+
     # plot the smoothing scale
     xlims = ax.get_xlim()
     ylims = ax.get_ylim()
@@ -106,8 +110,7 @@ def plot_DM_fhat(fhat, fhat_stars, clstNo, threshold=0.3,
     map(lambda x: x.set_rotation(xlabel_rotate_angle),
         ax.get_xticklabels())
 
-
-    return ax
+    return ax, xlims, ylims
 
 
 

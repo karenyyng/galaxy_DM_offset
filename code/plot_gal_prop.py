@@ -200,14 +200,20 @@ def plot_KDE_peaks(fhat, lvls=range(2, 100, 10), allPeaks=True,
                    ylabel="y (kpc / h)", showDomPeak=True,
                    fileDir="../plots/", fill=False, showContour=True,
                    ax=None, fig=None, xlabel_rotate_angle=45,
-                   legend_box_anchor=(1., 1.4), unit_conversion=1.,
-                   convert_kpc_to_kpc_over_h=False, flip_y=-1.,
-                   legend_markerscale=0.8,
+                   legend_box_anchor=(1., 1.4),
+                   convert_kpc_over_h_to_kpc=False, flip_y=-1.,
+                   legend_markerscale=0.8, unit_conversion=1./0.704,
+                   xlims=None, ylims=None
                    ):
     """make a plot of the fhat along with other important info
     :param fhat: dictionary or hdf5 filestream,
         that is generated from `do_KDE_and_get_peaks`
     """
+    if not convert_kpc_over_h_to_kpc:
+        unit_conversion = 1.
+    else:
+        xlabel = "kpc"
+        ylabel = "kpc"
 
     if ax is None:
         fig = plt.figure()
@@ -216,34 +222,31 @@ def plot_KDE_peaks(fhat, lvls=range(2, 100, 10), allPeaks=True,
     # flip histogram to match the DM contours
     if showContour:
         plot_cf_contour(fhat["estimate"][:],
-                        fhat["eval_points"][0], fhat["eval_points"][1] * flip_y,
+                        fhat["eval_points"][0] * unit_conversion,
+                        fhat["eval_points"][1] * flip_y * unit_conversion,
                         lvls=lvls, clabel=clabel, fill=fill, ax=ax)
 
     if plotDataPoints:
-        ax.plot(fhat["data_x"].transpose()[0],
-                fhat["data_x"].transpose()[1], 'r.', alpha=1)
-
-    low_xlim, up_xlim = plt.xlim()
-    low_ylim, up_ylim = plt.ylim()
-    plot_bandwidth_matrix(fhat["bandwidth_matrix_H"][:],
-                          up_xlim=up_xlim, up_ylim=up_ylim,
-                          low_xlim=low_xlim, low_ylim=low_ylim,
-                          ax=ax,
-                          flip_y=flip_y)
+        ax.plot(fhat["data_x"].transpose()[0] * unit_conversion,
+                fhat["data_x"].transpose()[1] * unit_conversion * flip_y,
+                'r.', alpha=1)
 
     if 'BCG' in fhat:
-        ax.plot(fhat['BCG'][0], flip_y * fhat['BCG'][1],
+        ax.plot(fhat['BCG'][0] * unit_conversion,
+                flip_y * fhat['BCG'][1] * unit_conversion,
                 '+', mew=3, label='BCG', ms=20)
 
     if 'centroid' in fhat:
-       ax.plot(fhat['centroid'][0], flip_y * fhat['centroid'][1],
+       ax.plot(fhat['centroid'][0] * unit_conversion,
+               flip_y * fhat['centroid'][1] * unit_conversion,
                'go', mew=3, label='i-band weighted centroid',
                 ms=15, fillstyle='none'
                 )
 
     if 'shrink_cent' in fhat:
-         ax.plot(fhat['shrink_cent'][0],
-                 flip_y * fhat['shrink_cent'][1], 'cx', mew=3,
+         ax.plot(fhat['shrink_cent'][0] * unit_conversion,
+                 flip_y * fhat['shrink_cent'][1] * unit_conversion,
+                 'cx', mew=3,
                  label='shrink_cent', ms=15, fillstyle='none'
                 )
 
@@ -251,16 +254,16 @@ def plot_KDE_peaks(fhat, lvls=range(2, 100, 10), allPeaks=True,
     if allPeaks:
         cm = plt.cm.get_cmap('bwr')
         for i in range(len(fhat["peaks_dens"][:])):
-            sc = ax.scatter(fhat["peaks_xcoords"][i],
-                            fhat["peaks_ycoords"][i] * flip_y,
+            sc = ax.scatter(fhat["peaks_xcoords"][i] * unit_conversion,
+                            fhat["peaks_ycoords"][i] * flip_y * unit_conversion,
                             c=fhat["peaks_dens"][i],
                             cmap=cm, vmin=0, vmax=1.0, edgecolor='k',
                             s=35, marker='s')
         fig.colorbar(sc)
 
     if showDomPeak:
-        ax.plot(fhat["peaks_xcoords"][0],
-                fhat["peaks_ycoords"][0] * flip_y,
+        ax.plot(fhat["peaks_xcoords"][0] * unit_conversion,
+                fhat["peaks_ycoords"][0] * flip_y * unit_conversion,
                 's', mew=4., markersize=9, label='dominant KDE peak',
                 fillstyle='none', color='gold')
 
@@ -285,6 +288,25 @@ def plot_KDE_peaks(fhat, lvls=range(2, 100, 10), allPeaks=True,
 
     ax.legend(loc='upper right', frameon=True, numpoints=1,
               bbox_to_anchor=legend_box_anchor, markerscale=legend_markerscale)
+
+
+    if xlims is not None:
+        ax.set_xlim(xlims)
+    if ylims is not None:
+        ylims = sorted([ylim * flip_y for ylim in ylims])
+        ax.set_ylim(ylims)
+
+    low_xlim, up_xlim = ax.get_xlim()
+    low_ylim, up_ylim = ax.get_ylim()
+    plot_bandwidth_matrix(fhat["bandwidth_matrix_H"][:],
+                          up_xlim=up_xlim,
+                          up_ylim=up_ylim,
+                          low_xlim=low_xlim,
+                          low_ylim=low_ylim,
+                          ax=ax,
+                          flip_y=flip_y,
+                          unit_conversion=unit_conversion
+                          )
 
     if save and clstNo is not None:
         plt.savefig(fileDir + fileName + str(clstNo) + ".png",
@@ -329,10 +351,10 @@ def plot_data_and_peak(df, peaks, R200C=None, save=False, title=None,
 
 
 def plot_bandwidth_matrix(mtx, up_xlim, up_ylim, low_xlim, low_ylim, ax,
-                          debug=False, flip_y=False):
+                          debug=False, unit_conversion=1., flip_y=1):
     """
     :params mtx: numpy array
-        represents symmteric positive definite matrix
+        represents symmetric positive definite matrix
     """
     eigval, eigvec = np.linalg.eig(mtx)
     order = eigval.argsort()[::-1]
@@ -342,22 +364,23 @@ def plot_bandwidth_matrix(mtx, up_xlim, up_ylim, low_xlim, low_ylim, ax,
     width, height = np.sqrt(eigval) * 2.
     angle = np.arctan2(*eigvec[:, 0][::-1]) / np.pi * 180.
     # want ellipse to be in lower right corner
-    mux = up_xlim - .7 * width
-    muy = low_ylim + .7 * width
+    mux = up_xlim - 1.5 * width
+    muy = (low_ylim + 1.5 * width)
 
     if debug:
-        print( "eigval {0} and eigvec are {1}".format(eigval, eigvec))
+        print( "eigval {0} \n eigvec are {1}".format(eigval, eigvec))
         print( "matrix is {0}".format(mtx))
-        print( "width: {0}, height: {1}, angle {2}".format(width, height,
-                                                           angle))
-    if flip_y:
+        print( "width: {0}, height: {1}, angle {2}".format(
+            width, height, angle))
+        print("centers = ", mux, muy)
+    if flip_y == -1:
         angle = -angle
-    ell = Ellipse(xy=np.array([mux, muy]), width=width, height=height,
+    ell = Ellipse(xy=np.array([mux, muy]),
+                  width=width * unit_conversion,
+                  height=height * unit_conversion,
                   angle=angle, color="m", edgecolor='none')
-    ax.text(mux - width, muy - 1.1 * height, 'kernel size')
+    ax.text(mux - 1.7 * width, muy - 1.3 * height, 'kernel size')
     ax = plt.gca()
     ax.add_artist(ell)
 
     return ell
-
-
