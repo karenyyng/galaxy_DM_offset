@@ -202,7 +202,7 @@ def plot_KDE_peaks(fhat, lvls=range(2, 100, 10), allPeaks=True,
                    ax=None, fig=None, xlabel_rotate_angle=45,
                    legend_box_anchor=(1., 1.4),
                    convert_kpc_over_h_to_kpc=False, flip_y=-1.,
-                   legend_markerscale=0.8, unit_conversion=1./0.704,
+                   legend_markerscale=0.5, unit_conversion=1./0.704,
                    xlims=None, ylims=None
                    ):
     """make a plot of the fhat along with other important info
@@ -234,7 +234,7 @@ def plot_KDE_peaks(fhat, lvls=range(2, 100, 10), allPeaks=True,
     if 'BCG' in fhat:
         ax.plot(fhat['BCG'][0] * unit_conversion,
                 flip_y * fhat['BCG'][1] * unit_conversion,
-                '+', mew=3, label='BCG', ms=20)
+                '+', mew=3, label='BCG', ms=25)
 
     if 'centroid' in fhat:
        ax.plot(fhat['centroid'][0] * unit_conversion,
@@ -247,7 +247,7 @@ def plot_KDE_peaks(fhat, lvls=range(2, 100, 10), allPeaks=True,
          ax.plot(fhat['shrink_cent'][0] * unit_conversion,
                  flip_y * fhat['shrink_cent'][1] * unit_conversion,
                  'cx', mew=3,
-                 label='shrink_cent', ms=15, fillstyle='none'
+                 label='shrink_cent', ms=25, fillstyle='none'
                 )
 
 

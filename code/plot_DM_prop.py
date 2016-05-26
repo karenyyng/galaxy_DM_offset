@@ -12,7 +12,7 @@ def plot_DM_fhat(fhat, fhat_stars, clstNo, threshold=0.3,
                  unit_conversion = 1. / .704, ax=None, markersize=25,
                  log_scale=True, legend_box_anchor=(1.0, 1.2),
                  legend_markerscale=0.7, kernel_width=1, flip_y=-1.,
-                 xlabel_rotate_angle=45, verbose=False, origin='upper'):
+                 xlabel_rotate_angle=45, verbose=False, origin='lower'):
     """
     :param kernel_width: float, the number times the histogram size = 2 kpc
     """
@@ -30,17 +30,20 @@ def plot_DM_fhat(fhat, fhat_stars, clstNo, threshold=0.3,
     if type(fhat) == dict:
         extent = [
                     fhat["eval_points"][0][0], fhat["eval_points"][0][-1],
-                    fhat["eval_points"][1][-1], fhat["eval_points"][1][0],
+                    fhat["eval_points"][1][0], fhat["eval_points"][1][-1],
                  ]
     else:
         extent = [
                     fhat["eval_points0"][0], fhat["eval_points0"][-1],
-                    fhat["eval_points1"][-1], fhat["eval_points1"][0],
+                    fhat["eval_points1"][0], fhat["eval_points1"][-1],
                  ]
     # Plot DM particle histograms
     ax.imshow(log_est.transpose(), cmap=plt.cm.afmhot,
-               extent=extent, origin='upper'
+               extent=extent, origin=origin
                )
+    # ax.imshow(log_est.transpose(), cmap=plt.cm.afmhot,
+    #            extent=extent, origin='upper'
+    #            )
 
     ((dist, matched_DM_ixes), sign_gal_peak_no,
      sign_DM_peak_no, gd_threshold) = \
