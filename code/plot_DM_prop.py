@@ -31,12 +31,12 @@ def plot_DM_fhat(fhat, fhat_stars, clstNo, threshold=0.3,
         extent = [
                     fhat["eval_points"][0][0], fhat["eval_points"][0][-1],
                     fhat["eval_points"][1][-1], fhat["eval_points"][1][0],
-                    ]
+                 ]
     else:
         extent = [
                     fhat["eval_points0"][0], fhat["eval_points0"][-1],
                     fhat["eval_points1"][-1], fhat["eval_points1"][0],
-                ]
+                 ]
     # Plot DM particle histograms
     ax.imshow(log_est.transpose(), cmap=plt.cm.afmhot,
                extent=extent, origin='upper'
@@ -63,16 +63,18 @@ def plot_DM_fhat(fhat, fhat_stars, clstNo, threshold=0.3,
         if verbose:
             print("Converting unit of kpc / h to kpc for galaxy data using ")
             print (unit_conversion)
-        ax.plot(
-            fhat_stars["peaks_xcoords"][:sign_gal_peak_no] * unit_conversion,
-            fhat_stars["peaks_ycoords"][:sign_gal_peak_no] * unit_conversion,
-            'o', color='m', fillstyle="none", mew=3, ms=markersize,
-            label="significant I band luminosity peaks")
+    else:
+        unit_conversion = 1.
+    ax.plot(
+        fhat_stars["peaks_xcoords"][:sign_gal_peak_no] * unit_conversion,
+        fhat_stars["peaks_ycoords"][:sign_gal_peak_no] * unit_conversion,
+        'o', color='m', fillstyle="none", mew=3, ms=markersize,
+        label="significant I band luminosity peaks")
 
     ax.plot(fhat["peaks_xcoords"][:][matched_DM_ixes],
             fhat["peaks_ycoords"][:][matched_DM_ixes],
              "o", color='blue', fillstyle="none", mew=3,
-             ms=markersize, label="matched DM peaks")
+             ms=markersize, label="matched DM peaks", alpha=0.8)
 
     offset_string = ["{0:0.0f}".format(i) for i in dist]
     offset_string = ', '.join(offset_string)
@@ -109,6 +111,18 @@ def plot_DM_fhat(fhat, fhat_stars, clstNo, threshold=0.3,
     # rotate tick label
     map(lambda x: x.set_rotation(xlabel_rotate_angle),
         ax.get_xticklabels())
+
+    if verbose:
+        print ("gal peak = ({0:0.0f}, {1:0.0f})".format(
+                fhat_stars["peaks_xcoords"][:sign_gal_peak_no][0] * unit_conversion,
+                fhat_stars["peaks_ycoords"][:sign_gal_peak_no][0] * unit_conversion,
+               ))
+
+        print ( "The matched DM peak = ({0:0.0f}, {1:0.0f})".format(
+            fhat["peaks_xcoords"][:][matched_DM_ixes][0],
+            fhat["peaks_ycoords"][:][matched_DM_ixes][0],
+            )
+        )
 
     return ax, xlims, ylims
 
