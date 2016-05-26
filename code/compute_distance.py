@@ -43,7 +43,9 @@ def compute_euclidean_dist(data, origin=None):
 
 
 def compute_distance_between_DM_and_gal_peaks(
-        fhat_star, fhat, fhat_star_to_DM_coord_conversion=1. / 0.704):
+        fhat_star, fhat, fhat_star_to_DM_coord_conversion=1. / 0.704,
+        verbose=False
+):
     """
     Parameters
     ===========
@@ -62,20 +64,32 @@ def compute_distance_between_DM_and_gal_peaks(
         for fhat_star peaks
     DM_peak_no: int, number of significant DM peaks that were considered when
                 finding the nearest neighbor
-    gal_peak_no: int, number of significant gal peaks, i.e. peak_dens > 0.5
+    gal_peak_no: int, number of significant gal peaks, i.e. peak_dens > 0.2
     """
     from scipy.spatial import KDTree
     from collections import OrderedDict
 
-    good_threshold, gal_peak_no = \
-        getDM.apply_peak_num_threshold(fhat_star["peaks_dens"], fhat)
+    gal_peak_no = \
+        getDM.find_num_of_significant_peaks(fhat_star["peaks_dens"][:],
+                                            threshold=0.5
+                                            )
 
-    DM_peak_no = getDM.find_num_of_significant_peaks(fhat["peaks_dens"],
-                                                     good_threshold)
+    good_threshold, DM_peak_no = \
+        getDM.apply_peak_num_threshold(fhat_star["peaks_dens"][:], fhat,
+                                       verbose=verbose
+                                       )
 
     valid_DM_peak_coords = np.array([fhat["peaks_xcoords"][:DM_peak_no],
                                      fhat["peaks_ycoords"][:DM_peak_no]]
                                     ).transpose()
+
+    if verbose:
+        print ("gal_peak_no = ", gal_peak_no)
+        print ("goodthreshold = {0}, DM_peak_no = {1}".format(
+            good_threshold, DM_peak_no))
+        print ("valid_DM_peak_coords = ", valid_DM_peak_coords)
+
+
     tree = KDTree(valid_DM_peak_coords)
 
     star_peak_coords = np.array([fhat_star["peaks_xcoords"][:gal_peak_no],

@@ -231,6 +231,23 @@ def plot_KDE_peaks(fhat, lvls=range(2, 100, 10), allPeaks=True,
                           ax=ax,
                           flip_y=flip_y)
 
+    if 'BCG' in fhat:
+        ax.plot(fhat['BCG'][0], flip_y * fhat['BCG'][1],
+                '+', mew=3, label='BCG', ms=20)
+
+    if 'centroid' in fhat:
+       ax.plot(fhat['centroid'][0], flip_y * fhat['centroid'][1],
+               'go', mew=3, label='i-band weighted centroid',
+                ms=15, fillstyle='none'
+                )
+
+    if 'shrink_cent' in fhat:
+         ax.plot(fhat['shrink_cent'][0],
+                 flip_y * fhat['shrink_cent'][1], 'cx', mew=3,
+                 label='shrink_cent', ms=15, fillstyle='none'
+                )
+
+
     if allPeaks:
         cm = plt.cm.get_cmap('bwr')
         for i in range(len(fhat["peaks_dens"][:])):

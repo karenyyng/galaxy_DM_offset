@@ -68,7 +68,7 @@ def make_histogram_with_some_resolution(data, resolution=2.0,
 
 def match_DM_peaks_with_gal_peaks(fhat, fhat_stars, threshold=0.3,
                                   convert_kpc_over_h_to_kpc=True,
-                                  verbose=True, k_neighbors=1,
+                                  verbose=False, k_neighbors=1,
                                   distance_upper_bound=100,
                                   p_norm=2):
     """
@@ -345,12 +345,13 @@ def apply_density_threshold(total_peak_dens, fhat, threshold=0.9):
     return threshold, np.sum(fhat["peaks_dens"][peaks_mask])
 
 
-def find_num_of_significant_peaks(peak_dens_list, threshold=0.1):
-    return np.sum(peak_dens_list[1:] > threshold)
+def find_num_of_significant_peaks(peak_dens_list, threshold=0.2):
+    no_sig_peaks = np.sum(peak_dens_list[1:] > threshold)
+    return no_sig_peaks + 1
 
 
 def apply_peak_num_threshold(gal_peak_dens_list, fhat,
-                             multiple_of_candidate_peaks=2,
+                             multiple_of_candidate_peaks=4,
                              sig_fraction=0.2, verbose=True):
     """
     Set the number of candidate DM peak to be a multiple of the significant
@@ -366,6 +367,12 @@ def apply_peak_num_threshold(gal_peak_dens_list, fhat,
             as a multiple of the number of galaxy peaks
     sig_fraction : float, (optional) default = 0.2,
        0 < sig_fraction < 1
+
+    Returns
+    -------
+    dens_threshold: float, a density threshold for picking peaks
+    sig_DM_peaks: integer,
+        the number of significant DM peaks to be considered
 
     """
     if sig_fraction < 0. or sig_fraction > 1.:
@@ -389,7 +396,7 @@ def apply_peak_num_threshold(gal_peak_dens_list, fhat,
                 "len(fhat['peaks_dens'][fhat['peaks_dens'] > good_threshold]]) " +
                 " < acceptance"
                 )
-        return 0, sig_gal_peaks
+        return 0, len(fhat["peaks_dens"])
 
     while (np.sum(fhat["peaks_dens"][fhat["peaks_dens"] > good_threshold]) <
            acceptance):
@@ -401,9 +408,13 @@ def apply_peak_num_threshold(gal_peak_dens_list, fhat,
                     "Warning: There is no good threshold for the input DM peaks.\n"
                 )
             good_threshold = 0.
+            if acceptance <= len(fhat["peaks_dens"]):
+                sig_DM_peaks = acceptance
+            else:
+                sig_DM_peaks = len(fhat["peaks_dens"])
             break
 
-    return good_threshold, sig_gal_peaks
+    return good_threshold, sig_DM_peaks
 
 
 # def smooth_histograms(fhat):

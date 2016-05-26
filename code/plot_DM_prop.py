@@ -12,7 +12,7 @@ def plot_DM_fhat(fhat, fhat_stars, clstNo, threshold=0.3,
                  unit_conversion = 1. / .704, ax=None, markersize=25,
                  log_scale=True, legend_box_anchor=(1.0, 1.2),
                  legend_markerscale=0.7, kernel_width=1,
-                 xlabel_rotate_angle=45):
+                 xlabel_rotate_angle=45, verbose=False):
     """
     :param kernel_width: float, the number times the histogram size = 2 kpc
     """
@@ -21,7 +21,7 @@ def plot_DM_fhat(fhat, fhat_stars, clstNo, threshold=0.3,
     if log_scale and "log_est" not in fhat.keys():
         log_est = np.log(fhat["estimate"][:])
     else:
-        log_est = np.power(fhat["estimate"][:], 1./ 4.)
+        log_est = np.power(fhat["estimate"][:], 1./ 2.)
 
     if ax is None:
         fig = plt.figure()
@@ -44,7 +44,8 @@ def plot_DM_fhat(fhat, fhat_stars, clstNo, threshold=0.3,
 
     ((dist, matched_DM_ixes), sign_gal_peak_no,
      sign_DM_peak_no, gd_threshold) = \
-        get_dist.compute_distance_between_DM_and_gal_peaks(fhat_stars, fhat)
+        get_dist.compute_distance_between_DM_and_gal_peaks(fhat_stars, fhat,
+                                                           verbose=verbose)
 
     # Plot DM peaks
     # Peaks that are associated with the galaxy peaks are in blue.
@@ -52,24 +53,26 @@ def plot_DM_fhat(fhat, fhat_stars, clstNo, threshold=0.3,
     ax.plot(fhat["peaks_xcoords"][:sign_DM_peak_no],
              fhat["peaks_ycoords"][:sign_DM_peak_no],
              "o", color='cyan', fillstyle="none", mew=3,
-             ms=markersize, label="candidate DM peaks")
+             ms=markersize, label="candidate DM peaks", alpha=0.5)
 
-    ax.plot(fhat["peaks_xcoords"][:][matched_DM_ixes],
-            fhat["peaks_ycoords"][:][matched_DM_ixes],
-             "o", color='blue', fillstyle="none", mew=3,
-             ms=markersize, label="matched DM peaks")
 
     # Plot I-band luminosity peaks
     # Peaks with density > 0.5 density of densest peak are in red.
     # Peaks with density < 0.5 density of densest peak are in pink.
     if convert_kpc_over_h_to_kpc:
-        print("Converting unit of kpc / h to kpc for galaxy data using ")
-        print (unit_conversion)
+        if verbose:
+            print("Converting unit of kpc / h to kpc for galaxy data using ")
+            print (unit_conversion)
         ax.plot(
             fhat_stars["peaks_xcoords"][:sign_gal_peak_no] * unit_conversion,
             fhat_stars["peaks_ycoords"][:sign_gal_peak_no] * unit_conversion,
             'o', color='m', fillstyle="none", mew=3, ms=markersize,
             label="significant I band luminosity peaks")
+
+    ax.plot(fhat["peaks_xcoords"][:][matched_DM_ixes],
+            fhat["peaks_ycoords"][:][matched_DM_ixes],
+             "o", color='blue', fillstyle="none", mew=3,
+             ms=markersize, label="matched DM peaks")
 
     offset_string = ["{0:0.0f}".format(i) for i in dist]
     offset_string = ', '.join(offset_string)
