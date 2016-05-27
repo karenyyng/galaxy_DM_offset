@@ -83,7 +83,7 @@ metadata["weights"] = OrderedDict({
     })
 
 # projections
-nside = 1  # nsides of HEALpix are powers of 2, pix for 16 nsides = 3072 / 2
+nside = 8  # nsides of HEALpix are powers of 2, pix for 16 nsides = 3072 / 2
 metadata["los_axis"] = [str(1)]  # use z-axis as los axis
 
 # Want to use string as key, not floats!

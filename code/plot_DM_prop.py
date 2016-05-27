@@ -12,7 +12,8 @@ def plot_DM_fhat(fhat, fhat_stars, clstNo, threshold=0.3,
                  unit_conversion = 1. / .704, ax=None, markersize=25,
                  log_scale=True, legend_box_anchor=(1.0, 1.2),
                  legend_markerscale=0.7, kernel_width=1, flip_y=-1.,
-                 xlabel_rotate_angle=45, verbose=False, origin='lower'):
+                 xlabel_rotate_angle=45, verbose=False, origin='lower',
+                 show_legend=True):
     """
     :param kernel_width: float, the number times the histogram size = 2 kpc
     """
@@ -45,18 +46,23 @@ def plot_DM_fhat(fhat, fhat_stars, clstNo, threshold=0.3,
     #            extent=extent, origin='upper'
     #            )
 
-    ((dist, matched_DM_ixes), sign_gal_peak_no,
-     sign_DM_peak_no, gd_threshold) = \
+    matched_dict = \
         get_dist.compute_distance_between_DM_and_gal_peaks(fhat_stars, fhat,
                                                            verbose=verbose)
+
+    dist = matched_dict["dist"]
+    matched_DM_ixes = matched_dict["DM_ixes"]
+    sign_gal_peak_no = matched_dict["gal_peak_no"]
+    sign_DM_peak_no = matched_dict["DM_peak_no"]
+    # gd_threshold = matched_dict["gd_threshold"]
 
     # Plot DM peaks
     # Peaks that are associated with the galaxy peaks are in blue.
     # Peaks that are not associated with the galaxy peaks are in cyan.
     ax.plot(fhat["peaks_xcoords"][:sign_DM_peak_no],
-             fhat["peaks_ycoords"][:sign_DM_peak_no],
-             "o", color='cyan', fillstyle="none", mew=3,
-             ms=markersize, label="candidate DM peaks", alpha=0.5)
+            fhat["peaks_ycoords"][:sign_DM_peak_no],
+            "o", color='cyan', fillstyle="none", mew=3,
+            ms=markersize, label="candidate DM peaks", alpha=0.5)
 
 
     # Plot I-band luminosity peaks
@@ -91,11 +97,12 @@ def plot_DM_fhat(fhat, fhat_stars, clstNo, threshold=0.3,
     # xtickslabels = ax.get_xticklabels()
     # ax.set_xticklabels(xtickslabels, rotation=45)
 
-    lgd = ax.legend(fontsize=int(fontsize * 1.1), frameon=1,
-                    numpoints=1, bbox_to_anchor=legend_box_anchor,
-                    loc='upper right', markerscale=legend_markerscale)
-    frame = lgd.get_frame()
-    frame.set_facecolor('white')
+    if show_legend:
+        lgd = ax.legend(fontsize=int(fontsize * 1.1), frameon=1,
+                        numpoints=1, bbox_to_anchor=legend_box_anchor,
+                        loc='upper right', markerscale=legend_markerscale)
+        frame = lgd.get_frame()
+        frame.set_facecolor('white')
     ax.set_xlabel('kpc', size=fontsize)
     ax.set_ylabel('kpc', size=fontsize)
 

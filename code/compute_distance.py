@@ -2,12 +2,74 @@
 This contains module for computing distances between fhat_star & fhat (from
 DM).
 """
+import pandas as pd
 import numpy as np
 import sys
 sys.path.append("../")
+import extract_catalog as ec
 import get_DM_centroids as getDM
 
-def convert_DM_path_to_star_path(DM_clstPath, star_key_no=6):
+
+# def construct_uber_result_df(fhat_star, fhat_DM, ):
+#     """uses different functions for constructing the uber result dataframe
+#
+#     :fhat_star: TODO
+#     :fhat_DM: TODO
+#     :: TODO
+#     :returns: TODO
+#
+#     """
+#     ec.extract_clst()
+#     uber_df = pd.DataFrame([])
+#     return uber_df
+
+
+def compute_distance_for_other_peaks(
+        matched_stat, star_fhat, summary_stat_keys,
+        unit_conversion=1./0.704, convert_kpc_over_h_to_kpc=True
+    ):
+    """use output from `compute_distance_between_DM_and_gal_peaks` to
+    compute the distances for other summary stat
+
+    :param matched_stat: output dictionary from
+        `compute_distance_between_DM_and_gal_peaks`, quantities are in units of
+        kpc
+    :param star_fhat: hdf5 file stream object, contains the gal density info
+        output from `test_star_fhat_*.py`, quantities are in units of kpc / h
+    :param summary_stat_keys: string,
+        the key in star_fhat for the relevant stat info
+    :param returns: dictionary
+        float, distance in kpc for that particular summary stat indicated by
+        the key
+
+    :note: if there are several DM peaks, this function returns the shortest
+    distance to the DM peak.
+    """
+    if type(summary_stat_keys) is str:
+        summary_stat_keys = list(summary_stat_keys)
+    elif type(summary_stat_keys) is not list:
+        raise TypeError("summary_stat_keys needs to be a list of str")
+
+    if not convert_kpc_over_h_to_kpc:
+        unit_conversion = 1.
+
+    dist_dict = {}
+    for sum_stat_key in summary_stat_keys:
+        star_sum_xy_coords = star_fhat[sum_stat_key][:] * unit_conversion
+        valid_DM_peak_coords = np.array([
+            matched_stat["DM_matched_peak_coords"]['peaks_x_coords'],
+            matched_stat["DM_matched_peak_coords"]['peaks_y_coords']]
+        ).transpose()
+
+        dist = sorted(compute_euclidean_dist(
+            star_sum_xy_coords - valid_DM_peak_coords))[0]
+
+        dist_dict[sum_stat_key] = dist
+
+    return dist_dict
+
+
+def convert_DM_path_to_star_path(DM_clstPath, star_key_no=-1):
     """
     :DM_clstPath: string, slash separated paths in HDF5 file
     :returns: string, star_clstPath
@@ -56,15 +118,19 @@ def compute_distance_between_DM_and_gal_peaks(
 
     Returns
     =======
-    (dist, ixes) : a tuple of two arrays
-        dist: np.array,
+    An ordered dictionary, the key-value pairs are as follows:
+    dist: np.array,
         the distance between the fhat_star peaks and the fhat peaks
-        ixes: np.array,
+    ixes: np.array,
         the index in fhat that corresponds to the closest match
         for fhat_star peaks
     DM_peak_no: int, number of significant DM peaks that were considered when
                 finding the nearest neighbor
     gal_peak_no: int, number of significant gal peaks, i.e. peak_dens > 0.2
+    star_sign_peak_coords: dictionary of two numpy arrays, the coordinates are
+        in terms of kpc
+    DM_matched_peak_coords: dictionary of two numpy arrays, the coordinates are
+        in terms of kpc
     """
     from scipy.spatial import KDTree
     from collections import OrderedDict
@@ -98,20 +164,28 @@ def compute_distance_between_DM_and_gal_peaks(
     # Convert kpc / h from stellar peak coords to kpc
     star_peak_coords *= fhat_star_to_DM_coord_conversion
 
+    # We use Euclidean distance for our query, i.e. p=2.
     (dist, DM_ixes) = tree.query(star_peak_coords, k=1, p=2)
     output = OrderedDict({})
     output["dist"] = dist
     output["DM_ixes"] = DM_ixes
+    output["DM_matched_peak_coords"] = {
+        "peaks_x_coords": fhat["peaks_xcoords"][:][DM_ixes],
+        "peaks_y_coords": fhat["peaks_ycoords"][:][DM_ixes],
+    }
+    output["star_sign_peak_coords"] = {
+        "peaks_x_coords":
+        fhat_star["peaks_xcoords"][:][:gal_peak_no] *
+        fhat_star_to_DM_coord_conversion,
+        "peaks_y_coords":
+        fhat_star["peaks_ycoords"][:][:gal_peak_no] *
+        fhat_star_to_DM_coord_conversion,
+    }
     output["gal_peak_no"] = gal_peak_no
     output["DM_peak_no"] = DM_peak_no
+    output["gd_threshold"] = good_threshold
 
-    # We use Euclidean distance for our query, i.e. p=2.
-    return (output["dist"],
-            output["DM_ixes"]),\
-            output["gal_peak_no"],\
-            output["DM_peak_no"],\
-            good_threshold
-
+    return output
 
 # ----- convert output to original dictionary form for visualization -------
 def append_corect_path(path_to_be_examined, path_lists, property="estimate"):
@@ -185,69 +259,70 @@ def retrieve_metadata_from_fhat_as_path(h5_fhat):
     return metadata
 
 
-def DM_h5path_to_groupbykey(h5path):
-    """
-    :h5path: string, hdf5 path to a certain object
-    :returns: tuple of strings
-    """
-    path_list = h5path.split("/")
-    path_list[0] = int(path_list[0])
-    return tuple(path_list)
+# --- deprecated ----------------------------
 
-
-def DM_h5path_to_star_groupbykey(DM_clstPath, keys_to_include):
-    """
-    :DM_clstPath: TODO
-    :returns: tuple of strings, star_gpBy_key
-    """
-    path = convert_DM_path_to_star_path(DM_clstPath, keys_to_include).split("/")
-    path[0] = int(path[0])
-    return tuple(path)
-
-
-def combine_DM_df_and_h5_to_dict(gpBy, h5fhat, h5path):
-    """
-    stateful: no
-    """
-    gpbykeys = DM_h5path_to_groupbykey(h5path)
-    # May want to convert some of the quantities back to float!?
-    fhat = {k: v for k, v in gpBy.get_group(gpbykeys).iteritems()}
-
-    fhat["estimate"] = h5fhat[h5path]["estimate"][:]
-    eval_points = [h5fhat[h5path]["eval_points0"][:],
-                   h5fhat[h5path]["eval_points1"][:]]
-    fhat["eval_points"] = eval_points
-    return fhat
-
-
-def combine_star_df_and_h5_to_dict(star_gpBy, star_h5fhat, DM_h5path,
-                                   keys_to_include):
-    """
-    :param star_gpBy: pandas groupby object from the star df
-    :param star_h5fhat: hdf5 file stream objects
-    :param DM_h5path: string, hdf5 file path to corresponding DM cluster object
-    :param keys_to_include: int, how many keys to include in the groupby
-    """
-    gpbykeys = DM_h5path_to_star_groupbykey(DM_h5path, keys_to_include)
-    star_h5path = str(gpbykeys[0]) + '/' + '/'.join(gpbykeys[1:])
-    # May want to convert some of the quantities back to float!?
-    fhat = {k: v for k, v in star_gpBy.get_group(gpbykeys).iteritems()}
-
-    for k in star_h5fhat[star_h5path].keys():
-        fhat[k] = star_h5fhat[star_h5path][k][:]
-
-    return fhat
-
-
-def get_DM_dict_from_run(DM_df, DM_fhat, DM_h5path, DM_gpBy_key_no=8):
-    DM_gpBy = get_gpBy_DM_objects(DM_df, DM_gpBy_key_no)
-    return combine_DM_df_and_h5_to_dict(DM_gpBy, DM_fhat, DM_h5path)
-
-
-def get_star_dict_from_run(star_df, star_fhat, DM_h5path, star_gpBy_key_no):
-    star_gpBy = get_gpBy_star_objects(star_df, star_gpBy_key_no)
-    return combine_star_df_and_h5_to_dict(
-        star_gpBy, star_fhat, DM_h5path, star_gpBy_key_no)
+# def DM_h5path_to_groupbykey(h5path):
+#     """
+#     :h5path: string, hdf5 path to a certain object
+#     :returns: tuple of strings
+#     """
+#     path_list = h5path.split("/")
+#     path_list[0] = int(path_list[0])
+#     return tuple(path_list)
+#
+#
+# def DM_h5path_to_star_groupbykey(DM_clstPath, keys_to_include):
+#     """
+#     :DM_clstPath: TODO
+#     :returns: tuple of strings, star_gpBy_key
+#     """
+#     path = convert_DM_path_to_star_path(DM_clstPath, keys_to_include).split("/")
+#     path[0] = int(path[0])
+#     return tuple(path)
+#
+#
+# def combine_DM_df_and_h5_to_dict(gpBy, h5fhat, h5path):
+#     """
+#     stateful: no
+#     """
+#     gpbykeys = DM_h5path_to_groupbykey(h5path)
+#     # May want to convert some of the quantities back to float!?
+#     fhat = {k: v for k, v in gpBy.get_group(gpbykeys).iteritems()}
+#
+#     fhat["estimate"] = h5fhat[h5path]["estimate"][:]
+#     eval_points = [h5fhat[h5path]["eval_points0"][:],
+#                    h5fhat[h5path]["eval_points1"][:]]
+#     fhat["eval_points"] = eval_points
+#     return fhat
+#
+#
+# def combine_star_df_and_h5_to_dict(star_gpBy, star_h5fhat, DM_h5path,
+#                                    keys_to_include):
+#     """
+#     :param star_gpBy: pandas groupby object from the star df
+#     :param star_h5fhat: hdf5 file stream objects
+#     :param DM_h5path: string, hdf5 file path to corresponding DM cluster object
+#     :param keys_to_include: int, how many keys to include in the groupby
+#     """
+#     gpbykeys = DM_h5path_to_star_groupbykey(DM_h5path, keys_to_include)
+#     star_h5path = str(gpbykeys[0]) + '/' + '/'.join(gpbykeys[1:])
+#     # May want to convert some of the quantities back to float!?
+#     fhat = {k: v for k, v in star_gpBy.get_group(gpbykeys).iteritems()}
+#
+#     for k in star_h5fhat[star_h5path].keys():
+#         fhat[k] = star_h5fhat[star_h5path][k][:]
+#
+#     return fhat
+#
+## def get_DM_dict_from_run(DM_df, DM_fhat, DM_h5path, DM_gpBy_key_no=8):
+#     DM_gpBy = get_gpBy_DM_objects(DM_df, DM_gpBy_key_no)
+#     return combine_DM_df_and_h5_to_dict(DM_gpBy, DM_fhat, DM_h5path)
+#
+#
+# def get_star_dict_from_run(star_df, star_fhat, DM_h5path, star_gpBy_key_no):
+#     star_gpBy = get_gpBy_star_objects(star_df, star_gpBy_key_no)
+#     return combine_star_df_and_h5_to_dict(
+#        star_gpBy, star_fhat, DM_h5path, star_gpBy_key_no)
 
 
 # def compute_distance_for_h5_outputs(
