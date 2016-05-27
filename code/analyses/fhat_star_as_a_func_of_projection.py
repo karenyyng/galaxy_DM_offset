@@ -138,7 +138,7 @@ for clstNo in metadata["clstNo"]:
             h5_fstream[
                 str(clstNo) + '/' + cut + '/' + wt_key + '/'
                 + "richness"
-            ] = richness[cut.keys()[0]]
+            ] = richness[cut]
 
             for los_axis in metadata["los_axis"]:
                 clst_metadata["los_axis"] = los_axis

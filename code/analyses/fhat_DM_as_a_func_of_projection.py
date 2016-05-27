@@ -240,32 +240,20 @@ for i, clstNo in enumerate(DM_metadata["clstNo"]):
                             fhat[peak_property] = \
                                 fhat[peak_property][threshold_mask]
 
-                        # uncomment the following if you just want the best
-                        # matched peak
-                        # Find distance and good peak threshold
-                        # (offset, fhat_ixes), _, _, good_threshold = \
-                        #     getDist.compute_distance_between_DM_and_gal_peaks(
-                        #         fhat_stars, fhat
-                        #     )
-                        # clst_metadata["good_threshold"] = \
-                        #     '{0:0.10f}'.format(good_threshold)
-
-                        # Uncomment to only include DM peaks that are matched to the gal peaks
-                        # for peak_property in peak_info_keys:
-                        #     fhat[peak_property] = fhat[peak_property][fhat_ixes]
-
-                        # fhat["offset"] = offset
-                        # peak_info_keys.append("offset")
-
-                        # peak_df = \
-                        #     getgal.convert_dict_peaks_to_df(
-                        #         fhat, clst_metadata,
-                        #         peak_info_keys=peak_info_keys)
-                        # store.append("peak_df", peak_df)
+                        fixed_size_data_keys = [
+                            # "eval_points",
+                            # "estimate",
+                            "peaks_xcoords",
+                            "peaks_ycoords",
+                            "peaks_dens"
+                        ]
 
                         logging.info ("Putting fhat into h5")
-                        getDM.convert_dict_dens_to_h5(fhat, clst_metadata,
-                                                      h5_fstream, verbose=False)
+                        getDM.convert_dict_dens_to_h5(
+                            fhat, clst_metadata, h5_fstream,
+                            verbose=False,
+                            fixed_size_data_keys=fixed_size_data_keys
+                        )
 
 logging.info ("Done with all loops.")
 h5_fstream.close()

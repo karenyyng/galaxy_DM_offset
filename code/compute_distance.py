@@ -206,7 +206,7 @@ def append_corect_path(path_to_be_examined, path_lists, property="estimate"):
         path_lists.append(p)
 
 
-def retrieve_cluster_path(h5file, property='estimate'):
+def retrieve_cluster_path(h5file, property='peaks_dens'):
     """
     :param h5file: hdf5 filestream, for fhat objects
     :param property: string, the key to look for in the path
