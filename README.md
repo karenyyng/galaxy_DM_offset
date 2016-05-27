@@ -31,3 +31,5 @@ Jupyter notebook for making
 
 * [Fig. 1](https://github.com/karenyyng/galaxy_DM_offset/blob/master/code/analyses/fig1_mass_richness_cuts.ipynb)
 * [Fig. 2](https://github.com/karenyyng/galaxy_DM_offset/blob/master/code/analyses/fig2_color_magnitude_diagram.ipynb)
+* [Fig. 3](https://github.com/karenyyng/galaxy_DM_offset/blob/95804288d0e5ae0ee10e0913d94e039773871283/code/analyses/fig3_peak_comparison_of_toy_Gaussians.ipynb)
+* [Fig. 4](https://github.com/karenyyng/galaxy_DM_offset/blob/95804288d0e5ae0ee10e0913d94e039773871283/code/analyses/fig4_Illustris_cluster_vis.ipynb)
