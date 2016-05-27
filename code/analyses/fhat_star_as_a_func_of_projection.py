@@ -12,7 +12,7 @@ datetime_stamp = datetime.now().strftime("%D").replace('/', '_')
 # =========== Decide what to output ============================
 
 dataPath = "../../data/"
-total_clstNo = 43
+total_clstNo = 3
 clstID_h5filepath = dataPath + "rich_cluster_ID.h5"
 # start_clstNo = 13
 logging_filename = "star_logging_{0}_{1}.log".format(
@@ -83,7 +83,7 @@ metadata["weights"] = OrderedDict({
     })
 
 # projections
-nside = 8  # nsides of HEALpix are powers of 2, pix for 16 nsides = 3072 / 2
+nside = 2  # nsides of HEALpix are powers of 2, pix for 16 nsides = 3072 / 2
 metadata["los_axis"] = [str(1)]  # use z-axis as los axis
 
 # Want to use string as key, not floats!
@@ -110,7 +110,7 @@ clst_metadata = OrderedDict({})
 for clstNo in metadata["clstNo"]:
     logging.info("Processing clst {0} ".format(int(clstNo)) +
                  "out of the range {0} to {1}".format(
-                     metadata['clstNo'][-total_clstNo:],
+                     metadata['clstNo'][-total_clstNo:][0],
                      metadata['clstNo'][-1]))
     peak_df = pd.DataFrame()
     clst_metadata["clstNo"] = clstNo
@@ -133,6 +133,12 @@ for clstNo in metadata["clstNo"]:
         for wt_key in metadata["weights"]:
             clst_metadata["weights"] = wt_key
             weights = thisdf[wt_key + "_wt"]
+
+            # save the richness
+            h5_fstream[
+                str(clstNo) + '/' + cut + '/' + wt_key + '/'
+                + "richness"
+            ] = richness[cut.keys()[0]]
 
             for los_axis in metadata["los_axis"]:
                 clst_metadata["los_axis"] = los_axis

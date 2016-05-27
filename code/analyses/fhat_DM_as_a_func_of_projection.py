@@ -13,11 +13,11 @@ import os
 from scipy import ndimage
 # from datetime import datetime
 # datetime_stamp = datetime.now().strftime("%D").replace('/', '_')
-datetime_stamp = '05_23_16'
+datetime_stamp = '05_26_16'
 data_path = "../../data/"
 
 # ------- specify output file paths  -----------------------
-total_clstNo = 43
+total_clstNo = 3
 input_datetime_stamp = datetime_stamp  # what fhat_star file to read in
 logging_filename = "DM_logging_{0}_{1}.log".format(
     total_clstNo, datetime_stamp)
