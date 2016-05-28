@@ -12,7 +12,7 @@ datetime_stamp = datetime.now().strftime("%D").replace('/', '_')
 # =========== Decide what to output ============================
 
 dataPath = "../../data/"
-total_clstNo = 3
+total_clstNo = 2
 clstID_h5filepath = dataPath + "rich_cluster_ID.h5"
 # start_clstNo = 13
 logging_filename = "star_logging_{0}_{1}.log".format(
@@ -83,7 +83,7 @@ metadata["weights"] = OrderedDict({
     })
 
 # projections
-nside = 2  # nsides of HEALpix are powers of 2, pix for 16 nsides = 3072 / 2
+nside = 1  # nsides of HEALpix are powers of 2, pix for 16 nsides = 3072 / 2
 metadata["los_axis"] = [str(1)]  # use z-axis as los axis
 
 # Want to use string as key, not floats!

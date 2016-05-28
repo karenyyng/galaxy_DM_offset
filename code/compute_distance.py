@@ -11,28 +11,34 @@ import extract_catalog as ec
 import get_DM_centroids as getDM
 
 
-def construct_uber_result_df(fhat_star, fhat_DM, main_h5):
+def construct_uber_result_df(star_fhats, DM_fhats, main_h5,
+                             dataPath):
     """uses different functions for constructing the uber result dataframe
 
-    :fhat_star: hdf5 file stream, output from test_star_fhat_*.py
-    :fhat_DM: hdf5 file stream, output from test_DM_fhat_*.py
+    :star_fhats: hdf5 filestream, output from test_star_fhat_*.py
+    :DM_fhats: hdf5 filestream, output from test_DM_fhat_*.py
     :main_h5:
         Illustris data filestream that contains metadata info about each
         cluster
     :returns: uber_df, a Pandas dataframe that contains the main result of the
     paper
-
-
     """
+    clstNo = [int(no) for no in star_fhats.keys()]
+
     # Read in main hdf5 file for retrieving the m200
     main_FOF_h5 = h5py.File(dataPath +
                         "Illustris-1_fof_subhalo_myCompleteHaloCatalog_00135" +
                         ".hdf5", "r")
 
-    # Retrieve info about which clusters were analyzed
-    ec.extract_clst()
-
+    # do not combine dataframe with projections in fhat objects
+    # until the very very end
     uber_df = pd.DataFrame([])
+    uber_df["M200C"] = main_FOF_h5['Group/Group_M_Crit200'][clstNo]
+
+    const_path =
+    uber_df["richness"] = [star_fhats[str(no) + ] for no in clstNo]
+
+
     # uber_df['m200c'] = pass
     # uber_df['richness'] = richness
     return uber_df
@@ -200,7 +206,7 @@ def compute_distance_between_DM_and_gal_peaks(
     return output
 
 # ----- convert output to original dictionary form for visualization -------
-def append_corect_path(path_to_be_examined, path_lists, property="estimate"):
+def append_correct_path(path_to_be_examined, path_lists, property="peaks_dens"):
     if property in path_to_be_examined:
         p = '/'.join(path_to_be_examined.split('/')[:-1])
         path_lists.append(p)
@@ -213,7 +219,8 @@ def retrieve_cluster_path(h5file, property='peaks_dens'):
     """
     path_lists = []
 
-    h5file.visititems(lambda x, y: append_corect_path(x, path_lists))
+    h5file.visit(lambda x:
+                 append_correct_path(x, path_lists, property))
     return path_lists
 
 
@@ -252,12 +259,12 @@ def retrieve_metadata_from_fhat_as_path(h5_fhat):
 
     # this traverses all the possible paths but
     # our path size is small enough it is very fast
-    h5_fhat.visititems(lambda x, y: append_corect_path(x, paths))
+    h5_fhat.visititems(lambda x, y: append_correct_path(x, paths))
     last_clstNo = sorted(np.unique([int(p.split('/')[0]) for p in paths]))[-1]
 
     correct_paths = []
     h5_fhat[str(last_clstNo)].visititems(
-        lambda x, y: append_corect_path(x, correct_paths)
+        lambda x, y: append_correct_path(x, correct_paths)
     )
 
     path = [str(last_clstNo)] + correct_paths[-1].split('/')
