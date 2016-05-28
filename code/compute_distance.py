@@ -7,40 +7,42 @@ import pandas as pd
 import numpy as np
 import sys
 sys.path.append("../")
-import extract_catalog as ec
+# import extract_catalog as ec
 import get_DM_centroids as getDM
 
 
 def construct_uber_result_df(star_fhats, DM_fhats, main_h5,
-                             dataPath):
+                             data_path="../../data/"):
     """uses different functions for constructing the uber result dataframe
 
-    :star_fhats: hdf5 filestream, output from test_star_fhat_*.py
-    :DM_fhats: hdf5 filestream, output from test_DM_fhat_*.py
-    :main_h5:
+    :param star_fhats: hdf5 filestream, output from test_star_fhat_*.py
+    :param DM_fhats: hdf5 filestream, output from test_DM_fhat_*.py
+    :param main_h5:
         Illustris data filestream that contains metadata info about each
         cluster
-    :returns: uber_df, a Pandas dataframe that contains the main result of the
-    paper
+    :returns: uber_df,
+        a Pandas dataframe that contains the main result of the paper
     """
     clstNo = [int(no) for no in star_fhats.keys()]
 
     # Read in main hdf5 file for retrieving the m200
-    main_FOF_h5 = h5py.File(dataPath +
-                        "Illustris-1_fof_subhalo_myCompleteHaloCatalog_00135" +
-                        ".hdf5", "r")
+    main_FOF_h5 = h5py.File(
+        data_path +
+        "Illustris-1_fof_subhalo_myCompleteHaloCatalog_00135" +
+        ".hdf5", "r")
 
-    # do not combine dataframe with projections in fhat objects
+    # Do not combine dataframe with projections in fhat objects
     # until the very very end
     uber_df = pd.DataFrame([])
     uber_df["M200C"] = main_FOF_h5['Group/Group_M_Crit200'][clstNo]
 
-    const_path =
-    uber_df["richness"] = [star_fhats[str(no) + ] for no in clstNo]
+    paths = retrieve_cluster_path(star_fhats, property_key="peaks_dens")
+    const_path = '/'.join(paths[0].split('/')[1:3])
+    uber_df["richness"] = [
+        star_fhats[str(no) + '/' + const_path + "/" + "richness"].value
+        for no in clstNo
+    ]
 
-
-    # uber_df['m200c'] = pass
-    # uber_df['richness'] = richness
     return uber_df
 
 
@@ -206,21 +208,21 @@ def compute_distance_between_DM_and_gal_peaks(
     return output
 
 # ----- convert output to original dictionary form for visualization -------
-def append_correct_path(path_to_be_examined, path_lists, property="peaks_dens"):
-    if property in path_to_be_examined:
+def append_correct_path(path_to_be_examined, path_lists, property_key="peaks_dens"):
+    if property_key in path_to_be_examined:
         p = '/'.join(path_to_be_examined.split('/')[:-1])
         path_lists.append(p)
 
 
-def retrieve_cluster_path(h5file, property='peaks_dens'):
+def retrieve_cluster_path(h5file, property_key='peaks_dens'):
     """
     :param h5file: hdf5 filestream, for fhat objects
-    :param property: string, the key to look for in the path
+    :param property_key: string, the key to look for in the path
     """
     path_lists = []
 
     h5file.visit(lambda x:
-                 append_correct_path(x, path_lists, property))
+                 append_correct_path(x, path_lists, property_key))
     return path_lists
 
 
