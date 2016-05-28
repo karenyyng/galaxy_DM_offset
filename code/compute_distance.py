@@ -2,7 +2,7 @@
 This contains module for computing distances between fhat_star & fhat (from
 DM).
 """
-import h5py
+# import h5py
 import pandas as pd
 import numpy as np
 import sys
@@ -11,8 +11,7 @@ sys.path.append("../")
 import get_DM_centroids as getDM
 
 
-def construct_uber_result_df(star_fhats, DM_fhats, main_h5,
-                             data_path="../../data/"):
+def construct_uber_result_df(star_fhats, DM_fhats, main_h5):
     """uses different functions for constructing the uber result dataframe
 
     :param star_fhats: hdf5 filestream, output from test_star_fhat_*.py
@@ -25,16 +24,10 @@ def construct_uber_result_df(star_fhats, DM_fhats, main_h5,
     """
     clstNo = [int(no) for no in star_fhats.keys()]
 
-    # Read in main hdf5 file for retrieving the m200
-    main_FOF_h5 = h5py.File(
-        data_path +
-        "Illustris-1_fof_subhalo_myCompleteHaloCatalog_00135" +
-        ".hdf5", "r")
-
     # Do not combine dataframe with projections in fhat objects
     # until the very very end
     uber_df = pd.DataFrame([])
-    uber_df["M200C"] = main_FOF_h5['Group/Group_M_Crit200'][clstNo]
+    uber_df["M200C"] = main_h5['Group/Group_M_Crit200'][clstNo]
 
     paths = retrieve_cluster_path(star_fhats, property_key="peaks_dens")
     const_path = '/'.join(paths[0].split('/')[1:3])
