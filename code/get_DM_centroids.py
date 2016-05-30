@@ -351,8 +351,8 @@ def find_num_of_significant_peaks(peak_dens_list, threshold=0.2):
 
 
 def apply_peak_num_threshold(gal_peak_dens_list, fhat,
-                             multiple_of_candidate_peaks=4,
-                             sig_fraction=0.2, verbose=True):
+                             multiple_of_candidate_peaks=3,
+                             sig_fraction=0.2, verbose=False):
     """
     Set the number of candidate DM peak to be a multiple of the significant
     galaxy peaks.
@@ -382,39 +382,26 @@ def apply_peak_num_threshold(gal_peak_dens_list, fhat,
                                                   sig_fraction)
 
     if sig_gal_peaks >= 3:
-        acceptance = multiple_of_candidate_peaks * sig_gal_peaks
+        accepted_peak_no = multiple_of_candidate_peaks * sig_gal_peaks
     else:
-        acceptance = multiple_of_candidate_peaks * (sig_gal_peaks + 1)
+        accepted_peak_no = multiple_of_candidate_peaks * (sig_gal_peaks + 1)
 
-    good_threshold = 0.99
-
-    # Guard against infinite loops.
-    if (len(fhat["peaks_dens"]) < acceptance):
+    # mask = fhat["peaks_dens"] > sig_fraction
+    # peaks_dens_above_threshold = np.array(fhat["peaks_dens"][:])[mask]
+    # if type(peaks_dens_above_threshold) is np.float64:
+    #     no_of_good_peaks = 1
+    # elif type(peaks_dens_above_threshold) is np.ndarray:
+    #     no_of_good_peaks = len(peaks_dens_above_threshold)
+    # if (no_of_good_peaks > accepted_peak_no):
+    #     return no_of_good_peaks
+    if (len(fhat["peaks_dens"]) < accepted_peak_no):
         if verbose:
             print (
                 "There are not enough DM peaks to be considered.\n" +
-                "len(fhat['peaks_dens'][fhat['peaks_dens'] > good_threshold]]) " +
-                " < acceptance"
+                "len(fhat['peaks_dens']) < accepted_peak_no"
                 )
-        return 0, len(fhat["peaks_dens"])
-
-    while (np.sum(fhat["peaks_dens"][fhat["peaks_dens"] > good_threshold]) <
-           acceptance):
-        good_threshold -= 0.05
-
-        if good_threshold < 0.06:
-            if verbose:
-                print (
-                    "Warning: There is no good threshold for the input DM peaks.\n"
-                )
-            good_threshold = 0.
-            if acceptance <= len(fhat["peaks_dens"]):
-                sig_DM_peaks = acceptance
-            else:
-                sig_DM_peaks = len(fhat["peaks_dens"])
-            break
-
-    return good_threshold, sig_DM_peaks
+        return len(fhat["peaks_dens"])
+    return accepted_peak_no
 
 
 # def smooth_histograms(fhat):

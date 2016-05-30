@@ -1,7 +1,7 @@
 """Extract data from raw halo FoF / subhalo catalog to catalog of clusters.
 for the Illustris-1 simulation
 Author: Karen Ng
-License: BSD
+License: Apache-2.0
 """
 
 import sys

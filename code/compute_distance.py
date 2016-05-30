@@ -2,26 +2,48 @@
 This contains module for computing distances between fhat_star & fhat (from
 DM).
 """
+import h5py
 import pandas as pd
 import numpy as np
 import sys
 sys.path.append("../")
-import extract_catalog as ec
+# import extract_catalog as ec
 import get_DM_centroids as getDM
 
 
-# def construct_uber_result_df(fhat_star, fhat_DM, ):
-#     """uses different functions for constructing the uber result dataframe
-#
-#     :fhat_star: TODO
-#     :fhat_DM: TODO
-#     :: TODO
-#     :returns: TODO
-#
-#     """
-#     ec.extract_clst()
-#     uber_df = pd.DataFrame([])
-#     return uber_df
+def construct_uber_result_df(star_fhats, DM_fhats, main_h5,
+                             data_path="../../data/"):
+    """uses different functions for constructing the uber result dataframe
+
+    :param star_fhats: hdf5 filestream, output from test_star_fhat_*.py
+    :param DM_fhats: hdf5 filestream, output from test_DM_fhat_*.py
+    :param main_h5:
+        Illustris data filestream that contains metadata info about each
+        cluster
+    :returns: uber_df,
+        a Pandas dataframe that contains the main result of the paper
+    """
+    clstNo = [int(no) for no in star_fhats.keys()]
+
+    # Read in main hdf5 file for retrieving the m200
+    main_FOF_h5 = h5py.File(
+        data_path +
+        "Illustris-1_fof_subhalo_myCompleteHaloCatalog_00135" +
+        ".hdf5", "r")
+
+    # Do not combine dataframe with projections in fhat objects
+    # until the very very end
+    uber_df = pd.DataFrame([])
+    uber_df["M200C"] = main_FOF_h5['Group/Group_M_Crit200'][clstNo]
+
+    paths = retrieve_cluster_path(star_fhats, property_key="peaks_dens")
+    const_path = '/'.join(paths[0].split('/')[1:3])
+    uber_df["richness"] = [
+        star_fhats[str(no) + '/' + const_path + "/" + "richness"].value
+        for no in clstNo
+    ]
+
+    return uber_df
 
 
 def compute_distance_for_other_peaks(
@@ -140,7 +162,7 @@ def compute_distance_between_DM_and_gal_peaks(
                                             threshold=0.5
                                             )
 
-    good_threshold, DM_peak_no = \
+    DM_peak_no = \
         getDM.apply_peak_num_threshold(fhat_star["peaks_dens"][:], fhat,
                                        verbose=verbose
                                        )
@@ -151,8 +173,7 @@ def compute_distance_between_DM_and_gal_peaks(
 
     if verbose:
         print ("gal_peak_no = ", gal_peak_no)
-        print ("goodthreshold = {0}, DM_peak_no = {1}".format(
-            good_threshold, DM_peak_no))
+        print ("DM_peak_no = {0}".format(DM_peak_no))
         print ("valid_DM_peak_coords = ", valid_DM_peak_coords)
 
 
@@ -183,25 +204,25 @@ def compute_distance_between_DM_and_gal_peaks(
     }
     output["gal_peak_no"] = gal_peak_no
     output["DM_peak_no"] = DM_peak_no
-    output["gd_threshold"] = good_threshold
 
     return output
 
 # ----- convert output to original dictionary form for visualization -------
-def append_corect_path(path_to_be_examined, path_lists, property="estimate"):
-    if property in path_to_be_examined:
+def append_correct_path(path_to_be_examined, path_lists, property_key="peaks_dens"):
+    if property_key in path_to_be_examined:
         p = '/'.join(path_to_be_examined.split('/')[:-1])
         path_lists.append(p)
 
 
-def retrieve_cluster_path(h5file, property='estimate'):
+def retrieve_cluster_path(h5file, property_key='peaks_dens'):
     """
     :param h5file: hdf5 filestream, for fhat objects
-    :param property: string, the key to look for in the path
+    :param property_key: string, the key to look for in the path
     """
     path_lists = []
 
-    h5file.visititems(lambda x, y: append_corect_path(x, path_lists))
+    h5file.visit(lambda x:
+                 append_correct_path(x, path_lists, property_key))
     return path_lists
 
 
@@ -240,12 +261,12 @@ def retrieve_metadata_from_fhat_as_path(h5_fhat):
 
     # this traverses all the possible paths but
     # our path size is small enough it is very fast
-    h5_fhat.visititems(lambda x, y: append_corect_path(x, paths))
+    h5_fhat.visititems(lambda x, y: append_correct_path(x, paths))
     last_clstNo = sorted(np.unique([int(p.split('/')[0]) for p in paths]))[-1]
 
     correct_paths = []
     h5_fhat[str(last_clstNo)].visititems(
-        lambda x, y: append_corect_path(x, correct_paths)
+        lambda x, y: append_correct_path(x, correct_paths)
     )
 
     path = [str(last_clstNo)] + correct_paths[-1].split('/')

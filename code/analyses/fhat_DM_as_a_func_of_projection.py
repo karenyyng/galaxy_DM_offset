@@ -13,11 +13,11 @@ import os
 from scipy import ndimage
 # from datetime import datetime
 # datetime_stamp = datetime.now().strftime("%D").replace('/', '_')
-datetime_stamp = '05_23_16'
+datetime_stamp = '05_27_16'
 data_path = "../../data/"
 
 # ------- specify output file paths  -----------------------
-total_clstNo = 43
+total_clstNo = 2
 input_datetime_stamp = datetime_stamp  # what fhat_star file to read in
 logging_filename = "DM_logging_{0}_{1}.log".format(
     total_clstNo, datetime_stamp)
@@ -28,15 +28,7 @@ logging.info ("Current date is {}".format(datetime_stamp))
 output_fhat_filename = \
     "test_DM_fhat_clst{0}_{1}.h5".format(total_clstNo, datetime_stamp)
 
-
-# StoreFile = \
-#     "test_DM_peaks_df_clst{0}_{1}.h5".format(total_clstNo, datetime_stamp)
-# if os.path.isfile(data_path + StoreFile):
-#     os.remove(data_path + StoreFile)
-# store = pd.HDFStore(data_path + StoreFile)
-
 logging.info ("Outputing files to: " + output_fhat_filename)
-# logging.info (StoreFile)
 
 import numpy as np
 import sys
@@ -47,10 +39,6 @@ import extract_catalog as ec
 import get_DM_centroids as getDM
 import get_gal_centroids as getgal
 import get_KDE as getKDE
-# import compute_distance as getDist
-
-# import get_KDE as KDE
-# import compute_distance as getDist
 
 verbose = True
 import h5py
@@ -114,12 +102,6 @@ h5_fstream = \
 pos_cols = ["SubhaloPos{}".format(i) for i in range(3)]
 
 clst_metadata = OrderedDict({})
-# clst_range = (int(128 - total_clstNo) + 1,
-#               len(DM_metadata["clstNo"]) + 128 - total_clstNo + 1)
-
-# clsts_Nos = sorted([int(d) for d in DM_metadata['clstNo']])
-# begin_clst = clsts_Nos[0]
-# end_clst = clsts_Nos[-1]
 
 # #### CHANGE THE RANGE of line below
 for i, clstNo in enumerate(DM_metadata["clstNo"]):
@@ -187,20 +169,8 @@ for i, clstNo in enumerate(DM_metadata["clstNo"]):
                     #### CHANGE THE RANGE of DM_metadata["kernel_width"] below
                     for kernel_width in DM_metadata["kernel_width"]:
 
-                        # Find the correpsonding galaxy projection
-                        # gpBy_keys = \
-                        #     tuple([clst_metadata[k]
-                        #            for k in star_gpBy_keys])
-
-                        # fhat_stars = \
-                        #     star_gpBy.get_group(gpBy_keys)
-
+                        # Find the correpsonding galaxy density projection
                         fhat_stars = fhats_stars[star_path]
-
-                        # Save the cluster metadata as strings
-
-                        # clst_metadata["sig_fraction"] = \
-                        #     '{0:0.2f}'.format(sig_fraction)
 
                         clst_metadata["kernel_width"] = kernel_width
                         logging.info (
@@ -214,18 +184,12 @@ for i, clstNo in enumerate(DM_metadata["clstNo"]):
                         getKDE.find_peaks_from_py_diff(fhat)
                         getKDE.get_density_weights(fhat)
 
-                        # Bad code: should loop through
-                        # different sig_fraction
-                        # Find a good threshold
-                        fhat["good_threshold"], _ = \
-                            getDM.apply_peak_num_threshold(
-                                fhat_stars["peaks_dens"][:],
-                                fhat,
-                                sig_fraction=float(
-                                    DM_metadata["sig_fraction"][0])
-                            )
-                        threshold_mask = \
-                            fhat["peaks_dens"] > fhat['good_threshold']
+                        # Fixed threshold for calling a gal peak as significant
+                        accepted_peak_no = getDM.apply_peak_num_threshold(
+                            fhat_stars["peaks_dens"][:],
+                            fhat,
+                            sig_fraction=DM_metadata["sig_fraction"][0]
+                        )
 
                         # only entries listed in peak_info_keys get stored
                         peak_info_keys = \
@@ -235,39 +199,27 @@ for i, clstNo in enumerate(DM_metadata["clstNo"]):
                              # "peaks_colIx",
                              "peaks_dens"]
 
-                        # Apply the threshold
+                        # Apply the threshold to reduce the amount of peaks
+                        # stored
                         for peak_property in peak_info_keys:
                             fhat[peak_property] = \
-                                fhat[peak_property][threshold_mask]
+                                fhat[peak_property][:accepted_peak_no]
 
-                        # uncomment the following if you just want the best
-                        # matched peak
-                        # Find distance and good peak threshold
-                        # (offset, fhat_ixes), _, _, good_threshold = \
-                        #     getDist.compute_distance_between_DM_and_gal_peaks(
-                        #         fhat_stars, fhat
-                        #     )
-                        # clst_metadata["good_threshold"] = \
-                        #     '{0:0.10f}'.format(good_threshold)
-
-                        # Uncomment to only include DM peaks that are matched to the gal peaks
-                        # for peak_property in peak_info_keys:
-                        #     fhat[peak_property] = fhat[peak_property][fhat_ixes]
-
-                        # fhat["offset"] = offset
-                        # peak_info_keys.append("offset")
-
-                        # peak_df = \
-                        #     getgal.convert_dict_peaks_to_df(
-                        #         fhat, clst_metadata,
-                        #         peak_info_keys=peak_info_keys)
-                        # store.append("peak_df", peak_df)
+                        fixed_size_data_keys = [
+                            "eval_points",
+                            "estimate",
+                            "peaks_xcoords",
+                            "peaks_ycoords",
+                            "peaks_dens"
+                        ]
 
                         logging.info ("Putting fhat into h5")
-                        getDM.convert_dict_dens_to_h5(fhat, clst_metadata,
-                                                      h5_fstream, verbose=False)
+                        getDM.convert_dict_dens_to_h5(
+                            fhat, clst_metadata, h5_fstream,
+                            verbose=False,
+                            fixed_size_data_keys=fixed_size_data_keys
+                        )
 
 logging.info ("Done with all loops.")
 h5_fstream.close()
-# store.close()
 DM_fstream.close()
