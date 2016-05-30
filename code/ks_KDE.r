@@ -65,6 +65,29 @@ TwoDtestCase1 = function(samp_no = 5e2, cwt = 1 / 11)
   do_KDE(x, Hscv)
 }
 
+bootstrap_KDE = function(data_x, bootNo=4L, nrows=nrow(data_x), ncpus=2L, 
+                         dom_peak_no=1L,
+                         bw_selector=Hscv, w=rep.int(1, nrow(data_x))){ 
+  # perform bootstrapping for getting confidence regions 
+  # @param data_x:  matrix 
+  # @param bootNo: integer 
+  # etc.
+  # @stability : needs much more debugging to see how the results are stacked
+  # and returned
+  cl <- makeCluster(ncpus, "FORK")
+  ix_list <- lapply(1:bootNo, function(i) 
+                    ix <- sample(1:nrows, nrows, replace=T))
+  res <- parSapply(cl, ix_list, 
+                   function(ix) do_KDE_and_get_peaks(data_x[ix, 1:2], 
+                                                     bw_selector,
+                                                     w=w,
+                                                     dom_peak_no=dom_peak_no))
+  stopCluster(cl)
+  ix_list <- NULL  # delete the ix list 
+  gc()  # tell R to collect memory from the deleted variables
+
+  return(t(res))
+}
 
 # ----- I broke some of the functions / not stable for the script below---
 
@@ -219,30 +242,8 @@ TwoDtestCase1 = function(samp_no = 5e2, cwt = 1 / 11)
 # }
 
 
-# bootstrap_KDE = function(data_x, bootNo=4L, nrows=nrow(data_x), ncpus=2L, 
-#                          dom_peak_no=1L,
-#                          bw_selector=Hscv, w=rep.int(1, nrow(data_x))){ 
-#   # perform bootstrapping for getting confidence regions 
-#   # @param data_x:  matrix 
-#   # @param bootNo: integer 
-#   # etc.
-#   # @stability : needs much more debugging to see how the results are stacked
-#   # and returned
-#   cl <- makeCluster(ncpus, "FORK")
-#   ix_list <- lapply(1:bootNo, function(i) 
-#                     ix <- sample(1:nrows, nrows, replace=T))
-#   res <- parSapply(cl, ix_list, 
-#                    function(ix) do_KDE_and_get_peaks(data_x[ix, 1:2], 
-#                                                      bw_selector,
-#                                                      w=w,
-#                                                      dom_peak_no=dom_peak_no))
-#   stopCluster(cl)
-#   ix_list <- NULL  # delete the ix list 
-#   gc()  # tell R to collect memory from the deleted variables
-# 
-#   return(t(res))
-# }
-# 
+
+ 
 # plot_bootst_KDE_peaks = function(bt_peaks, truth=NULL){
 #   # rough draft of how we can plot the peaks
 #   # params bt_peaks = vector from bootstrap_KDE function
