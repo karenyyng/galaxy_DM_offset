@@ -27,6 +27,7 @@ def construct_uber_result_df(star_fhats, DM_fhats, main_h5):
     # Do not combine dataframe with projections in fhat objects
     # until the very very end
     uber_df = pd.DataFrame([])
+    uber_df['clstNo'] = clstNo
     uber_df["M200C"] = main_h5['Group/Group_M_Crit200'][clstNo]
 
     paths = retrieve_cluster_path(star_fhats, property_key="peaks_dens")
@@ -39,9 +40,19 @@ def construct_uber_result_df(star_fhats, DM_fhats, main_h5):
     return uber_df
 
 
+def assign_sign_for_dist():
+    """
+    """
+    if np.random.randint(10) % 2 == 0:
+        return 1.
+    else:
+        return -1.
+
+
 def compute_distance_for_other_peaks(
         matched_stat, star_fhat, summary_stat_keys,
-        unit_conversion=1./0.704, convert_kpc_over_h_to_kpc=True
+        unit_conversion=1./0.704, convert_kpc_over_h_to_kpc=True,
+        assign_rand_sign=False
     ):
     """use output from `compute_distance_between_DM_and_gal_peaks` to
     compute the distances for other summary stat
@@ -79,6 +90,9 @@ def compute_distance_for_other_peaks(
         dist = sorted(compute_euclidean_dist(
             star_sum_xy_coords - valid_DM_peak_coords))[0]
 
+        if assign_rand_sign:
+            dist *= assign_sign_for_dist()
+
         dist_dict[sum_stat_key] = dist
 
     return dist_dict
@@ -95,7 +109,7 @@ def convert_DM_path_to_star_path(DM_clstPath, star_key_no=-1):
 def compute_euclidean_dist(data, origin=None):
     """
     between numpy array of (nobs, ndim) and one point
-    if origin doest not represent a data point, results may be wrong.
+    if `origin` param doest not represent a data point, results may be wrong.
 
     :param data: numpy array, shape = (nobs, ndim)
     :param origin: numpy array (optional), shape = (1, ndim )
@@ -121,8 +135,7 @@ def compute_euclidean_dist(data, origin=None):
 
 def compute_distance_between_DM_and_gal_peaks(
         fhat_star, fhat, fhat_star_to_DM_coord_conversion=1. / 0.704,
-        verbose=False
-):
+        verbose=False, assign_rand_sign=False):
     """
     Parameters
     ===========
@@ -180,8 +193,13 @@ def compute_distance_between_DM_and_gal_peaks(
 
     # We use Euclidean distance for our query, i.e. p=2.
     (dist, DM_ixes) = tree.query(star_peak_coords, k=1, p=2)
+
+    if assign_rand_sign:
+        dist *= assign_sign_for_dist()
+
     output = OrderedDict({})
     output["dist"] = dist
+
     output["DM_ixes"] = DM_ixes
     output["DM_matched_peak_coords"] = {
         "peaks_x_coords": fhat["peaks_xcoords"][:][DM_ixes],
@@ -200,8 +218,9 @@ def compute_distance_between_DM_and_gal_peaks(
 
     return output
 
-# ----- convert output to original dictionary form for visualization -------
-def append_correct_path(path_to_be_examined, path_lists, property_key="peaks_dens"):
+# - convert output to original dictionary form for visualization -------
+def append_correct_path(path_to_be_examined, path_lists,
+                        property_key="peaks_dens"):
     if property_key in path_to_be_examined:
         p = '/'.join(path_to_be_examined.split('/')[:-1])
         path_lists.append(p)

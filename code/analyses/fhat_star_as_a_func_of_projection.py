@@ -60,9 +60,10 @@ metadata = OrderedDict({})
 # contain less particles and run faster
 metadata["clstNo"] = \
     clstID_h5file["rich_cluster_ID"][-total_clstNo:]
-    # [str(i) for i in range(start_clstNo, start_clstNo + total_clstNo)]  #  range(129)
+    # [str(i) for i in range(start_clstNo, start_clstNo + total_clstNo)]
+    #  range(129)
 
-# cuts
+### cuts
 # cut_kwargs = {"DM_cut": 1e3, "star_cut": 5e2}
 # cut_methods = {"min": getg.cut_reliable_galaxies}  # use cut_dim_galaxies!?
 # cut_cols = {"min": pos_cols}
@@ -173,14 +174,6 @@ for clstNo in metadata["clstNo"]:
                         spat_key1='spat1', spat_key2='spat2'
                     )
 
-                    # This is not needed since the offset will be computed
-                    # w.r.t. dark matter peak instead
-                    # getg.compute_KDE_peak_offsets(fhat, original_f,
-                    #                               clst_metadata["clstNo"])
-                    # peak_df = \
-                    #     getg.convert_dict_peaks_to_df(fhat, clst_metadata)
-                    # store.append("peak_df", peak_df)
-
                     # output fhat
                     output_keys = [
                         'eval_points', "estimate", "bandwidth_matrix_H",
@@ -191,4 +184,4 @@ for clstNo in metadata["clstNo"]:
                         fhat, clst_metadata,
                         h5_fstream, fixed_size_data_keys=output_keys)
 
-# store.close()
+h5_fstream.close()
