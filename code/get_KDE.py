@@ -221,10 +221,23 @@ def get_density_weights(fhat, ix_rkey="peaks_rowIx",
 def py_2D_arr_to_R_matrix(x):
     """flattens the array, convert to R float vector then to R matrix
     x = np.array, with shape (dataNo, 2)
+
+    TODO: think of a more general way of converting between python and R data
+    structures
     """
     nrow = x.shape[0]
     x = robjects.FloatVector(np.concatenate([x[:, 0], x[:, 1]]))
     return robjects.r['matrix'](x, nrow=nrow)
+
+
+def py_1D_arr_to_R_vector(x):
+    """flattens the array, convert to R float vector then to R matrix
+    x = np.array, with shape (dataNo)
+
+    TODO: think of a more general way of converting between python and R data
+    structures
+    """
+    return robjects.FloatVector(x)
 
 
 def gaussian_mixture_data(samp_no=int(5e2), cwt=1. / 11., set_seed=True):
@@ -241,28 +254,63 @@ def gaussian_mixture_data(samp_no=int(5e2), cwt=1. / 11., set_seed=True):
     return robjects.r["gaussian_mixture_data"](samp_no, cwt, set_seed=set_seed)
 
 
-def do_KDE(x, w=None, dom_peak_no=1):
-    """ don't want to write this for a general bandwidth selector yet
-    :params x: np.array, each row should be one observation / subhalo
-    :params w: np.float, weight of each row of data
-    :dom_peak_no: (DEPRECIATED)
+def do_1D_KDE(data, weight=None, convert_to_py_format=True):
+    """
+    :data: numpy 1D array
+    :weight: TODO
+    :convert_to_py_format: TODO
+    :returns: TODO
+
+    """
+    do_KDE_in_R = robjects.r["do_KDE"]
+    data = np.array(data)
+    if data.ndim == 1:
+        data = py_1D_arr_to_R_vector(data)
+    else:
+        raise ValueError(
+            "Argument `data` needs to be a 1D array / list")
+
+    if weight is None:
+        weight = np.ones(len(data))
+
+    weight = robjects.FloatVector(weight)
+    r_fhat = do_KDE_in_R(data, w=weight)
+
+    if not convert_to_py_format:
+        return r_fhat
+    else:
+        return convert_rfhat_to_dict(r_fhat)
+
+
+def do_KDE(x, w=None, dom_peak_no=1, convert_to_py_format=False):
+    """
+    :param x: np.array, each row should be one observation / subhalo
+    :param w: np.float, weight of each row of data
+    :param convert_to_py_format: bool, whether to return r object
+        or python dictionary
 
     :returns list of 2 R objects:
         :R matrix of peaks: each row correspond to coordinates of one peak
         :R object: fhat this should be fed to convert_rfhat_to_dict()
             if you wish to examine the object in python
+    or it returns a dictionary.
+    See `convert_rfhat_to_dict` for more info about the returned dictionary
 
-    :stability: untested
     """
-    do_KDE = robjects.r["do_KDE"]
+    do_KDE_in_R = robjects.r["do_KDE"]
 
-    x = py_2D_arr_to_R_matrix(np.array(x))
+    x = np.array(x)
+    x = py_2D_arr_to_R_matrix(x)
 
-    if w is not None:
-        w = robjects.FloatVector(w)
-        return do_KDE(x, w=w, dom_peak_no=dom_peak_no)
+    if w is None:
+        w = np.ones(x.shape[0])
+    w = robjects.FloatVector(w)
+    r_fhat = do_KDE_in_R(x, w=w, dom_peak_no=dom_peak_no)
+
+    if not convert_to_py_format:
+        return r_fhat
     else:
-        return do_KDE(x, dom_peak_no=dom_peak_no)
+        return convert_rfhat_to_dict(r_fhat)
 
 
 def do_KDE_and_get_peaks(x, w=None, dom_peak_no=1):

@@ -16,7 +16,13 @@ do_KDE = function(data, bandwidth_selector=Hscv, w=rep.int(1, nrow(data)),
   # w = vector of floats that is same size as data that denotes the weight
   # @return
   # fhat_pi1 = R object from the ks package  
-  H <- bandwidth_selector(x=data)
+  if (length(dim(data)) == 2){
+    H <- bandwidth_selector(x=data)
+  } else if (length (dim(data)) == 0){
+    # a vector has NULL dimension and gives 0 in the above
+    # condition
+    H <- hscv(data)
+  }
   fhat_pi1 <- kde(x=data, H=H, w=w, binned = FALSE) 
 
   return(fhat_pi1)

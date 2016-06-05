@@ -42,7 +42,7 @@ def kde1d(x, ax, prob=None, kernel="gau", bw="scott", fft=True,
             weights=weights)
     support, density = kde.support, kde.density
 
-    ax.plot(support, density, **kwargs)
+    ax.plot(support, density, 'b-', **kwargs)
     if isinstance(ax, ModuleType):
         ax.ylabel("PDF")
         if xlabel is not None:
@@ -109,11 +109,13 @@ def central_CI(support, density, level=68, lim=None):
     return low_ix, up_ix
 
 
-def CI_loc_plot(x, ax, c='b', prob=None, kernel="gau", bw="scott",
+def CI_loc_plot(x, ax, c='b', prob=None, kernel="gau", bw="silverman",
                 fft=True, gridsize=None, adjust=1, cut=3,
                 clip=(-np.inf, np.inf), xlabel=None, lim=None,
-                weights=None,
+                weights=None, ylabel=None,
                 labelsize=None, legendloc=None, **kwargs):
+
+    # make font looks like latex font
     rc("font", family="serif")
     support, den = kde1d(x, ax, prob=prob, kernel=kernel, bw=bw,
                          fft=fft, gridsize=gridsize, adjust=adjust, cut=cut,
@@ -124,16 +126,20 @@ def CI_loc_plot(x, ax, c='b', prob=None, kernel="gau", bw="scott",
     low68_ix, up68_ix = central_CI(support, den, level=68, lim=lim)
     low95_ix, up95_ix = central_CI(support, den, level=95, lim=lim)
     ax.fill_between(support[low68_ix: up68_ix],
-                     den[low68_ix: up68_ix], alpha=0.5, color=c)
+                    den[low68_ix: up68_ix], alpha=0.5, color=c)
     ax.fill_between(support[low95_ix: up95_ix],
-                     den[low95_ix: up95_ix], alpha=0.2, color=c)
+                    den[low95_ix: up95_ix], alpha=0.2, color=c)
     loc_ix = low68_ix
     loc = C_BI(x)
     while(support[loc_ix] < loc):
         loc_ix += 1
     ylim = ax.get_ylim()
-    ax.axvline(loc, ymin=0,
-                ymax=den[loc_ix] / ylim[1], ls='--', lw=3, c='k')
+    xlim = ax.get_xlim()
+    ax.axvline(loc, ymin=0.0,
+               ymax=(den[loc_ix] + den[loc_ix + 1]) / 2. / ylim[1],
+               ls='--', lw=3, c='k')
+
+    ax.set_ylim(0., ylim[1])
 
     sum_stat = {"loc": loc,
                 "low68": support[low68_ix],
