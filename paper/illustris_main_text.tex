@@ -338,9 +338,10 @@ We compare four ways to identify the light/galaxy centers:
 \item Brightest cluster galaxy (BCG)
 
 \end{enumerate}
-
-We try to avoid any manual methods for identifying peaks for
-reproducibility and comparison purposes. Since all the methods listed in this
+We avoid any manual methods for identifying peaks for
+comparison purposes, scalability and reproducibility, 
+which is a key property of science. 
+Since all the methods listed in this
 paper are automated with the source code openly available, 
 it is possible for future studies to reuse our code for comparisons. 
 There are a number of decisions ($\sim $[TODO] ADD NUMBER) that one needs to make to 
@@ -411,8 +412,8 @@ $\Delta s$.
 \subsubsection{Shrinking aperture}
 Another popular method among astronomers for finding the peak of a spatial
 distribution include what we call a shrinking aperture method.
-We test if the shrinking aperture method is able to reliably recover the highest 
-peak.
+We test if the shrinking aperture method is able to reliably recover the 
+densest peak.
 This method is dependent on the initial diameter and the initial center 
 location of the aperture.
 This method does not evaluate if the cluster is made up of
@@ -427,7 +428,7 @@ convergence criteria for reference.
 We note that the exact implementation may result in different performances.
 \begin{algorithm}
 	\caption{Shrinking aperture algorithm. See code at
-		\href{https://goo.gl/98PwfS}{https://goo.gl/98PwfS}.
+		\href{https://goo.gl/nqxJl8}{https://goo.gl/nqxJl8}.
 	}
 	\KwData{subhalo that satisfy cuts as a galaxy}
 	 \hrulefill \\
@@ -536,8 +537,12 @@ size.
 
 
 \subsection{Finding offsets} 
-We computed the projected offsets between the galaxy density peaks inferred from the
-cross-validated KDE peaks of the galaxy data and the closest DM density peak.
+We computed the projected offsets between the galaxy density peaks inferred
+from the different peak finding methods. 
+Furthermore, to avoid undesirable effects from setting hard boundary at offset
+= 0 when plotting the PDF of the offsets, we randomly assign the sign of an
+offset before smoothing the PDF. Finally, after smoothing the PDF, we take the
+
 
 % It is possible to also  
 
@@ -597,6 +602,28 @@ Ill-defined problem without a unique solution
 
 \subsection{Galaxy-DM Offset in Illustris}
 \subsubsection{Projected offsets}
+\begin{figure*}
+	\begin{center}
+	\includegraphics[width=0.85\linewidth]{Fig5_offset_distribution.png}
+	\caption{ 		
+		The distribution of different offsets of [TODO] clusters with [TODO]
+		projections. The dark blue area indicates the 68\% confidence interval
+		while the light blue area shows the 95\% confidence interval. 
+		We provide two ways of summarizing the offsets, the {\bf left column} shows
+		the offsets when we do not take the absolute magnitude of the offset.
+		The estimates of the offsets on the left are all consistent with 0 within
+		the 68\% confidence interval.
+		On the {\bf right column}, we plot the same values after taking the
+		absolute magnitude. The estimates from the absolute magnitude of the
+		offsets are pushed towards larger values. None of the estimates from the
+		absolute offsets are consistent with 0 within the 68\% interval.
+				\label{fig:offset_distributions}
+	}
+\end{center}
+\end{figure*}
+
+
+
 \begin{itemize}
 \item those between BCG, the most bound particle and the other masses. 
 \item explain the variation of the offsets for the same cluster under different 
@@ -628,7 +655,8 @@ projections
 % 		\label{fig:est_offset_distrib_for_different_projections}}
 % \end{figure*}
 
-\subsubsection{Correlations between the offsets and properties of the cluster / groups}
+\subsubsection{Correlations between the offsets and properties of the 
+cluster / groups}
 \begin{itemize}
 \item relaxedness
 \item mass 
@@ -636,12 +664,13 @@ projections
 \end{itemize}
 
 
-\section{DISCUSSION}
+\section{DISCUSSION}\label{sec:discussion}
+It is not easy to compare the result of this study to other study due to the 
+differences in the multi-step method for inferring the "peak", or the
+"centroid".
 
-
-
-\label{sec:discussion}
 \subsection{Comparison to other simulations}
+
 \subsection{Comparison to other observational studies}
 Central galaxy paradigm (CGP)
 
@@ -676,6 +705,9 @@ We showed that
 			from simulations make it hard if not impossible for comparison between studies. 
 			We call researchers in this field to make their software and analysis code openly
 			available.
+		% \item a proper Bayesian analysis should be performed between a set of
+		% 	simulation with and without a detectable $\sigma_{\rm SIDM}$ to verify
+		% 	which statistic would be sufficient to capture  
 \end{itemize}
 While this paper does not provide a solution to the complete statistical model
 for galaxy clusters, it points out some of the aspects that good models should
