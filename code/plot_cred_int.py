@@ -134,7 +134,7 @@ def CI_loc_plot(x, ax, c='b', prob=None, kernel="gau", bw="silverman",
     while(support[loc_ix] < loc):
         loc_ix += 1
     ylim = ax.get_ylim()
-    xlim = ax.get_xlim()
+    # xlim = ax.get_xlim()
     ax.axvline(loc, ymin=0.0,
                ymax=(den[loc_ix] + den[loc_ix + 1]) / 2. / ylim[1],
                ls='--', lw=3, c='k')
@@ -149,3 +149,150 @@ def CI_loc_plot(x, ax, c='b', prob=None, kernel="gau", bw="silverman",
                 }
 
     return sum_stat
+
+
+def N_by_N_lower_triangle_plot(data, space, var_list, axlims=None,
+                               Nbins_2D=None, axlabels=None, N_bins=None,
+                               xlabel_to_rot=None, histran=None, figsize=6,
+                               fontsize=12, save=False, prefix=None,
+                               suffix=".png", path="./"):
+    """ create a N by N matrix of plots
+    with the top plot of each row showing a density plot in 1D
+    and the remaining plots being 2D contour plots
+    df = dataframe that contain the data of all the variables to be plots
+    space = float, px of space that is added between subplots
+    var_list = list of strings - denotes the column header names
+        that needs to be plotted
+    axlims = dictionary, keys are the strings in var_list,
+        each value is a tuple of (low_lim, up_lim) to denote the limit
+        of values to be plotted
+    Nbins_2D = dictionary, keys are in format of tuples of
+        (x_col_str, y_col_str) to denote which subplot you are referring to
+    axlabels = dictionary, keys correspond to the variable names
+    xlabel_to_rot = dictionary,
+        key is the the key for the labels to be rotated,
+        value is the degree to be rotated
+    histran = dictionary,
+        some keys has to be the ones for the plots, value are in
+        form of (lowerhist_range, upperhist_range)
+    figsize = integer, figuares are squared this refers to the side length
+    fontsize = integer, denotes font size of the labels
+    save = logical, denotes if plot should be saved or not
+    prefix = string, prefix of the output plot file
+    path = string, path of the output plot file
+    suffix = string, file extension of the output plot file
+
+    Stability: Not entirely tested, use at own risk
+    """
+    from matplotlib.ticker import MaxNLocator
+
+    def comb_zip(ls1, ls2):
+        return [(lb1, lb2) for lb1 in ls1 for lb2 in ls2]
+
+    # begin checking if inputs make sense
+    N = len(var_list)
+    assert N <= len(axlabels), "length of axlabels is wrong"
+    assert N >= 2, "lower triangular contour plots require more than 2\
+        variables in the data"
+
+    for var in var_list:
+        assert var in data.columns, "variable to be plotted not in df"
+
+    if axlabels is None:
+        axlabels = {key: key for key in var_list}
+
+    if xlabel_to_rot is None:
+        xlabel_to_rot = {key: 0 for key in var_list}
+
+    if histran is None:
+        histran = {key: None for key in var_list}
+
+    if axlims is None:
+        axlims = {key: (None, None) for key in var_list}
+
+    if Nbins_2D is None:
+        keys = comb_zip(var_list, var_list)
+        Nbins_2D = {key: 50 for key in keys}
+
+    if N_bins is None:
+        N_bins = {key: 'knuth' for key in var_list}
+
+    if save:
+        assert prefix is not None, "prefix for output file cannot be none"
+
+    # impossible for the matrix plot not to be squared in terms of dimensions
+    # set each of the subplot to be squared with the figsize option
+    f, axarr = plt.subplots(N, N, figsize=(figsize, figsize))
+    f.subplots_adjust(wspace=space, hspace=space)
+
+    # remove unwanted plots on the upper right
+    plt.setp([a.get_axes() for i in range(N - 1)
+              for a in axarr[i, i + 1:]], visible=False)
+
+    # remove unwanted row axes tick labels
+    plt.setp([a.get_xticklabels() for i in range(N - 1)
+              for a in axarr[i, :]], visible=False)
+
+    # remove unwanted column axes tick labels
+    plt.setp([axarr[0, 0].get_yticklabels()], visible=False)
+    plt.setp([a.get_yticklabels() for i in range(N - 1)
+              for a in axarr[i + 1, 1:]], visible=False)
+
+    # create axes labels
+    if axlabels is not None:
+        for j in range(1, N):
+            axarr[j, 0].set_ylabel(axlabels[var_list[j]], fontsize=fontsize)
+        for i in range(N):
+            axarr[N - 1, i].set_xlabel(axlabels[var_list[i]],
+                                       fontsize=fontsize)
+
+    for n in range(N):
+        # avoid overlapping lowest and highest ticks mark
+        # print "setting x and y tick freq for {0}".format((n, n))
+        ax2 = axarr[n, n]
+        ax2.xaxis.set_major_locator(MaxNLocator(nbins=6, prune="both"))
+        ax2.yaxis.set_major_locator(MaxNLocator(nbins=6, prune="both"))
+
+    # print "setting x and y tick freq for {0}".format((i, j))
+    for i in range(N):
+        for j in range(N):  # range(i)
+            ax2 = axarr[i, j]
+            ax2.yaxis.set_major_locator(MaxNLocator(nbins=6, prune="both"))
+            ax2.xaxis.set_major_locator(MaxNLocator(nbins=6, prune="both"))
+
+    # rotate the xlabels appropriately
+    if xlabel_to_rot is not None:
+        match_ix = [var_list.index(item) for item in var_list]
+        # ok to use for-loops for small number of iterations
+        for ix in match_ix:
+            labels = axarr[N - 1, ix].get_xticklabels()
+            for label in labels:
+                label.set_rotation(xlabel_to_rot[var_list[ix]])
+
+    # start plotting the diagonal
+    for i in range(N):
+        print "N_bins = {0}".format(N_bins[var_list[i]])
+        histplot1d_part(axarr[i, i], np.array(data[var_list[i]]),
+                        np.array(data['prob']),
+                        N_bins=N_bins[var_list[i]],
+                        histrange=histran[var_list[i]],
+                        x_lim=axlims[var_list[i]])
+
+    # start plotting the lower triangle when row no > col no
+    for i in range(N):
+        for j in range(i):
+            histplot2d_part(axarr[i, j], np.array(data[var_list[j]]),
+                            np.array(data[var_list[i]]),
+                            prob=np.array(data['prob']),
+                            N_bins=Nbins_2D[(var_list[j], var_list[i])],
+                            x_lim=axlims[var_list[j]],
+                            y_lim=axlims[var_list[i]])
+
+    if save:
+        print "saving plot to {0}".format(path + prefix + suffix)
+        plt.savefig(path + prefix + suffix, dpi=200, bbox_inches='tight')
+
+    return
+
+
+
