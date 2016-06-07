@@ -32,15 +32,17 @@ def compile_line_list(df, df_keys, row_labels, table_properties):
         "\caption{" + table_properties['title'] + "}",
         "\\begin{center}",
         "\\begin{tabular}{@{}lcccc}\n",
-        "\hline \hline Offset (kpc) & Location & 68\% CI$^\\dagger$ & 95\% CI$^\\dagger$ \\\\ \hline\n",
+        "\hline \hline Offset (kpc) & Location & 68\% CI$^\\dagger$ " +
+        "& 95\% CI$^\\dagger$ \\\\ \hline\n",
     ] + compile_data_lines(df, df_keys, row_labels) + [
         "\hline",
         "\end{tabular} ",
         "\end{center} ",
         "\label{tab:" + "{0}".format(table_properties['shortcut_label']) + "}",
-        "\\footnotesize{$\dagger$ CI stands for the credible interval centered " +
-        "on the biweight location estimate, " +
-        "with 68\% of the probability density contained in the 68\% credible interval.}\\\\",
+        "\\footnotesize{$\dagger$ CI stands for the credible interval" +
+        " centered on the biweight location estimate, " +
+        "with 68\% of the probability density contained in the 68\% " +
+        "credible interval.}\\\\",
         "\end{table}"
     ]
 
@@ -56,7 +58,8 @@ if __name__ == "__main__":
     F = open(paper2 + "input_table.tex", "w")
 
     full_sample_tab_prop = {
-        "title": "Offsets for the full sample of 43 clusters at 2 kpc resolution.",
+        "title":
+        "Offsets for the full sample of 43 clusters at 2 kpc resolution.",
         "shortcut_label": "full2kpc_offsets",
     }
 
