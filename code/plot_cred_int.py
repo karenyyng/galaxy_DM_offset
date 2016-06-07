@@ -1,4 +1,4 @@
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 from matplotlib import rc
 import numpy as np
 from statsmodels.api import nonparametric
@@ -151,6 +151,152 @@ def CI_loc_plot(x, ax, c='b', prob=None, kernel="gau", bw="silverman",
     return sum_stat
 
 
+def histplot1d_part(ax, x, prob=None, N_bins='knuth', histrange=None,
+                    x_lim=None, y_lim=None):
+    '''
+    This take the additional value of an array axes. for use with subplots
+    similar to histplot1d but for subplot purposes I believe
+    '''
+    # compare bin width to knuth bin width
+    # if type(N_bins) is int:
+    #    print "specified bin width is {0}, Knuth bin size is {1}".format(
+    #        N_bins, knuth_N_bins)
+    if N_bins == 'knuth':
+        binwidth, bins = de.knuth_bin_width(x, return_bins=True)
+        knuth_N_bins = bins.size - 1
+        N_bins = knuth_N_bins
+
+    hist, binedges, tmp = ax.hist(
+        x, bins=N_bins, histtype='step', weights=prob, range=histrange,
+        color='k', linewidth=1)
+
+    # Calculate the location and %confidence intervals
+    # Since my location and confidence calculations can't take weighted data I
+    # need to use the weighted histogram data in the calculations
+    for i in np.arange(N_bins):
+        if i == 0:
+            x_binned = \
+                np.ones(hist[i]) * (binedges[i] + binedges[i + 1]) / 2
+        elif np.size(x_binned) == 0:
+            x_binned = \
+                np.ones(hist[i]) * (binedges[i] + binedges[i + 1]) / 2
+        else:
+            x_temp = \
+                np.ones(hist[i]) * (binedges[i] + binedges[i + 1]) / 2
+            x_binned = np.concatenate((x_binned, x_temp))
+    loc = biweightLoc(x_binned)
+    ll_68, ul_68 = bcpcl(loc, x_binned, 1)
+    ll_95, ul_95 = bcpcl(loc, x_binned, 2)
+
+    # Create location and confidence interval line plots
+    # find the binedge that the location falls into
+    # so that the line indicating the location only extends to top of
+    # histogram
+    loc_ix = find_bin_ix(binedges, loc)
+    ll_68_ix = find_bin_ix(binedges, ll_68)
+    ul_68_ix = find_bin_ix(binedges, ul_68)
+    ll_95_ix = find_bin_ix(binedges, ll_95)
+    ul_95_ix = find_bin_ix(binedges, ul_95)
+
+    ax.plot((loc, loc), (0, hist[loc_ix - 1]), ls='--', lw=1, color="k")
+
+    width = binedges[ll_68_ix + 1] - binedges[ll_68_ix]
+    for i in range(ll_68_ix, ul_68_ix):
+        ax.bar(binedges[i], hist[i], width, lw=0, color="b", alpha=.6)
+    for i in range(ll_95_ix, ul_95_ix):
+        ax.bar(binedges[i], hist[i], width, lw=0, color="b", alpha=.3)
+
+    if x_lim is not None:
+        ax.set_xlim(x_lim)
+    if y_lim is not None:
+        ax.set_ylim(y_lim)
+    return loc, ll_68, ul_68, ll_95, ul_95
+
+
+def histplot2d_part(ax, x, y, prob=None, N_bins=100, histrange=None,
+                    x_lim=None, y_lim=None):
+    '''
+    similar to histplot2d
+    This take the additional value of an array axes. for use with subplots
+    Input:
+    x = [1D array of N floats]
+    y = [1D array of N floats]
+    prefix = [string] prefix of output file
+    prob = [None] or [1D array of N floats] weights to apply to each (x,y) pair
+    N_bins = [integer] the number of bins in the x and y directions
+    histrange = [None] or [array of floats: (x_min,x_max,y_min,y_max)] the range
+        over which to perform the 2D histogram and estimate the confidence
+        intervals
+    x_lim = [None] or [array of floats: (x_min,x_max)] min and max of the range
+        to plot
+    y_lim = [None] or [array of floats: (x_min,x_max)] min and max of the range
+        to plot
+    x_label = [None] or [string] the plot's x-axis label
+    y_label = [None] or [string] the plot's y-axis label
+    legend = [None] or [True] whether to display a legend or not
+    '''
+    # prevent masked array from choking up the 2d histogram function
+    x = np.array(x)
+    y = np.array(y)
+
+    # Create the confidence interval plot
+    assert prob is not None, "there is no prob given for weighting"
+
+    if histrange is None:
+        if prob is not None:
+            H, xedges, yedges = \
+                np.histogram2d(x, y, bins=N_bins, weights=prob)
+        elif prob is None:
+            H, xedges, yedges = np.histogram2d(x, y, bins=N_bins)
+    else:
+        if prob is not None:
+            H, xedges, yedges = \
+                np.histogram2d(x, y, bins=N_bins,
+                                  range=[[histrange[0], histrange[1]],
+                                         [histrange[2], histrange[3]]],
+                                  weights=prob)
+        elif prob is None:
+            H, xedges, yedges = np.histogram2d(
+                x, y, bins=N_bins, range=[[histrange[0], histrange[1]],
+                                          [histrange[2], histrange[3]]])
+    H = np.transpose(H)
+    # Flatten H
+    h = np.reshape(H, (N_bins ** 2))
+    # Sort h from smallest to largest
+    index = np.argsort(h)
+    h = h[index]
+    h_sum = np.sum(h)
+    # Find the 2 and 1 sigma levels of the MC hist
+    for j in np.arange(np.size(h)):
+        if j == 0:
+            runsum = h[j]
+        else:
+            runsum += h[j]
+        if runsum / h_sum <= 0.05:
+            # then store the value of N at the 2sigma level
+            h_2sigma = h[j]
+        if runsum / h_sum <= 0.32:
+            # then store the value of N at the 1sigma level
+            h_1sigma = h[j]
+
+    # Create the contour plot using the 2Dhist info
+    # define pixel values to be at the center of the bins
+    x = xedges[:-1] + (xedges[1] - xedges[0]) / 2
+    y = yedges[:-1] + (yedges[1] - yedges[0]) / 2
+    X, Y = np.meshgrid(x, y)
+
+    # can use pcolor or imshow to show the shading instead
+    ax.pcolormesh(X, Y, H, cmap=pylab.cm.gray_r, shading='gouraud')
+    ax.contour(X, Y, H, (h_2sigma, h_1sigma), linewidths=(2, 2),
+               colors=((158 / 255., 202 / 255., 225 / 255.),
+                       (49 / 255., 130 / 255., 189 / 255.)))
+
+    if x_lim is not None:
+        ax.set_xlim(x_lim)
+    if y_lim is not None:
+        ax.set_ylim(y_lim)
+
+
 def N_by_N_lower_triangle_plot(data, space, var_list, axlims=None,
                                Nbins_2D=None, axlabels=None, N_bins=None,
                                xlabel_to_rot=None, histran=None, figsize=6,
@@ -295,4 +441,12 @@ def N_by_N_lower_triangle_plot(data, space, var_list, axlims=None,
     return
 
 
-
+def round_to_n_sig_fig(x, n):
+    if x > 1:
+        return round(x, -int(np.log10(x)) + (n - 1))
+    elif x < 1 and x > 0:
+        return round(x, -int(np.log10(x)) + (n))
+    elif x < 0 and x > -1:
+        return -1. * round(np.abs(x), -int(np.log10(np.abs(x)) + (n)))
+    elif x < -1:
+        return -1. * round(np.abs(x), -int(np.log10(np.abs(x))) + (n - 1))
