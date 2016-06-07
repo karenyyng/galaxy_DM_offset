@@ -32,13 +32,15 @@ def compile_line_list(df, df_keys, row_labels, table_properties):
         "\caption{" + table_properties['title'] + "}",
         "\\begin{center}",
         "\\begin{tabular}{@{}lcccc}\n",
-        "\hline \hline Offset & Location & 68\% CI$^\\dagger$ & 95\% CI$^\\dagger$ \\\\ \hline\n",
+        "\hline \hline Offset (kpc) & Location & 68\% CI$^\\dagger$ & 95\% CI$^\\dagger$ \\\\ \hline\n",
     ] + compile_data_lines(df, df_keys, row_labels) + [
         "\hline",
         "\end{tabular} ",
         "\end{center} ",
         "\label{tab:" + "{0}".format(table_properties['shortcut_label']) + "}",
-        "\\footnotesize{$\dagger$ CI stands for confidence interval.}\\\\",
+        "\\footnotesize{$\dagger$ CI stands for the credible interval centered " +
+        "on the biweight location estimate, " +
+        "with 68\% of the probability density contained in the 68\% credible interval.}\\\\",
         "\end{table}"
     ]
 
