@@ -32,7 +32,7 @@ to best compute the instrinsic scatter of the offsets without SIDM.
 This is the first study to investigate if it is a feasible
 idea to use the galaxy-DM offsets given the main constraints from observations,
 namely, the projections and the dynamical states of the galaxy clusters. These
-two latent variables are confounding and can add to the uncertainty 
+two latent variables are confounding and can increase the variance of
 population summary statistics of galaxy clusters.  
 
 % Another aspect of this study to find out the precision
@@ -125,11 +125,9 @@ observables such as $\Delta s$.
 		% \ref{fig:select_peak_visualization}). 
 		{\bf Right figure:} 
 		Mass-richness relationship of galaxy clusters and groups with 
-		$M_{\rm FoF} > 10^{13} M_{\odot}$ . We require clusters to have more than 50 member 
-		galaxies that are above observation limit, i.e. apparent $i \leq 24.4$ when 
-		we assume a cosmological redshift
-of $z=0.3$, as shown by the richness cut. A total of 43 clusters have 
-survived this cut. \label{fig:mass_richness}}
+		$M_{\rm FoF} > 10^{13} M_{\odot}$ assuming different cosmological redshifts
+		of the observed clusters. 
+\label{fig:mass_richness}}
 \end{figure*}
 
 % Basic setup 
@@ -159,36 +157,57 @@ km~s$^{-1}$~Mpc$^{-1}$.
 
 \section{THE ILLUSTRIS SIMULATION DATA} 
 \label{sec:illustris_sim}
-The Illustris simulation that we made use of contains some of the most
+The Illustris simulation contains some of the most
 realistic, simulated galaxies to date, making it especially suitable for 
 verifying the properties of galaxy clusters. We obtained our data from 
 snapshot number 135 (cosmological $z=0$) of the Illustris-1 simulation. The Illustris-1
 simulation has the highest particle resolution and has incorporated the most 
 comprehensive baryonic physics among the different Illustris simulation suites. 
 The sophisticated galaxy formation model in Illustris-1 
-includes star formation rate, stellar evolution due to
-environmental effects and supernovae feedback to the intercluster medium etc. 
-These makes the spatial distribution of galaxies in  Illustris data more 
-realistic than galaxies that are prescribed onto DM-only cosmological
-simulation data such as those used in \cite{Harvey2013d}.  The physics of stellar
+includes star formation rate, and stellar evolution due to
+environmental effects of the intracluster medium, such as ram pressure stripping and
+strangulation and feedback from Active Galactic Nuclei (AGN) etc. \citep{Genel2014a}.
+The physics of stellar
 evolution were solved using a moving mesh code {\bf \texttt{AREPO}} \citep{Springel2010}.
-This simulation formalism accounts for the environment effects of a cluster to the
-evolution of galaxies. The galaxies were statistically consistent
-with the Sloan Digital Sky Survey data
-\citep{Vogelsberger2014}. Since the profile of the galaxies clusters were not
-provided in symmetrical parametric forms, we can study 
+The observable properties of galaxies were statistically consistent
+with the Sloan Digital Sky Survey (SDSS) data
+\citep{Vogelsberger2014}. 
+
+As the stellar population in Illustris were evolved from the initial condition,
+these makes the spatial distribution of galaxies in  Illustris data more 
+realistic than galaxies that are prescribed onto DM-only cosmological
+simulation data such as those used in \cite{Harvey2013d}.  
+Gravitational effects in Illustris-1 have provided realistic dynamics and
+spatial distribution of subhalos. The simulated effects include
+tidal stripping, dynamical friction and merging. 
+Since the profile of the galaxies clusters were not
+provided in symmetrical, parametric forms, we can study 
 how asymmetry in the cluster profile affects the estimate of our summary 
 statistic. This data allows us to examine cluster galaxies
 in a realistic, yet noise-free way. The softening length of the DM particles is
-[TODO] 1.4 kpc and those of the stellar particles is [TODO] kpc.
+1.4 kpc and those of the stellar particles is 
+0.7 kpc, both in constant comoving units \citep{Genel2014a}.
 
 The two sets of data catalogs in use are obtained through two types of halo
 finders. The catalog that maps particles to the halo of a certain cluster was 
-created by the {\bf \texttt{Subfind}} algorithm. The friends-of-friends (FoF) 
+created by the {\bf \texttt{SUBFIND}} algorithm. The friends-of-friends (FoF) 
 finder \citep{Davis1985} was further used to identify the affinity
 of galaxy-sized halos to a galaxy-cluster. 
 These galaxy-size halos are referred to as {\it subhalos} and 
 they are the dark matter hosts of what we refer to as galaxies in Illustris-1. 
+\cite{Vogelsberger2014a} also extracted the 
+absolute magnitude of each subhalo in
+the SDSS bands of $g, r, i, z$ as part of the {\bf
+\texttt{SUBFIND}} catalog using stellar population synthesis models.
+
+For our analyses, we make use of galaxy clusters / groups 
+with at least 50 member galaxies that are above a reasonable observation limit, 
+i.e. apparent $i \leq 24.4$ when we assume a cosmological redshift of $z = 0.3$
+in the $i$ band. 
+This is because of the relatively large statistical uncertainty if we try
+to analyze clusters with less than 50 member galaxies. 
+As indicated by the right-hand panel of Fig. \ref{fig:mass_richness}, a total of 43 clusters have 
+survived this magnitude cut. 
 
 \begin{figure}
 	\centering
@@ -203,10 +222,6 @@ they are the dark matter hosts of what we refer to as galaxies in Illustris-1.
 		\label{fig:color_magnitude_diagram}
 	} 
 \end{figure}
-For our analyses, we make use of galaxy clusters / groups 
-that have at least 50 member galaxies after this magnitude cut in the $i$ band. 
-This is because of the relatively large statistical uncertainty if we try
-to analyze clusters with less than 50 member galaxies. 
 
 
 
@@ -220,7 +235,7 @@ to analyze clusters with less than 50 member galaxies.
 Clusters undergo merger activities of a large range of physical scales and 
 in the time scale of million of years. 
 The dynamical history, or what we call ``relaxedness" is hard to retrieve from 
-simulations across different saved states and is not observed from observations.
+simulations across different saved states and is missing from observations.
 We quantify the state of the cluster by providing several quantitative
 definitions of relaxedness and see how they correlate with $\Delta s$.
 Some definitions of relaxedness referred by the simulation community
@@ -249,13 +264,13 @@ quantities in the method section \ref{subsubsec:KDE}.
 \hline 
 Data &  Selection strategy  & Sensitivity & Relevant section  \\ \hline
 Field of view (FOV) & FoF halo finder& comparable to FOV of the Subaru
-Suprime camera &   \\ 
+Suprime camera & \ref{sec:FOV}  \\ 
 Observed filter & $i$-band & consistent among the redder $r, i, z$ bands &   \\ 
 Cluster richness  & $i \leq 24.4$ and $z = 0.3$  & sensitive to
-the assumed cosmological redshift of cluster and &    \\ 
+the assumed cosmological redshift of cluster and & \ref{sec:illustris_sim} \\ 
 & & the assumed limiting magnitude of telescope &   \\
-Two-dimensional projections & even HealPix samples over half a sphere &
-discussed as results  & \\  
+Two-dimensional projections & even HEALPix samples over half a sphere &
+discussed as results  & \ref{subsubsec:projections}\\  
 \hline
 \end{tabular} 
 \label{tab:selection_criteria} 
@@ -265,7 +280,7 @@ discussed as results  & \\
 \end{center} 
 \end{table*}
 
-We make use of the {\bf \texttt{Subfind}} member particle for the DM and the 
+We make use of the {\bf \texttt{SUBFIND}} member particle for the DM and the 
 {\bf \texttt{FoF}} subhalo identification as our
 default volume selection scheme for each cluster / group.
 We understand that this choice of volume selection can be more ideal than
@@ -281,6 +296,7 @@ which covers a physical area of [TODO] $\sim 9$ Mpc $\times 7$ Mpc.
 showing the extent of the Dark Matter distribution of the most massive 129 clusters)
 
 \subsubsection{Spatial Projections}
+\label{subsubsec:projections}
 The summary statistics are computed all based on 2D projections of the
 spatial location.
 For computing the summary statistic, we note that 
@@ -325,30 +341,27 @@ Most bound particle & bottom of gravitational potential well &  &
 \subsubsection{Galaxy weights}
 \label{subsubsec:galaxy_weights}
 
-Not all galaxies are created equal, so they should not be considered with equal
-importance for peak identification, which requires summing the
+Different galaxies have different masses, so they should not be considered with equal
+importance for peak identification, which requires summing
 the mass proxies of different galaxies. 
-Galaxies reside in host halos with different masses and 
-contain different stellar masses. The brightness of galaxies in a cluster are 
-also affected by the cluster environments.
-For example, the star formation rates of cluster galaxies are known to be 
-suppressed by the high concentration of intracluster medium. 
 One of the most common weighting schemes employed for galaxy data is to weight
-by the luminosity in a particular band.
-We make use of the available mock observables in the Illustris data, including 
-the $u, g, r, i, z$ band absolute magnitude associated with each subhalo. 
-
-[TODO] Discuss Fig. \ref{fig:color_magnitude_diagram} and the red sequence.
-[TODO] Discuss how none of the methods here will mitigate for missing or
-incomplete member data. 
-
-
+by the luminosity in a particular band. We make use of the $i-$band magnitude
+associated with each subhalo as the weight. Since the $i-$band is
+one of the redder bands, the mass-to-light ratio is not skewed as much due to star
+formation activities. 
+We further examined if the colors distribution of galaxies in Illustris-1 are
+similar to the observed color-magnitude diagrams for clusters.
+The Illustris cluster galaxies are realistic enough that it is easy to
+identify an overdense region of galaxies known as the red-sequence in the 
+color-magnitude diagram such as Fig.
+\ref{fig:color_magnitude_diagram}). The red-sequence is prominent even if we
+use other colors formed by different combinations of $r, i, z$ bands.
 
 \section{METHODS}\label{sec:methods}
 A common and the most precise way of summarizing the DM distribution in a
 galaxy cluster is by finding the lensing peaks 
 (\citealt{Medezinski2013}, \citealt{Markevitch2004}, \citealt{Zitrin13}).
-In addition to having the highest precision, the peak region is physically 
+Additionally, the peak region is physically 
 interesting due to the higher particle density and interaction rates. 
 The most direct analogous statistic for summarizing the member galaxy
 population in a cluster is therefore, also the peak. 
@@ -489,10 +502,10 @@ Specifically, we made use of the smoothed-cross validation \citep{Hall1992}
 bandwidth selector in the statistical package {\bf \texttt{ks}} \citep{Duong2007} 
 in the {\bf \texttt{R}} statistical computing environment \citep{R_core}. 
 Among all the different {\bf \texttt{R}} packages, {\bf \texttt{ks}} is the
-only one capable of handling the different weights of the data points 
+only package capable of handling the different weights of the data points 
 while inferring the density estimates \citep{Deng2011}. 
 Although the particular implementation of KDE has a computational runtime of $O(n^2)$ 
-, the number of cluster galaxies are
+, the number of cluster galaxies is
 small enough for this method to finish quickly. 
 
 After obtaining the KDE estimate, we employed both a first and second-order  
@@ -501,9 +514,10 @@ The local maxima were then sorted according to the KDE density in a descending
 fashion before we perform peak matching. The density
 of the peaks are normalized as a fraction of the densest peak for each
 projection of each cluster in our sample. 
-We investigated if the presence of subdominant peaks are correlated with
-$\Delta s$. We provide scientifically accurate contours from the KDE 
-estimates from the cross-validated KDE method. 
+% With the subdominant peak information, we investigate if the presence of subdominant peaks are correlated with
+% $\Delta s$. 
+% We provide scientifically accurate contours from the KDE 
+% estimates from the cross-validated KDE method. 
 
 
 \subsubsection{Shrinking aperture estimates}
@@ -718,7 +732,7 @@ From Fig. \ref{fig:offset_distributions}, we can tell that the population
 estimates. 
 
 The variance of the offsets due to projection is [TODO].
-In particular for the most massive galaxy clusters with $10^{14} M_{\sum}$
+In particular for the most massive galaxy clusters with $10^{14} M_{\odot}$
 
 
 
