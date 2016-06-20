@@ -5,15 +5,14 @@ This
 * reads the metadata for the cuts from the fhat_star*.h5 file
 * produces the DM projections accordingly
 """
-from __future__ import (print_function,
-                        division, absolute_import)
+from __future__ import (print_function, division)
 import logging
 import pandas as pd
 import os
 from scipy import ndimage
 # from datetime import datetime
 # datetime_stamp = datetime.now().strftime("%D").replace('/', '_')
-datetime_stamp = '06_01_16'
+datetime_stamp = '06_17_16'
 data_path = "../../data/"
 
 # ------- specify output file paths  -----------------------
@@ -26,7 +25,7 @@ logging.info ("Current date is {}".format(datetime_stamp))
 
 # ----------------------------------------------------------
 output_fhat_filename = \
-    "test_DM_fhat_clst{0}_{1}.h5".format(total_clstNo, datetime_stamp)
+    "DM_fhat_clst{0}_{1}.h5".format(total_clstNo, datetime_stamp)
 
 logging.info ("Outputing files to: " + output_fhat_filename)
 
@@ -57,7 +56,7 @@ DM_fstream = h5py.File(DM_h5file)
 #         data_path, input_star_file, input_h5_key)
 
 input_star_fhat_file = data_path + \
-    "test_stars_fhat_clst{}_{}.h5".format(
+    "stars_fhat_clst{}_{}.h5".format(
         total_clstNo, input_datetime_stamp)
 fhats_stars = h5py.File(input_star_fhat_file, "r")
 logging.info ("input_star_file = " + input_star_fhat_file)
@@ -65,6 +64,7 @@ logging.info ("input_star_file = " + input_star_fhat_file)
 
 DM_metadata = \
     getDM.retrieve_DM_metadata_from_gal_h5file(fhats_stars)
+
 DM_metadata["projection"] = \
     np.unique([str(p) for p in DM_metadata["projection"]])
 
@@ -78,6 +78,7 @@ logging.info("DM_metadata['clstNo'] = {}".format(DM_metadata['clstNo']))
 #     getgal.get_clst_gpBy_from_DM_metadata(star_peak_df)
 
 DM_resolution = 2.  # kpc
+
 DM_metadata["kernel_width"] = np.array([0, 50]) / DM_resolution
 DM_metadata["kernel_width"] = ['{0:0.1f}'.format(stuff) for stuff in
                                DM_metadata["kernel_width"] ]
@@ -102,13 +103,13 @@ h5_fstream = \
 pos_cols = ["SubhaloPos{}".format(i) for i in range(3)]
 
 clst_metadata = OrderedDict({})
+count = 0
 
-# #### CHANGE THE RANGE of line below
 for i, clstNo in enumerate(DM_metadata["clstNo"]):
     logging.info ("Processing {0}-th ".format(i) +
-           "out of the range {0} to {1}".format(DM_metadata['clstNo'][0],
-                                                DM_metadata['clstNo'][-1]
-                                                ))
+           "out of the range {0} to {1}".format(
+               DM_metadata['clstNo'][0], DM_metadata['clstNo'][-1]
+            ))
     peak_df = pd.DataFrame()
     star_path = ''
     clst_metadata["clstNo"] = clstNo  # clstNo is a string
@@ -120,6 +121,17 @@ for i, clstNo in enumerate(DM_metadata["clstNo"]):
                             shift_coords_for_hist=False
                             )[clstNo]
 
+    # downsample to only 5% of original number of data points
+    downsampled_size = int(len(coord_dict["coords"]) * 0.05)
+    if downsampled_size < 1e4:
+        raise ValueError(
+            "Downsampled particle size is too small.")
+
+    downsampled_ixes = np.random.choice(
+        range(len(coord_dict["coords"])), size=downsampled_size,
+        replace=False
+    )
+    downsampled_coords = coord_dict["coords"][downsampled_ixes]
     # There are no cuts / weights for the DM particles.
     # However, the DM peaks are informed by the galaxy peaks.
     # The choice of cuts and weights affect the galaxy peaks.
@@ -145,7 +157,7 @@ for i, clstNo in enumerate(DM_metadata["clstNo"]):
                         str(clst_metadata["projection"]) + "/"
 
                     data = getgal.project_coords(
-                        coord_dict["coords"],
+                        downsampled_coords,
                         clst_metadata["projection"][0],
                         clst_metadata["projection"][1],
                         los_axis=clst_metadata["los_axis"])
@@ -166,8 +178,9 @@ for i, clstNo in enumerate(DM_metadata["clstNo"]):
                             data, resolution=2,  # in kpc
                             find_peak=False)
 
-                    #### CHANGE THE RANGE of DM_metadata["kernel_width"] below
                     for kernel_width in DM_metadata["kernel_width"]:
+                        count += 1
+                        print ("Projection no {} in progress".format(count))
 
                         # Find the correpsonding galaxy density projection
                         fhat_stars = fhats_stars[star_path]
@@ -188,7 +201,8 @@ for i, clstNo in enumerate(DM_metadata["clstNo"]):
                         accepted_peak_no = getDM.apply_peak_num_threshold(
                             fhat_stars["peaks_dens"][:],
                             fhat,
-                            sig_fraction=DM_metadata["sig_fraction"][0]
+                            sig_fraction=DM_metadata["sig_fraction"][0],
+                            multiple_of_candidate_peaks=3L
                         )
 
                         # only entries listed in peak_info_keys get stored

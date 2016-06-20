@@ -262,6 +262,10 @@ def do_1D_KDE(data, weight=None, convert_to_py_format=True):
     :returns: TODO
 
     """
+
+    if weight is None:
+        weight = np.ones(len(data))
+
     do_KDE_in_R = robjects.r["do_KDE"]
     data = np.array(data)
     if data.ndim == 1:
@@ -270,8 +274,6 @@ def do_1D_KDE(data, weight=None, convert_to_py_format=True):
         raise ValueError(
             "Argument `data` needs to be a 1D array / list")
 
-    if weight is None:
-        weight = np.ones(len(data))
 
     weight = robjects.FloatVector(weight)
     r_fhat = do_KDE_in_R(data, w=weight)
@@ -297,14 +299,16 @@ def do_KDE(x, w=None, dom_peak_no=1, convert_to_py_format=False):
     See `convert_rfhat_to_dict` for more info about the returned dictionary
 
     """
-    do_KDE_in_R = robjects.r["do_KDE"]
 
     x = np.array(x)
-    x = py_2D_arr_to_R_matrix(x)
-
     if w is None:
         w = np.ones(x.shape[0])
     w = robjects.FloatVector(w)
+    x = py_2D_arr_to_R_matrix(x)
+
+    do_KDE_in_R = robjects.r["do_KDE"]
+
+
     r_fhat = do_KDE_in_R(x, w=w, dom_peak_no=dom_peak_no)
 
     if not convert_to_py_format:

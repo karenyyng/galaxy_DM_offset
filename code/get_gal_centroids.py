@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 from get_KDE import *
 from compute_distance import compute_euclidean_dist
+from multiprocessing import Pool
 # import calculate_astrophy_quantities as cal_astrophy
 # import logging
 
@@ -704,6 +705,7 @@ def project_coords(coords, xi, phi, los_axis=2, radian=True):
 
     :return: array like object as coords, same dimension
     """
+
     xi = float(xi)
     phi = float(phi)
     los_axis = int(los_axis)
@@ -732,6 +734,7 @@ def project_coords(coords, xi, phi, los_axis=2, radian=True):
         # to a lower dimension
         return proj_plane * np.dot(mtx, coords)
     elif coords.ndim > 1:
+
         data = np.array(map(lambda d: proj_plane * np.dot(mtx, d), coords))
         return data
 

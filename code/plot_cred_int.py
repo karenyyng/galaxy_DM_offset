@@ -113,7 +113,7 @@ def CI_loc_plot(x, ax, c='b', prob=None, kernel="gau", bw="silverman",
                 fft=True, gridsize=None, adjust=1, cut=3,
                 clip=(-np.inf, np.inf), xlabel=None, lim=None,
                 weights=None, ylabel=None,
-                labelsize=None, legendloc=None, **kwargs):
+                labelsize=None, legendloc=None, lvls=[68., 95.]):
 
     # make font looks like latex font
     rc("font", family="serif")
@@ -122,15 +122,34 @@ def CI_loc_plot(x, ax, c='b', prob=None, kernel="gau", bw="silverman",
                          clip=clip, xlabel=xlabel, lim=lim,
                          weights=weights,
                          labelsize=labelsize, legendloc=legendloc,
-                         **kwargs)
-    low68_ix, up68_ix = central_CI(support, den, level=68, lim=lim)
-    low95_ix, up95_ix = central_CI(support, den, level=95, lim=lim)
-    ax.fill_between(support[low68_ix: up68_ix],
-                    den[low68_ix: up68_ix], alpha=0.5, color=c)
-    ax.fill_between(support[low95_ix: up95_ix],
-                    den[low95_ix: up95_ix], alpha=0.2, color=c)
-    loc_ix = low68_ix
+                         )
+
+    # we need the 68 percentile
+    if 68. not in lvls:
+        lvls.append(68.)
+    if 95. not in lvls:
+        lvls.append(95.)
+    alpha_lvl = {68.: 0.5, 95.: 0.2}
+
+    lowCI_ixes = {}
+    upCI_ixes = {}
+    sum_stat = {}
+    # get confidence interval
+    for lvl in lvls:
+        lowCI_ixes[lvl], upCI_ixes[lvl] = \
+            central_CI(support, den, level=lvl, lim=lim)
+        if lvl == 68. or lvl == 95.:
+            ax.fill_between(support[lowCI_ixes[lvl]: upCI_ixes[lvl]],
+                            den[lowCI_ixes[lvl]: upCI_ixes[lvl]],
+                            alpha=alpha_lvl[lvl],
+                            color=c)
+        sum_stat['low' + str(int(lvl))] = support[lowCI_ixes[lvl]]
+        sum_stat['up' + str(int(lvl))] = support[upCI_ixes[lvl]]
+
+    loc_ix = lowCI_ixes[68.]
+    # compute the location estimate
     loc = C_BI(x)
+    # find the density estimate at the location estimate
     while(support[loc_ix] < loc):
         loc_ix += 1
     ylim = ax.get_ylim()
@@ -141,12 +160,7 @@ def CI_loc_plot(x, ax, c='b', prob=None, kernel="gau", bw="silverman",
 
     ax.set_ylim(0., ylim[1])
 
-    sum_stat = {"loc": loc,
-                "low68": support[low68_ix],
-                "up68": support[up68_ix],
-                "low95": support[low95_ix],
-                "up95": support[up95_ix],
-                }
+    sum_stat['loc'] = loc
 
     return sum_stat
 

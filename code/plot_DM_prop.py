@@ -13,7 +13,7 @@ def plot_DM_fhat(fhat, fhat_stars, clstNo, threshold=0.3,
                  log_scale=True, legend_box_anchor=(1.0, 1.2),
                  legend_markerscale=0.7, kernel_width=1, flip_y=-1.,
                  xlabel_rotate_angle=45, verbose=False, origin='lower',
-                 show_legend=True):
+                 show_legend=True, power=1./20.):
     """
     :param kernel_width: float, the number times the histogram size = 2 kpc
     """
@@ -22,7 +22,7 @@ def plot_DM_fhat(fhat, fhat_stars, clstNo, threshold=0.3,
     if log_scale and "log_est" not in fhat.keys():
         log_est = np.log(fhat["estimate"][:])
     else:
-        log_est = np.power(fhat["estimate"][:], 1./ 2.)
+        log_est = np.power(fhat["estimate"][:], power)
 
     if ax is None:
         fig = plt.figure()

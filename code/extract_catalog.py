@@ -226,8 +226,9 @@ def get_DM_particles(clsts, partDMh5, h5part_coord_key="PartType1_Coordinates",
     # We retrieve the end indices of all the particles within a cluster
     haloEndIx = [0] + list(part_halos["loc"][...])
     # Extract coordinates from relevant parts of the h5 file
-    coords = {clstNo: partDMh5[h5part_coord_key][:, haloEndIx[clstNo]:
-                                                 haloEndIx[clstNo + 1]]
+    coords = {clstNo:
+              partDMh5[h5part_coord_key][:,
+                                         haloEndIx[clstNo]:haloEndIx[clstNo + 1]]
               for clstNo in clsts}
 
     # Wrap and center coordinates then put it in a dictionary
