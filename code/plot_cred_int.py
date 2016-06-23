@@ -130,6 +130,7 @@ def CI_loc_plot(x, ax, c='b', prob=None, kernel="gau", bw="silverman",
     ax.fill_between(support[low95_ix: up95_ix],
                     den[low95_ix: up95_ix], alpha=0.2, color=c)
     loc_ix = low68_ix
+    # estimate the weight location WITHOUT binning the data
     loc = C_BI(x)
     while(support[loc_ix] < loc):
         loc_ix += 1

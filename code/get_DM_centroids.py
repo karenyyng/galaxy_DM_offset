@@ -302,49 +302,6 @@ def convert_dict_dens_to_h5(fhat, clst_metadata, h5_fstream, verbose=False,
     return
 
 
-#  -stuff below this line are unstable but may be used if all else fails -----
-
-def get_dens_and_grid(x, y, bw='normal_reference',
-                      gridsize=100, cut=4,
-                      clip=[-np.inf, np.inf], n_jobs=10):
-    """wrapper around statsmodel and seaborn function for inferring 2D density
-    :note: unstable:
-    """
-    from seaborn.distributions import _kde_support
-    import statsmodels.nonparametric.kernel_density as KDE
-    KDEMultivariate = KDE.KDEMultivariate
-
-    kde = KDEMultivariate(np.array([x, y]), var_type='cc', bw=bw)
-    kde.n_jobs = n_jobs
-
-    x_support = _kde_support(x, kde.bw[0], gridsize, cut, clip)
-    y_support = _kde_support(y, kde.bw[1], gridsize, cut, clip)
-    xx, yy = np.meshgrid(x_support, y_support)
-
-    z = kde.pdf([xx.ravel(), yy.ravel()]).reshape(xx.shape)
-    return xx, yy, z
-
-
-def infer_stat_significant_threshold(sigma_no, fhat):
-    """
-    :sigma_no: float, how many sigma to use as the threshold
-    :returns: threshold number for the density
-    """
-    return
-
-
-def apply_density_threshold(total_peak_dens, fhat, threshold=0.9):
-    """
-    Make sure that the summed density of the DM peaks match the
-    summed density of the galaxy KDE peaks.
-    """
-    peaks_mask = fhat["peaks_dens"] > threshold
-    while(np.sum(fhat["peaks_dens"][peaks_mask]) < total_peak_dens):
-        threshold -= .05
-        peaks_mask = fhat["peaks_dens"] > threshold
-    return threshold, np.sum(fhat["peaks_dens"][peaks_mask])
-
-
 def find_num_of_significant_peaks(peak_dens_list, threshold=0.2):
     no_sig_peaks = np.sum(peak_dens_list[1:] > threshold)
     return no_sig_peaks + 1
@@ -402,6 +359,50 @@ def apply_peak_num_threshold(gal_peak_dens_list, fhat,
                 )
         return len(fhat["peaks_dens"])
     return accepted_peak_no
+
+
+#  -stuff below this line are unstable but may be used if all else fails -----
+
+def get_dens_and_grid(x, y, bw='normal_reference',
+                      gridsize=100, cut=4,
+                      clip=[-np.inf, np.inf], n_jobs=10):
+    """wrapper around statsmodel and seaborn function for inferring 2D density
+    :note: unstable:
+    """
+    from seaborn.distributions import _kde_support
+    import statsmodels.nonparametric.kernel_density as KDE
+    KDEMultivariate = KDE.KDEMultivariate
+
+    kde = KDEMultivariate(np.array([x, y]), var_type='cc', bw=bw)
+    kde.n_jobs = n_jobs
+
+    x_support = _kde_support(x, kde.bw[0], gridsize, cut, clip)
+    y_support = _kde_support(y, kde.bw[1], gridsize, cut, clip)
+    xx, yy = np.meshgrid(x_support, y_support)
+
+    z = kde.pdf([xx.ravel(), yy.ravel()]).reshape(xx.shape)
+    return xx, yy, z
+
+
+def infer_stat_significant_threshold(sigma_no, fhat):
+    """
+    :sigma_no: float, how many sigma to use as the threshold
+    :returns: threshold number for the density
+    """
+    return
+
+
+def apply_density_threshold(total_peak_dens, fhat, threshold=0.9):
+    """
+    Make sure that the summed density of the DM peaks match the
+    summed density of the galaxy KDE peaks.
+    """
+    peaks_mask = fhat["peaks_dens"] > threshold
+    while(np.sum(fhat["peaks_dens"][peaks_mask]) < total_peak_dens):
+        threshold -= .05
+        peaks_mask = fhat["peaks_dens"] > threshold
+    return threshold, np.sum(fhat["peaks_dens"][peaks_mask])
+
 
 
 # def smooth_histograms(fhat):

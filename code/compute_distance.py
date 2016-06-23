@@ -42,8 +42,6 @@ def construct_uber_result_df(star_fhats, DM_fhats, main_h5):
 
 
 def assign_sign_for_dist():
-    """
-    """
     if np.random.randint(10) % 2 == 0:
         return 1.
     else:
@@ -143,7 +141,8 @@ def compute_distance_between_DM_and_gal_peaks(
     fhat_star: OrderedDict, one of the fhat_stars from `get_KDE`
         coordinates from fhat_star is in kpc / h,
         convert this to kpc by multiplying fhat_star_coordinates
-    fhat: OrderedDict, fhat output from `getDM.make_histogram_with_some_resolution`
+    fhat: OrderedDict,
+        fhat output from `getDM.make_histogram_with_some_resolution`
 
     Returns
     =======
