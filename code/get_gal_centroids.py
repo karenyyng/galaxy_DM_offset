@@ -6,7 +6,6 @@ import numpy as np
 import pandas as pd
 from get_KDE import *
 from compute_distance import compute_euclidean_dist
-from multiprocessing import Pool
 # import calculate_astrophy_quantities as cal_astrophy
 # import logging
 
@@ -750,7 +749,7 @@ def spherical_coord_to_cartesian(phi, xi):
                      ])
 
 
-def angles_given_HEALpix_nsides(nside):
+def angles_given_HEALpix_nsides(nside, return_all=False, return_first_half=True):
     """
     :param nside: integer, this integer must be a power of 2, int_val = 2 ** n
     :returns: tuple of two arrays, each array corresponds to angles in radians
@@ -767,11 +766,18 @@ def angles_given_HEALpix_nsides(nside):
     angle_idxes = range(npix)
     xi_arr, phi_arr = pix2ang(nside, angle_idxes, nest=False)
 
-    # Find duplicate projection by brute force
-    sameP, combo = angles_give_same_projections(phi_arr, xi_arr)
-    first_half, second_half = combo[sameP].transpose()
+    if not return_all :
+        # TODO: really messy if statements here, clean up if possible
+        # Find duplicate projection by brute force
+        sameP, combo = angles_give_same_projections(phi_arr, xi_arr)
+        first_half, second_half = combo[sameP].transpose()
 
-    return phi_arr[first_half], xi_arr[first_half],
+        if return_first_half:
+            return phi_arr[first_half], xi_arr[first_half]
+        else:
+            return phi_arr[second_half], xi_arr[second_half]
+    else:
+        return phi_arr, xi_arr
 
 
 def get_clst_gpBy_from_DM_metadata(metadata_df, gpBy_keys=None):

@@ -12,22 +12,37 @@ datetime_stamp = datetime.now().strftime("%D").replace('/', '_')
 # =========== Decide what to output ============================
 
 dataPath = "../../data/"
-total_clstNo = 43
+
+
+# these are for adjusting the number of clusters that are analyzed
 clstID_h5filepath = dataPath + "rich_cluster_ID.h5"
+total_clstNo = 43
 # start_clstNo = 13
+
+
 logging_filename = "star_logging_{0}_{1}.log".format(
     total_clstNo, datetime_stamp)
+# output fhat
+
+output_keys = [
+    # 'eval_points',
+    # "estimate",
+    # "bandwidth_matrix_H",
+    "shrink_cent",
+    # "centroid",
+    # 'BCG',
+    "peaks_dens",
+    "peaks_xcoords",
+    "peaks_ycoords"
+]
 
 # =========== Decide what to output ============================
 assert total_clstNo <=128 and total_clstNo > 0, \
     "0 < total_clstNo <= 128"
+
 output_fhat_filename = \
-    "test_stars_fhat_clst{0}_{1}.h5".format(total_clstNo, datetime_stamp)
-# StoreFile = \
-#     "test_stars_peak_df_clst{0}_{1}.h5".format(total_clstNo, datetime_stamp)
-# if os.path.isfile(dataPath + StoreFile):
-#     os.remove(dataPath + StoreFile)
-# store = pd.HDFStore(dataPath + StoreFile)
+    "stars_fhat_clst_no_density_{0}_{1}.h5".format(
+        total_clstNo, datetime_stamp)
 logging.basicConfig(filename=logging_filename, level=logging.INFO)
 
 from collections import OrderedDict
@@ -79,16 +94,23 @@ cut_cols = {"mag": "apparent_i_band"}
 metadata["cut"] = {"mag": cut_kwargs}
 
 # weights
-metadata["weights"] = OrderedDict({
-    "i_band": getg.mag_to_lum
-    })
+# metadata["weights"] = {
+#     "i_band": getg.mag_to_lum
+#     }
+metadata["weights"] = {
+    "None": None
+}
 
 # projections
-nside = 8  # nsides of HEALpix are powers of 2, pix for 16 nsides = 3072 / 2
-metadata["los_axis"] = [str(1)]  # use z-axis as los axis
+metadata["los_axis"] = [str(1)]  # use y-axis as los axis
+# metadata["los_axis"] = [str(2)]  # use z-axis as los axis
 
 # Want to use string as key, not floats!
-phi_arr, xi_arr = getg.angles_given_HEALpix_nsides(nside)
+nside = 8  # nsides of HEALpix are powers of 2, pix for 16 nsides = 3072 / 2
+phi_arr, xi_arr = \
+    getg.angles_given_HEALpix_nsides(nside, return_all=True)
+# phi_arr, xi_arr = [[0.0], [0.0]]
+
 xi_arr = ['{0:1.10f}'.format(xi) for xi in xi_arr]
 phi_arr = ['{0:1.10f}'.format(phi) for phi in phi_arr]
 metadata['projection'] = zip(xi_arr, phi_arr)
@@ -170,16 +192,10 @@ for clstNo in metadata["clstNo"]:
                     thisdf['spat1'] = data[:, cols[0]]
                     thisdf['spat2'] = data[:, cols[1]]
                     fhat['BCG'] = getg.get_BCG_location(
-                        thisdf, band=metadata['weights'].keys()[0],
+                        thisdf, band="i_band",
                         spat_key1='spat1', spat_key2='spat2'
                     )
 
-                    # output fhat
-                    output_keys = [
-                        'eval_points', "estimate", "bandwidth_matrix_H",
-                        "shrink_cent", "centroid", 'BCG', "peaks_dens",
-                        "peaks_xcoords", "peaks_ycoords"
-                    ]
                     getg.convert_dict_dens_to_h5(
                         fhat, clst_metadata,
                         h5_fstream, fixed_size_data_keys=output_keys)

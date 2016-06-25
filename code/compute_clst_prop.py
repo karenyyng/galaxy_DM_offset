@@ -32,7 +32,9 @@ def compute_relaxedness0(df, f, clstNo):
         but there are also gas and stellar mass that we have to account for
         not just DM subhalos
     """
-    groupM = f["Group"]["GroupMass"][clstNo]
+    # the subhalo masses actually don't quite add up to FoF GroupMass
+    # groupM = f["Group"]["GroupMass"][clstNo]
+    groupM = np.sum(df["SubhaloMass"][:])
     subhaloM_total = np.sum(df["SubhaloMass"][1:])
 
     return subhaloM_total / groupM * 100.

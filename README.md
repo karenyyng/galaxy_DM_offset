@@ -12,8 +12,7 @@ Jupyter notebook for making
 
 # Exploratory plots of clusters
 [IPython
-notebook](http://nbviewer.ipython.org/urls/bitbucket.org/karenyng/illustris_analyses/raw/d1aebf98fbe273e9bb750d9c829904fce9cb0495/code/analyses/visualize_Illustris_peaks_and_density.ipynb)
-of galaxy luminosity maps with associated peaks for 129 clusters and groups .
+notebook](https://github.com/karenyyng/galaxy_DM_offset/blob/master/code/analyses/visualize_Illustris_peaks_and_density.ipynb) of galaxy luminosity maps with associated peaks for 129 clusters and groups .
 
 [IPython
 notebook](https://github.com/karenyyng/galaxy_DM_offset/blob/master/code/prototypes/Informed_peak_finding.ipynb)

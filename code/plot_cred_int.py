@@ -114,6 +114,13 @@ def CI_loc_plot(x, ax, c='b', prob=None, kernel="gau", bw="silverman",
                 clip=(-np.inf, np.inf), xlabel=None, lim=None,
                 weights=None, ylabel=None,
                 labelsize=None, legendloc=None, lvls=[68., 95.]):
+    """
+    :param x: numpy array of data value
+    :param ax: matplotlib ax object
+    :param prob: numpy array of weights, data array x is weighted by prob.
+    :param w
+    for the rest of the parameters, see `kde1d`
+    """
 
     # make font looks like latex font
     rc("font", family="serif")
@@ -138,13 +145,13 @@ def CI_loc_plot(x, ax, c='b', prob=None, kernel="gau", bw="silverman",
     for lvl in lvls:
         lowCI_ixes[lvl], upCI_ixes[lvl] = \
             central_CI(support, den, level=lvl, lim=lim)
+        sum_stat['low' + str(int(lvl))] = support[lowCI_ixes[lvl]]
+        sum_stat['up' + str(int(lvl))] = support[upCI_ixes[lvl]]
         if lvl == 68. or lvl == 95.:
             ax.fill_between(support[lowCI_ixes[lvl]: upCI_ixes[lvl]],
                             den[lowCI_ixes[lvl]: upCI_ixes[lvl]],
                             alpha=alpha_lvl[lvl],
                             color=c)
-        sum_stat['low' + str(int(lvl))] = support[lowCI_ixes[lvl]]
-        sum_stat['up' + str(int(lvl))] = support[upCI_ixes[lvl]]
 
     loc_ix = lowCI_ixes[68.]
     # compute the location estimate

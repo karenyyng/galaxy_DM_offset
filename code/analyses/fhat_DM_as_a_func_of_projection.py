@@ -12,7 +12,7 @@ import os
 from scipy import ndimage
 # from datetime import datetime
 # datetime_stamp = datetime.now().strftime("%D").replace('/', '_')
-datetime_stamp = '06_17_16'
+datetime_stamp = '06_21_16'
 data_path = "../../data/"
 
 # ------- specify output file paths  -----------------------

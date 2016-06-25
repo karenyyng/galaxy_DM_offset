@@ -1,6 +1,6 @@
 """
-This contains module for computing distances between fhat_star & fhat (from
-DM).
+This contains module for computing distances between fhat_star & fhat
+(from DM).
 """
 # import h5py
 import pandas as pd
@@ -53,7 +53,7 @@ def assign_sign_for_dist():
 def compute_distance_for_other_peaks(
         matched_stat, star_fhat, summary_stat_keys,
         unit_conversion=1./0.704, convert_kpc_over_h_to_kpc=True,
-        assign_rand_sign=False
+        compute_2D_distance=False
     ):
     """use output from `compute_distance_between_DM_and_gal_peaks` to
     compute the distances for other summary stat
@@ -72,6 +72,8 @@ def compute_distance_for_other_peaks(
     :note: if there are several DM peaks, this function returns the shortest
     distance to the DM peak.
     """
+    from scipy.spatial import KDTree
+
     if type(summary_stat_keys) is str:
         summary_stat_keys = list(summary_stat_keys)
     elif type(summary_stat_keys) is not list:
@@ -88,13 +90,15 @@ def compute_distance_for_other_peaks(
             matched_stat["DM_matched_peak_coords"]['peaks_y_coords']]
         ).transpose()
 
-        dist = sorted(compute_euclidean_dist(
-            star_sum_xy_coords - valid_DM_peak_coords))[0]
+        tree = KDTree(valid_DM_peak_coords)
+        (dist_dict[sum_stat_key], DM_ixes) = \
+            tree.query(star_sum_xy_coords, k=1, p=2)
 
-        if assign_rand_sign:
-            dist *= assign_sign_for_dist()
-
-        dist_dict[sum_stat_key] = dist
+        if compute_2D_distance:
+            dist_dict["Delta_x_" + sum_stat_key], \
+            dist_dict["Delta_y_" + sum_stat_key] = \
+                np.array(star_sum_xy_coords - valid_DM_peak_coords[DM_ixes]
+                        ).transpose()
 
     return dist_dict
 
@@ -136,7 +140,7 @@ def compute_euclidean_dist(data, origin=None):
 
 def compute_distance_between_DM_and_gal_peaks(
         fhat_star, fhat, fhat_star_to_DM_coord_conversion=1. / 0.704,
-        verbose=False, assign_rand_sign=False):
+        verbose=False, compute_2D_distance=False):
     """
     Parameters
     ===========
@@ -184,7 +188,6 @@ def compute_distance_between_DM_and_gal_peaks(
         print ("valid_DM_peak_coords = ", valid_DM_peak_coords)
 
 
-    tree = KDTree(valid_DM_peak_coords)
 
     star_peak_coords = np.array([fhat_star["peaks_xcoords"][:gal_peak_no],
                                  fhat_star["peaks_ycoords"][:gal_peak_no]]
@@ -193,12 +196,15 @@ def compute_distance_between_DM_and_gal_peaks(
     star_peak_coords *= fhat_star_to_DM_coord_conversion
 
     # We use Euclidean distance for our query, i.e. p=2.
+    tree = KDTree(valid_DM_peak_coords)
     (dist, DM_ixes) = tree.query(star_peak_coords, k=1, p=2)
 
-    if assign_rand_sign:
-        dist *= assign_sign_for_dist()
-
     output = OrderedDict({})
+    if compute_2D_distance:
+        output["Delta_x_KDE"], output["Delta_y_KDE"] = \
+            np.array(star_peak_coords - valid_DM_peak_coords[DM_ixes]
+                     ).transpose()
+
     output["dist"] = dist
 
     output["DM_ixes"] = DM_ixes
@@ -272,10 +278,7 @@ def retrieve_metadata_from_fhat_as_path(h5_fhat):
     """
     paths = []
 
-    # this traverses all the possible paths but
-    # our path size is small enough it is very fast
-    h5_fhat.visititems(lambda x, y: append_correct_path(x, paths))
-    last_clstNo = sorted(np.unique([int(p.split('/')[0]) for p in paths]))[-1]
+    last_clstNo = sorted([int(clstNo) for clstNo in h5_fhat.keys()])[-1]
 
     correct_paths = []
     h5_fhat[str(last_clstNo)].visititems(
@@ -291,6 +294,10 @@ def retrieve_metadata_from_fhat_as_path(h5_fhat):
         metadata.append(h5_fhat[this_p].attrs['info'])
 
     return metadata
+
+
+### Compute ranking of the distance
+
 
 
 # --- deprecated ----------------------------

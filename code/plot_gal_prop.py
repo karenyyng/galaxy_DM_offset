@@ -201,7 +201,7 @@ def plot_KDE_peaks(fhat, lvls=range(2, 100, 10), allPeaks=True,
                    fileDir="../plots/", fill=False, showContour=True,
                    ax=None, fig=None, xlabel_rotate_angle=45,
                    legend_box_anchor=(1., 1.4),
-                   convert_kpc_over_h_to_kpc=False, flip_y=-1.,
+                   convert_kpc_over_h_to_kpc=False, flip_y=1.,
                    legend_markerscale=0.5, unit_conversion=1./0.704,
                    xlims=None, ylims=None
                    ):
