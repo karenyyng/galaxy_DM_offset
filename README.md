@@ -15,10 +15,18 @@ Jupyter notebook for making
 notebook](https://github.com/karenyyng/galaxy_DM_offset/blob/master/code/analyses/visualize_Illustris_peaks_and_density.ipynb) of galaxy luminosity maps with associated peaks for 129 clusters and groups .
 
 [IPython
+notebook](https://github.com/karenyyng/galaxy_DM_offset/blob/master/code/analyses/visualize_Illustris_peaks_and_density_no_density.ipynb) that visualizes the same galaxy clusters but gives number
+density instead. We can clearly tell luminosity maps do a better job matching
+the underlying DM particle distribution when you compare the notebooks with the
+one below.
+
+
+[IPython
 notebook](https://github.com/karenyyng/galaxy_DM_offset/blob/master/code/prototypes/Informed_peak_finding.ipynb)
 of DM particle density histograms with associated peaks.
 Since this notebook is quite large, you may need to refresh the website a few
 times for it to be rendered correctly.
+
 
 
 # Use 
