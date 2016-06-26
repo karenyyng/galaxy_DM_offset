@@ -128,7 +128,7 @@ def CI_loc_plot(x, ax, c='b', prob=None, kernel="gau", bw="silverman",
                          fft=fft, gridsize=gridsize, adjust=adjust, cut=cut,
                          clip=clip, xlabel=xlabel, lim=lim,
                          weights=weights,
-                         labelsize=labelsize, legendloc=legendloc,
+                         labelsize=labelsize, legendloc=legendloc)
 
     # we need the 68 percentile
     if 68. not in lvls:
