@@ -51,8 +51,9 @@ observationally feasible.
 simulation with $\sigma_{\rm SIDM} = 0 {\rm~cm}^2 /$ g using $10^5$ 
 galaxy particles 
 When assumed with zero impact parameter for mergers, Kim and Peter et al.
-(2016), using 5800 galaxy tracer particles, and \cite{Kahlhoefer14} also show 
-null galaxy-DM offset during most periods of their control staged simulation with $\sigma_{\rm
+(2016), using 5800 galaxy tracer particles also show 
+null galaxy-DM offset during most periods of their control staged simulation 
+with $\sigma_{\rm
 SIDM} = 0 {\rm~cm}^2 /$ g. While we provide a more in-depth comparison with
 these staged simulation in the discussion, we argue 
 these staged simulations do not probe  
@@ -151,7 +152,6 @@ statistic for summarizing the physical state of a galaxy cluster.
 % % summary statistics for studying galaxy clusters. Considering the large quantity
 % % of data, methods with manual tuning will not scale well. The manual biases may
 % % also make it hard to obtain consistent statistics from the samples.
-% 
 
 In this paper, we 
 1) extract realistic observables from the Illustris simulation for
@@ -362,10 +362,19 @@ clusters).
 
 \subsubsection{Spatial Projections}
 \label{subsubsec:projections}
+Unlike in staged simulation, picking out a particular projection for a cluster 
+does not always make physical sense.
+For highly symmetrical clusters, the projection does not matter. 
+However, for mergers or highly asymmetric clusters, 
+there is no obvious choice for the plane of projection that can allow us to
+understand the cluster. There is no simplistic merger axis that should be 
+projected along the plane of the field of view due to possible 3D spiraling
+trajectories of the merging components. 
+
 The summary statistics are computed all based on 2D projections of the
 spatial location.
 For computing the summary statistic, we note that 
-the order of projecting the data and taking the summary statistic is
+the order of projecting the data and estimating the summary statistic is
 non-commutative.  
 In order to represent the projection uncertainty, we compute even angular
 orientation as our line-of-sight.
@@ -376,7 +385,8 @@ currently hosted at http://healpix.sourceforge.net}
 pixel.
 % The viewing angles of the projections are defined by an elevation angle
 % $\xi$ and an azimuthal angle $\phi$. 
-The number of projections that we employed is 768 for each cluster.
+The number of projections that we employed is 768 for each cluster over an
+entire sphere of possible orientation for the line-of-sight. 
 Details of the implementation of the projection is available in Appendix
 \ref{app:projections}.
 
@@ -789,7 +799,7 @@ Appendix \ref{app:table_of_results}.
 \end{center}
 \end{figure*}
 
-\subsection{Total significant peak density}
+% \subsection{Cluster relaxedness and total peak density $\nu$}
 
  
 
@@ -826,22 +836,17 @@ estimates.
 
 
 \subsection{Projection uncertainty per cluster}
+There is a correlations between the median magnitude of the offsets and the
+variance of the offset for each cluster.
 The variance of the offsets due to projection is [TODO].
 In particular for the most massive galaxy clusters with $10^{14} M_{\odot}$
  
-% \begin{itemize}
-% \item those between BCG, the most bound particle and the other masses. 
-% \item explain the variation of the offsets for the same cluster under different 
-% projections 
-% \end{itemize}
-% 
-% While there is a tight distribution for $\Delta s_{\rm BCG}$ that peaks around
-% zero, there is a non-negligible population of data points that lies outside
-% this peak. 
-% [TODO] investigate what is WRONG with those outliers.
-% 
 \subsection{Correlations between different variables and the offsets}
-$M_{200c}$
+
+When we only include the offsets between the brightest luminosity peaks and the
+closest DM peak, there is no significant correlation between the mass and 
+the projected offsets.
+
 
 
 
