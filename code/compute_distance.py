@@ -220,11 +220,16 @@ def compute_dist_between_matched_DM_peak_and_no_dens_peak(
             k=1, p=2)
         outputs["no_dens_dist"].append(dist)
         outputs["Delta_no_peak_x"].append(
-            star_fhat_no_dens[path]['peaks_xcoords'][ix])
+            star_fhat_no_dens[path]['peaks_xcoords'][ix] -
+            uber_df.ix[i, 'matched_DM_peak_x']
+        )
         outputs["Delta_no_peak_y"].append(
-            star_fhat_no_dens[path]['peaks_ycoords'][ix])
+            star_fhat_no_dens[path]['peaks_ycoords'][ix] -
+            uber_df.ix[i, 'matched_DM_peak_y']
+        )
 
     return pd.DataFrame(outputs)
+
 
 def compute_euclidean_dist(data, origin=None):
     """
