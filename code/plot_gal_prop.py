@@ -123,7 +123,7 @@ def plot_color_mag_diag(df, bluer_band, redder_band, band_limit,
     return
 
 
-def plot_cf_contour(dens, x, y, lvls=[68, 95], show=False, clabel=False,
+def plot_cf_contour(dens, x, y, lvls=[68, 95], clabel=False,
                     fill=False, colors=None, ax=None):
     """this sort through the density, add them up til they are
     below the required confidence level, then
@@ -182,9 +182,6 @@ def plot_cf_contour(dens, x, y, lvls=[68, 95], show=False, clabel=False,
         str_lvls = {l: "{0:.1f}".format(s * 100)
                     for l, s in zip(CS.levels, lvls)}
         ax.clabel(CS, CS.levels, fmt=str_lvls, inline=1, fontsize=6.5)
-
-    if show:
-        ax.show()
 
     lvl_contours = {}
     for i, lvl in enumerate(lvls):

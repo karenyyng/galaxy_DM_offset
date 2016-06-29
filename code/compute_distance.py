@@ -8,6 +8,7 @@ import numpy as np
 import sys
 sys.path.append("../")
 # import extract_catalog as ec
+import compute_distance as compDist
 import get_DM_centroids as getDM
 
 
@@ -27,18 +28,91 @@ def construct_uber_result_df(star_fhats, DM_fhats, main_h5):
     # Do not combine dataframe with projections in fhat objects
     # until the very very end
     uber_df = pd.DataFrame([])
-    uber_df['clstNo'] = clstNo
-    uber_df["M200C"] = main_h5['Group/Group_M_Crit200'][clstNo]
+    uber_df['clstNo'] = sorted(clstNo)
+    uber_df["M200C"] = main_h5['Group/Group_M_Crit200'][
+        uber_df['clstNo']]
 
-    paths = retrieve_cluster_path(star_fhats, property_key="peaks_dens")
+    paths = retrieve_cluster_path(star_fhats,
+                                  property_key="peaks_dens")
     const_path = '/'.join(paths[0].split('/')[1:3])
     uber_df["richness"] = [
-        star_fhats[str(no) + '/' + const_path + "/" + "richness"].value
+        star_fhats[str(no) + '/' + const_path + "/" + "richness"
+                   ].value
         for no in clstNo
     ]
 
-
     return uber_df
+
+
+def convert_result_fhat_to_proj_uber_df(
+    star_fhats, DM_fhats, compute_2D_distance=True,
+    bin_widths=['/0.0/', '/25.0/'], star_paths=None,
+    summary_stat_keys=['centroid', 'BCG', 'shrink_cent'],
+    save=False, filename=None
+    ):
+    """
+    :star_fhats: h5 file stream
+    :DM_fhats: h5 file stream
+    :compute_2D_distance: bool
+    :returns: TODO
+    """
+    df_list = []
+
+    if star_paths is None:
+        star_paths = compDist.retrieve_cluster_path(star_fhats)
+
+    for star_path in star_paths:
+        clstNo = [int(star_path.split('/')[0])]
+        star_fhat = star_fhats[star_path]
+        for bin_width in bin_widths:
+            DM_fhat = DM_fhats[star_path + bin_width]
+
+            # temporarily put results in matched_stat first
+            matched_stat = compDist.compute_distance_between_DM_and_gal_peaks(
+                    star_fhat, DM_fhat, compute_2D_distance=True
+                )
+
+            # compute all other offsets before putting them somewhere
+            # for computing my uber_df
+            dist_dict = compDist.compute_distance_for_other_peaks(
+                matched_stat, star_fhat, summary_stat_keys=summary_stat_keys,
+                compute_2D_distance=True
+            )
+            # gal_peak_no is the number of significant luminosity peaks
+            # that we match
+            peak_no = matched_stat['gal_peak_no']
+            if peak_no > 1:
+                df = pd.DataFrame(dist_dict,
+                                  index=[clstNo[0] for i in range(peak_no)])
+            else:
+                df = pd.DataFrame(dist_dict, index=clstNo)
+
+            # can think of modifying the data type of matched_stat...
+            df['peak_id'] = range(peak_no)
+            df['KDE' ] = matched_stat['dist']
+            df['Delta_x_KDE'] = matched_stat['Delta_x_KDE']
+            df['Delta_y_KDE'] = matched_stat['Delta_y_KDE']
+            df['matched_DM_peak_x'] = \
+                matched_stat['DM_matched_peak_coords']['peaks_x_coords']
+            df['matched_DM_peak_y'] = \
+                matched_stat['DM_matched_peak_coords']['peaks_y_coords']
+
+            df['total_peaks_dens'] = np.sum(star_fhat['peaks_dens'])
+            # bin_widths contain strings in format of '/bin_width/'
+            df['bin_width'] = float(bin_width[1:-1])
+            df['gal_peak_no'] = matched_stat['gal_peak_no']
+            df['projection'] = star_path.split('/')[-1]
+            df_list.append(df)
+
+    # this is rbind
+    uber_df_proj = pd.concat(df_list)
+
+    if save and filename is None:
+        raise ValueError('`filename` cannot be None')
+    elif save and filename is not None:
+        uber_df_proj.to_hdf(filename,'df')
+
+    return uber_df_proj
 
 
 def assign_sign_for_dist():
@@ -109,6 +183,57 @@ def convert_DM_path_to_star_path(DM_clstPath, star_key_no=-1):
     return '/'.join(DM_clstPath.split('/')[:star_key_no])
 
 
+def compute_dist_between_matched_DM_peak_and_no_dens_peak(
+        star_fhat_no_dens, uber_df,
+        fixed_star_path='/mag/None/1/'):
+    """Docstring for compute_dist_between_matched_DM_peak_and_no_dens_peak.
+
+    :star_fhat_no_dens: h5stream object
+    :uber_df: pandas dataframe like object
+    :star_paths: list of strings, paths to no density peak estimates
+    :returns: TODO
+
+    """
+    from scipy.spatial import KDTree
+    if 'clstNo' not in uber_df:
+        uber_df['clstNo'] = np.array(uber_df.index)
+
+    uber_df.index = range(uber_df.shape[0])
+
+    star_paths = uber_df.apply(
+        lambda x: str(x.clstNo) + fixed_star_path + str(x.projection),
+        axis=1
+    )
+
+    # slow to preallocate .... it is ok
+    outputs = {"no_dens_dist": [],
+               "Delta_no_peak_x": [],
+               "Delta_no_peak_y": [],
+               }
+
+    # have to build a KDTree for each entry
+    for i, path in enumerate(star_paths):
+        no_peak_coords = np.array([star_fhat_no_dens[path]['peaks_xcoords'],
+                                   star_fhat_no_dens[path]['peaks_ycoords']]
+                                  ).transpose()
+
+        tree = KDTree(no_peak_coords)
+        (dist, ix) = tree.query(
+            tuple(uber_df.ix[i, ['matched_DM_peak_x', 'matched_DM_peak_y']]),
+            k=1, p=2)
+        outputs["no_dens_dist"].append(dist)
+        outputs["Delta_no_peak_x"].append(
+            star_fhat_no_dens[path]['peaks_xcoords'][ix] -
+            uber_df.ix[i, 'matched_DM_peak_x']
+        )
+        outputs["Delta_no_peak_y"].append(
+            star_fhat_no_dens[path]['peaks_ycoords'][ix] -
+            uber_df.ix[i, 'matched_DM_peak_y']
+        )
+
+    return pd.DataFrame(outputs)
+
+
 def compute_euclidean_dist(data, origin=None):
     """
     between numpy array of (nobs, ndim) and one point
@@ -160,9 +285,19 @@ def compute_distance_between_DM_and_gal_peaks(
                 finding the nearest neighbor
     gal_peak_no: int, number of significant gal peaks, i.e. peak_dens > 0.2
     star_sign_peak_coords: dictionary of two numpy arrays, the coordinates are
-        in terms of kpc
+        in terms of kpc. These coordinates denote where the significant KDE
+        luminosity peaks are used for matching the DM peaks.
     DM_matched_peak_coords: dictionary of two numpy arrays, the coordinates are
-        in terms of kpc
+        in terms of kpc. These coordinates denote which DM peaks were matched
+        to significant luminosity peaks. There is a one-to-one correspondance
+        between the `star_sign_peak_coords` and `DM_matched_peak_coords` for
+        the computation of the distances returned below.
+    Delta_x_KDE: float or numpy array of floats, depending on how many peaks
+        were used for the matching. This denotes a difference between
+        'star_sign_peak_coords' and `DM_matched_peak_coords` along the x-axis.
+    Delta_y_KDE: float or numpy array of floats, depending on how many peaks
+        were used for the matching. This denotes a difference between
+        'star_sign_peak_coords' and `DM_matched_peak_coords` along the y-axis.
     """
     from scipy.spatial import KDTree
     from collections import OrderedDict
@@ -186,8 +321,6 @@ def compute_distance_between_DM_and_gal_peaks(
         print ("DM_peak_no = {0}".format(DM_peak_no))
         print ("valid_DM_peak_coords = ", valid_DM_peak_coords)
 
-
-
     star_peak_coords = np.array([fhat_star["peaks_xcoords"][:gal_peak_no],
                                  fhat_star["peaks_ycoords"][:gal_peak_no]]
                                 ).transpose()
@@ -199,6 +332,8 @@ def compute_distance_between_DM_and_gal_peaks(
     (dist, DM_ixes) = tree.query(star_peak_coords, k=1, p=2)
 
     output = OrderedDict({})
+
+    # a test case can check if sqrt(Delta_x_KDE^2 + Delta_y_KDE^2) == dist
     if compute_2D_distance:
         output["Delta_x_KDE"], output["Delta_y_KDE"] = \
             np.array(star_peak_coords - valid_DM_peak_coords[DM_ixes]
@@ -275,7 +410,6 @@ def retrieve_metadata_from_fhat_as_path(h5_fhat):
     :returns: metadata, a list of strings that represent the metadata in the
     correct order
     """
-    paths = []
 
     last_clstNo = sorted([int(clstNo) for clstNo in h5_fhat.keys()])[-1]
 

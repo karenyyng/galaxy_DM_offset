@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from matplotlib import rc
+from matplotlib import (rc, pylab)
 import numpy as np
 from statsmodels.api import nonparametric
 from astropy.stats import biweight_location as C_BI
@@ -109,7 +109,7 @@ def central_CI(support, density, level=68, lim=None):
     return low_ix, up_ix
 
 
-def CI_loc_plot(x, ax, c='b', prob=None, kernel="gau", bw="silverman",
+def CI_loc_plot(x, ax=None, c='b', prob=None, kernel="gau", bw="silverman",
                 fft=True, gridsize=None, adjust=1, cut=3,
                 clip=(-np.inf, np.inf), xlabel=None, lim=None,
                 weights=None, ylabel=None,
@@ -124,11 +124,15 @@ def CI_loc_plot(x, ax, c='b', prob=None, kernel="gau", bw="silverman",
 
     # make font looks like latex font
     rc("font", family="serif")
+    if ax is None:
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+
     support, den = kde1d(x, ax, prob=prob, kernel=kernel, bw=bw,
                          fft=fft, gridsize=gridsize, adjust=adjust, cut=cut,
                          clip=clip, xlabel=xlabel, lim=lim,
                          weights=weights,
-                         labelsize=labelsize, legendloc=legendloc,
+                         labelsize=labelsize, legendloc=legendloc)
 
     # we need the 68 percentile
     if 68. not in lvls:
@@ -260,7 +264,7 @@ def histplot2d_part(ax, x, y, prob=None, N_bins=100, histrange=None,
     y = np.array(y)
 
     # Create the confidence interval plot
-    assert prob is not None, "there is no prob given for weighting"
+    # assert prob is not None, "there is no prob given for weighting"
 
     if histrange is None:
         if prob is not None:
