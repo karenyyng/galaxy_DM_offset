@@ -28,13 +28,16 @@ def construct_uber_result_df(star_fhats, DM_fhats, main_h5):
     # Do not combine dataframe with projections in fhat objects
     # until the very very end
     uber_df = pd.DataFrame([])
-    uber_df['clstNo'] = clstNo
-    uber_df["M200C"] = main_h5['Group/Group_M_Crit200'][clstNo]
+    uber_df['clstNo'] = sorted(clstNo)
+    uber_df["M200C"] = main_h5['Group/Group_M_Crit200'][
+        uber_df['clstNo']]
 
-    paths = retrieve_cluster_path(star_fhats, property_key="peaks_dens")
+    paths = retrieve_cluster_path(star_fhats,
+                                  property_key="peaks_dens")
     const_path = '/'.join(paths[0].split('/')[1:3])
     uber_df["richness"] = [
-        star_fhats[str(no) + '/' + const_path + "/" + "richness"].value
+        star_fhats[str(no) + '/' + const_path + "/" + "richness"
+                   ].value
         for no in clstNo
     ]
 
