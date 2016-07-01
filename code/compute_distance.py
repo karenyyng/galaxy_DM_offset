@@ -38,7 +38,7 @@ def construct_uber_result_df(star_fhats, DM_fhats, main_h5):
     uber_df["richness"] = [
         star_fhats[str(no) + '/' + const_path + "/" + "richness"
                    ].value
-        for no in clstNo
+        for no in sorted(clstNo)
     ]
 
     return uber_df
