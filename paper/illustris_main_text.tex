@@ -761,12 +761,12 @@ the 1D distributions along a particular spatial axis, e.g. $\Delta {\bf x}$ and 
 each with a support of $\mathbb{R}$, will not exhibit a discontinuity when
 the offset is zero. 
 
-While we notice the caveat of representing the offset as $|\Delta {\bf s}|$
+Due to the caveat of representing the offset as $|\Delta {\bf s}|$
 and the completely asymmetric distribution of $|\Delta {\bf s}|$
 , we compute the hypothesis test significance level with the 
-one-dimensional offset $\Delta {\bf x}$.
+ offset $\Delta {\bf x}$ along one of the spatial axes.
 We also provide a table of statistic of different ways of representing the
-offsets in Appendix [TODO].
+offsets.
 
 \section{RESULTS} 
 \label{sec:results}
@@ -787,8 +787,8 @@ to the most bound particle computed by different method is as follows:
 The table denoting the exact distribution of offsets from the most bound 
 particle is available in Appendix [TODO]. 
 In fact, most of the BCG offsets are very small except for two clusters with ID 13
-and 33. Both clusters have total normalized peak density $\nu > 2.0$ and from
-the projected visualization, we confirm that
+and 33. Both clusters have all the values  of $\nu > 0 $ over different projections  
+and from the projected visualization, we confirm that
 both clusters have significant substructures. It is therefore possible for the
 most bound particle to have similar gravitational potential level as another 
 substructure where the BCG is located. 
@@ -922,10 +922,11 @@ for constraining $\sigma_{\rm SIDM}$.
 \begin{figure*}
 	\begin{center}
 	\includegraphics[width=0.85\linewidth]{fig6_projected_KDE_offset_distribution.pdf}
-	\caption{The distribution of projected offsets for each of the clusters 
-		based on 768 projections. The offsets were computed between the closest DM 
-		peak to the brightest luminosity peak of each cluster. [TODO] elaborate on
-		what the different symbols in the boxplot mean.
+	\caption{A box plot showing the distribution of projected offsets for each of the clusters 
+		based on 768 projections. The red line shows the median of the projections,
+		the box encompasses the 25\% and 75\% quantile of the distribution.
+		The offsets were computed between the closest DM 
+		peak to the brightest luminosity peak of each cluster. 		
 		\label{fig:projected_KDE_offset_distribution}
 	}
 \end{center}
@@ -1000,47 +1001,6 @@ foreground objects. It is less clear about the effect of missing member galaxies
 for computing the luminosity map because there is a selection bias favoring 
 bright member galaxies.
 
-\subsection{Comparison to surveys of relaxed galaxy clusters}
-
-\subsection{Comparing the offset distributions with merging cluster observations}
-
-Our estimated distribution present in table \ref{tab:p_val_table}
-represents a lower bound of the spread of offsets.
-This is due to the high purity and completeness of the Illustris data.
-We do not further divide the cluster sample base on the dynamical state because
-they are realizations of the possible dynamical states of clusters.
-Most of them are relaxed while a small number ($\sim 3$)
-
-
-If we restrict to comparison of clusters total mass $\sim 10^{14} M_{\odot}$,
-there is no clusters with offsets 
-that go beyond our reported 95-th percentile interval.  
-
-The largest observed $\Delta s_{\rm num. dens} \approx 570$ 
-kpc to date is from El Gordo (ACT-CL J0102-4915; \citealt{Jee2014}). 
-And the number density peak in \citep{Jee2014} is determined via a shrinking 
-aperture algorithm (via private communication).
-The luminosity peak of El Gordo, however, is located much closer 
-to the DM peak location of the lensing convergence map.
-El Gordo is also more much more massive ($10^{15} M_{\odot}$) than the Illustris
-clusters.
-
-Other large $\Delta s$ from mergers are reported at the level of 200 kpc 
-using the number density peak of CIZA J2242.8+5301 \citep{Jee2015}
-. These offset level are within the 95\% percentile level 
-when we look at $\Delta s_{\rm num. dens}$. The reported 
-luminosity peak offset $\Delta
-s \approx 200$ kpc, however, goes beyond the $99\%$ level of our reported
-intervals. CIZA J2242.8+5301 is located close to the plane
-of the Milky Way with high chance of star contamination. 
-Again, CIZA J2242.8+5301 is more massive (total mass $\sim 10^{15} M_{\odot}$) 
-than the Illustris clusters.
-
-
-
-At this uncertainty level, it is hard to disentangle the effects 
-from the intrinsic statistical offset with the physical signal from SIDM. 
-
 % From the high resolution visualization of the DM maps (two-dimensional
 % histograms with 2 kpc bins) in 
 % Fig. \ref{fig:select_peak_visualization}, we can tell that some clusters clearly
@@ -1051,6 +1011,7 @@ from the intrinsic statistical offset with the physical signal from SIDM.
 % densest region. This illustrates why finding a `center' or peak of a cluster 
 % is an ill-defined notion. Most of the density-based statistics 
 % are only unambiguous for smooth, symmetrical data.  
+
 % 
 % Furthermore, we show a lower-resolution visualization of the DM surface
 % map in Fig. [TODO] compared to the higher resolution map, we can see a clear
@@ -1076,6 +1037,50 @@ from the intrinsic statistical offset with the physical signal from SIDM.
 % where the galaxy luminosity peaks are represented with squared markers that are
 % colored according to the relative density to the densest galaxy peak of that 
 % projection). 
+\subsection{Comparison to surveys of relaxed galaxy clusters}
+Using X-ray selected relaxed galaxy clusters, 
+\citep{George2012a} reported $\Delta s$ the order of 50 kpc to 150 kpc. 
+
+huge offset
+
+galaxy centroid 
+
+\subsection{Comparing the offset distributions with merging cluster observations}
+
+Our estimated distribution present in table \ref{tab:p_val_table}
+represents a lower bound of the spread of offsets.
+This is due to the high purity and completeness of the Illustris data.
+Most observations of massive galaxy clusters with total mass of M$_\odot
+\approx 10^{14}$ have richness $\lesssim 300$, while the most massive Illustris
+cluster (M$_{\rm FoF} = 3.23 \times 10^{14} M_\odot$) has a richness of 483.
+We do not further divide the cluster sample base on the dynamical state because
+they are realizations of the possible dynamical states of clusters.
+Most of them are relaxed while a small number ($\sim 3$)
+
+
+If we restrict to comparison of clusters total mass $\sim 10^{14} M_{\odot}$,
+there is no clusters with offsets 
+that go beyond our reported 95-th percentile interval.  
+
+The largest observed $\Delta s_{\rm num. dens} \approx 570$ 
+kpc to date is from El Gordo (ACT-CL J0102-4915; \citealt{Jee2014}). 
+And the number density peak in \citep{Jee2014} is determined via a shrinking 
+aperture algorithm (via private communication).
+The luminosity peak of El Gordo, however, is located much closer 
+to the DM peak location of the lensing convergence map.
+El Gordo is also more much more massive ($10^{15} M_{\odot}$) than the Illustris
+clusters.
+Other large $\Delta s$ from mergers are reported at the level of 200 kpc 
+using the number density peak of CIZA J2242.8+5301 \citep{Jee2015}
+. These offset level are within the 95\% percentile level 
+when we look at $\Delta s_{\rm num. dens}$. The reported 
+luminosity peak offset $\Delta
+s \approx 200$ kpc, however, goes beyond the $99\%$ level of our reported
+intervals. CIZA J2242.8+5301 is located close to the plane
+of the Milky Way with high chance of star contamination. 
+Again, CIZA J2242.8+5301 is more massive (total mass $\sim 10^{15} M_{\odot}$) 
+than the Illustris clusters.
+
 % 
 % \subsection{The statistical performance of different peak finding methods}
 % The difficulty in matching is not necessarily due to wrong algorithms.
@@ -1092,7 +1097,7 @@ from the intrinsic statistical offset with the physical signal from SIDM.
 % The number of non-relaxed clusters far outnumber the ones that are dynamically 
 % relaxed. 
 % 
-% The situation is subsection{Comparison to other simulations}
+
 \subsection{Comparison to other simulations}
 \subsubsection{Comparison to other cosmological simulations}
 % 
@@ -1101,7 +1106,7 @@ from the intrinsic statistical offset with the physical signal from SIDM.
 % Assume dynamical equilibrium 
 % 
 % 
-% \cite{Cui2015} X-ray center, BCG
+\cite{Cui2015} X-ray center, BCG
 % 
 % does not provide the pairwise offset between the DM and the galaxy distributions
 % but rather the offset between the minimum potential and DM. 
@@ -1386,18 +1391,17 @@ contour levels for spatial maps and inferring density peaks at
 % 
 % 
 % 
-% \section{ACKNOWLEDGEMENTS}
-% % Our software setup is available through a Docker image on DockerHub while the
-% % The main code are version controlled via Git and GitHub. 
-% KN would like to thank Professor Thomas Lee for the helpful discussion of 
-% the construction of the Monte Carlo p-value hypothesis test. 
-% Part of the work before the conception of this paper was discussed during 
-% the AstroHack week 2014. KN would like to thank Phil
-% Marshall and Jake Vanderplas for preliminary discussions for analyzing galaxy clusters. 
-% 
-% 
-% Part of this work was performed under HST grant (TODO ask Dave for grant
-% number). 
+
+
+\section{ACKNOWLEDGEMENTS}
+% Our software setup is available through a Docker image on DockerHub while the
+% The main code are version controlled via Git and GitHub. 
+KN would like to thank Professor Thomas Lee for the helpful discussion of 
+the construction of the p-value hypothesis test. 
+Part of the work before the conception of this paper was discussed during 
+the AstroHack week 2014. 
+Part of this work was performed under HST grant (TODO ask Dave for grant
+number). 
 % 
 % 
 % 
