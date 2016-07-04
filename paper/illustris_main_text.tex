@@ -271,7 +271,10 @@ For our analyses, we make use of galaxy clusters / groups
 with at least 50 member galaxies that are within a reasonable observational limit, 
 i.e. apparent $i \leq 24.4$ which is the limiting magnitude of the DEIMOS
 spectrometer on the Keck telescope, when we assume a cosmological redshift of $z = 0.3$
-in the $i$ band. 
+in the $i$ band. The limiting magnitude of 24.2 in the
+F814W filter of the Hubble Space Telescope, and the limiting magnitude of the
+Canadian-Hawaii French Telescope of 24.5, 
+are also close to our chosen limiting magnitude. 
 This is because of the relatively large statistical uncertainty if we try
 to analyze clusters with less than 50 member galaxies. 
 As indicated by the right-hand panel of Fig. \ref{fig:mass_richness}, 
@@ -757,15 +760,18 @@ the resulting 1D distribution of $|\Delta {\bf s}|$,
 those support being [0, $\infty$),
 will not peak at zero even if the original
 distribution of $\Delta {\bf s}$ peaks at (0, 0). On the other hand, 
-the 1D distributions along a particular spatial axis, e.g. $\Delta {\bf x}$ and $\Delta {\bf y}$,
+the 1D distributions along a particular spatial axis, 
+e.g. $\Delta {\bf x}$ and $\Delta {\bf y}$,
 each with a support of $\mathbb{R}$, will not exhibit a discontinuity when
-the offset is zero. 
+the offset is zero. Also, since we have enough samples for there to be
+rotational symmetry for the distribution of $(\Delta x, \Delta y)$, it does not
+matter if we picked $\Delta {\rm x}$ or $\Delta {\rm y}$ for the 1D representation.
 
 Due to the caveat of representing the offset as $|\Delta {\bf s}|$
-and the completely asymmetric distribution of $|\Delta {\bf s}|$
+and the asymmetric distribution of $|\Delta {\bf s}|$
 , we compute the hypothesis test significance level with the 
- offset $\Delta {\bf x}$ along one of the spatial axes.
-We also provide a table of statistic of different ways of representing the
+ offset $\Delta {\bf x}$ along one of the spatial axes. 
+ We also provide a table of statistic of different ways of representing the
 offsets.
 
 \section{RESULTS} 
@@ -893,8 +899,13 @@ the peak location from the luminosity map increased the 68-th percentile of the
 offset to more than double those of $\Delta y_{\rm KDE}'$ at $\pm 65$ kpc.
 The peak estimate from the number density map has even larger variance 
 (with its 68-th percentile at $\pm 84$ kpc). 
+The ranking of the variance for different methods stay the same even if we only
+consider projections with $\nu <1.2$ and that we only consider the offsets from
+the dominant DM peak. 
 The spread of the offsets inferred by each method will affect their ability
-for constraining $\sigma_{\rm SIDM}$. 
+for constraining $\sigma_{\rm SIDM}$. We will further elaborate on this point
+when we compare our results with staged simulations in section . 
+
 
 % \subsubsection{Offsets from all clusters}
 % From Fig. \ref{fig:offset_distributions} we can tell that there are
@@ -1055,9 +1066,11 @@ This is due to the high purity and completeness of the Illustris data.
 Most observations of massive galaxy clusters with total mass of M$_\odot
 \approx 10^{14}$ have richness $\lesssim 300$, while the most massive Illustris
 cluster (M$_{\rm FoF} = 3.23 \times 10^{14} M_\odot$) has a richness of 483.
-We do not further divide the cluster sample base on the dynamical state because
+
+
+We do not further divide the cluster sample based on the dynamical state because
 they are realizations of the possible dynamical states of clusters.
-Most of them are relaxed while a small number ($\sim 3$)
+Most of them are relaxed while a small number ($\sim 3$).
 
 
 If we restrict to comparison of clusters total mass $\sim 10^{14} M_{\odot}$,
@@ -1065,10 +1078,11 @@ there is no clusters with offsets
 that go beyond our reported 95-th percentile interval.  
 
 The largest observed $\Delta s_{\rm num. dens} \approx 570$ 
-kpc to date is from El Gordo (ACT-CL J0102-4915; \citealt{Jee2014}). 
+kpc to date is from the southeastern (SE) subcluster of El Gordo (ACT-CL J0102-4915; 
+\citealt{Jee2014}). 
 And the number density peak in \citep{Jee2014} is determined via a shrinking 
 aperture algorithm (via private communication).
-The luminosity peak of El Gordo, however, is located much closer 
+The SE luminosity peak of El Gordo, however, is found to be much closer 
 to the DM peak location of the lensing convergence map.
 El Gordo is also more much more massive ($10^{15} M_{\odot}$) than the Illustris
 clusters.
@@ -1237,8 +1251,7 @@ test include:
 \begin{itemize}
 \item whether the population PDF of offsets have converged  
 \end{itemize}
-% 
-% 
+ 
 Characterizing the state of the cluster is not trivial.
 % Although in such a high dimensional 
 % % 
