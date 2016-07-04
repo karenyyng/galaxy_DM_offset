@@ -44,6 +44,56 @@ def construct_uber_result_df(star_fhats, DM_fhats, main_h5):
     return uber_df
 
 
+def compute_distance_from_most_bound_particle(
+    star_fhats, DM_fhats, compute_2D_distance=False,
+    bin_widths=['/0.0/', '/25.0/'], star_paths=None,
+    summary_stat_keys=['centroid', 'BCG', 'shrink_cent'],
+    save=False, filename=None, primary_peak=True
+    ):
+    """
+    :star_fhats: h5 file stream
+
+ :DM_fhats: h5 file stream
+    :compute_2D_distance: bool
+    :returns: TODOm
+    """
+    df_list = []
+
+    if star_paths is None:
+        star_paths = compDist.retrieve_cluster_path(star_fhats)
+
+    for star_path in star_paths:
+        star_fhat = star_fhats[star_path]
+
+        temp_dict = {key + "_" + direction: star_fhat[key][i]
+                     for key in summary_stat_keys
+                     for i, direction in enumerate(['x', 'y'])}
+
+        # temporarily put results in matched_stat first
+        # this is useful if we want to compute secondary peak locations
+        # matched_stat = compDist.compute_distance_between_DM_and_gal_peaks(
+        #         star_fhat, DM_fhat, compute_2D_distance=False
+        #     )
+
+        star_props = star_path.split('/')
+        temp_dict['projection'] = star_props[-1]
+        temp_dict['clstNo'] = int(star_props[0])
+
+        if primary_peak:
+            for direction in ['x', 'y']:
+                temp_dict["lum_KDE_{}".format(direction)] = \
+                    star_fhat['peaks_{}coords'.format(direction)][0]
+        else:
+            raise NotImplementedError(
+                "Duplicate rows for non-primary peaks needed.")
+
+        df_list.append(pd.DataFrame(temp_dict, index=[temp_dict['clstNo']]))
+
+    mbp_df = pd.concat(df_list)
+
+    return mbp_df
+
+
 def convert_result_fhat_to_proj_uber_df(
     star_fhats, DM_fhats, compute_2D_distance=True,
     bin_widths=['/0.0/', '/25.0/'], star_paths=None,
@@ -209,6 +259,8 @@ def compute_dist_between_matched_DM_peak_and_no_dens_peak(
     outputs = {"no_dens_dist": [],
                "Delta_no_peak_x": [],
                "Delta_no_peak_y": [],
+               "no_dens_xcoord": [],
+               "no_dens_ycoord": [],
                }
 
     # have to build a KDTree for each entry
@@ -230,6 +282,10 @@ def compute_dist_between_matched_DM_peak_and_no_dens_peak(
             star_fhat_no_dens[path]['peaks_ycoords'][ix] -
             uber_df.ix[i, 'matched_DM_peak_y']
         )
+        outputs["no_dens_x"].append(
+            star_fhat_no_dens[path]['peaks_xcoords'][ix])
+        outputs["no_dens_y"].append(
+            star_fhat_no_dens[path]['peaks_ycoords'][ix])
 
     return pd.DataFrame(outputs)
 
