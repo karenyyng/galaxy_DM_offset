@@ -6,6 +6,9 @@ import sys
 sys.path.append("../")
 import get_gal_centroids as get_gal
 import calculate_astrophy_quantities as cal_astrophy
+import plot_cred_int as plotCI
+import matplotlib.gridspec as gridspec
+from astropy.stats import biweight_location
 
 
 
@@ -180,5 +183,69 @@ def plot_mass_vs_richness(FoF_mass, clst_df_list, ax=None,
     return richness, mask
 
 
-def plot_offsets_panel():
-    return
+def plot_2D_offsets(df, stat_key, prefices=["Delta_x_", "Delta_y_"],
+                    suffices=["_x", "_y"], prefix_bool=1):
+    for i, key in enumerate(stat_key) :
+        plt.axes().set_aspect('equal')
+        if prefix_bool:
+            fixed_keys = [prefices[0] + key, prefices[1] + key]
+        else:
+            fixed_keys = [key + suffices[0], key + suffices[1]]
+
+        plt.plot(
+            np.array(df[fixed_keys[0]]),
+            np.array(df[fixed_keys[1]]), 'b.', alpha=0.05
+            )
+        biweight_loc = (
+            biweight_location(df[fixed_keys[0]]),
+            biweight_location(df[fixed_keys[1]]))
+
+        # The red cross is the biweight location along each dimension
+        plt.plot(biweight_loc[0], biweight_loc[1],
+             'rx', mew=2.)
+        plt.tick_params(labeltop='off', labelright='off')
+        plt.axes().yaxis.set_ticks_position('left')
+        plt.axes().xaxis.set_ticks_position('bottom')
+        plt.xlim(-300, 300)
+        plt.ylim(-300, 300)
+        plt.title(key + ', biweight_loc = {0:.2f}, {1:.2f}'.format(
+            *biweight_loc))
+
+        plt.show()
+        plt.clf()
+
+
+def plot_offset_along_1_dimension(
+        df, stat_key_dict, save=False, lvls=[68., 95., 99.],
+        savefile=None, xlims=(-400.,400.)):
+    key_length = len(stat_key_dict)
+    sum_stat_df_dict = {}
+    fig = plt.figure(figsize=(18, 3 * key_length))
+    gs = gridspec.GridSpec(key_length, 1)
+    gs.update(hspace=0.4)
+    gs.set_width_ratios([1., 1.])
+
+
+    ax_lists = [[fig.add_subplot(gs[row, col]) for col in range(1)]
+            for row in range(key_length)]
+
+    for i, stat in enumerate(stat_key_dict):
+        ax = ax_lists[i][0]
+        sum_stat_df_dict[stat] = \
+            plotCI.CI_loc_plot(
+                np.array(df[stat]), ax=ax, lvls=lvls)
+        ax.set_xlim(*xlims)
+        ax.set_xlabel(stat_key_dict[stat] + ' (kpc)')
+        ax.set_ylabel('PDF')
+        ax.tick_params(labeltop='off', labelright='off')
+        ax.yaxis.set_ticks_position('left')
+        ax.xaxis.set_ticks_position('bottom')
+        ax.spines['right'].set_visible(False)
+        ax.spines['top'].set_visible(False)
+
+    if save and savefile is not None:
+        fig.savefig(savefile, bbox_inches='tight')
+    elif save and savefile is None:
+        raise ValueError("`savefile` cannot be None.")
+
+    return sum_stat_df_dict
