@@ -298,6 +298,7 @@ masses ranging from $10^{13}$ M$_\odot $ to $10^{14}$ M$_\odot$.
 
 \subsection{Cluster properties}
 \label{subsec:cluster_properties}
+
 \subsubsection{Relaxedness of the galaxy clusters}
 \label{subsubsec:relaxedness}
 
@@ -772,8 +773,8 @@ the offset is zero. Also, since we have enough samples for there to be
 rotational symmetry for the distribution of $(\Delta x, \Delta y)$, it does not
 matter if we picked $\Delta {\rm x}$ or $\Delta {\rm y}$ for the 1D representation.
 
-Due to the caveat of representing the offset as $|\Delta {\bf s}|$
-and the asymmetric distribution of $|\Delta {\bf s}|$
+Due to the asymmetry of representing the offset as $|\Delta {\bf s}|$
+that can mislead readers to think that there is an offset when there is none 
 , we compute the hypothesis test significance level with the 
  offset $\Delta {\bf x}$ along one of the spatial axes. 
  We also provide a table of statistic of different ways of representing the
@@ -793,12 +794,14 @@ to the most bound particle computed by different method is as follows:
 	\item densest peak of the luminosity map created by weighted the KDE 
 		\item shrinking aperture center from the luminosity weighted galaxy data
 		\item densest peak of the number density map created by the unweighted KDE 
+		\item centroid (center of mass) estimate using luminosity weights
 \end{itemize}
 
-The table denoting the exact distribution of offsets from the most bound 
-particle is available in Appendix [TODO]. 
+Table \ref{tab:most_bound_particle_offset_distributions} contains the different
+percentile and robust estimates of the distribution of offsets from the most bound 
+particle. 
 In fact, most of the BCG offsets are very small except for two clusters with ID 13
-and 33. Both clusters have all the values  of $\nu > 0 $ over different projections  
+and 33. Both clusters have all the values  of $\nu > 1.5 $ over different projections  
 and from the projected visualization, we confirm that
 both clusters have significant substructures. It is therefore possible for the
 most bound particle to have similar gravitational potential level as another 
@@ -878,12 +881,18 @@ substructure where the BCG is located.
 \end{figure*}
 
 \subsection{Relaxedness of the clusters}
-Out of the $43 \times 768 = 33024$ projections, $\sim 45\%$ of the projections 
-have only one dominant subcluster $\nu \leq 1.2$, 
-while $\sim 50\%$ of the projections have approximately two dominant subclusters with
-$1.2 < \nu < 2.2$.   
-
-
+Out of the $43 \times 768 = 33 024$ projections, $\sim 45\%$ of the projections 
+have only one dominant luminosity peak, with the total peak density of the
+projection being $\nu \leq 1.2$, 
+while $\sim 50\%$ of the projections have approximately two dominant luminosity
+peaks with $1.2 < \nu < 2.2$.   
+From \ref{fig:total_peak_dens_distribution}, 
+most clusters show some kind of secondary peak, 
+only 7 clusters (with ID 15, 16, 17, 22, 31, 35, 51) out of 43 clusters have $\nu
+\lesssim 1.2$ for most of the projections.
+There is also very a strong correlation of $\sim 0.8$ 
+between each of the two non-relaxedness quantities 
+and the median total density of the luminosity peaks $\nu$ of each cluster.
 
 \subsection{Galaxy-DM Offset in Illustris}
 % talks about the overview of the offsets in the simulation
@@ -894,8 +903,11 @@ around zero ($\lesssim 4$ kpc) with rotational symmetry,
 except the luminosity weighted centroid method with slight asymmetry along x-axis
 (See table \ref{tab:offset_distributions}).
 The spread of $\Delta s$ computed by each method 
-differ (See Fig. \ref{fig:offset_distributions} for the distribution along
-the y-axis). The offset $\Delta s_{\rm BCG}$ peaks sharply near zero but 
+differ enough that one needs to know which offset method an astronomical study
+used for a fair comparison 
+(See Fig. \ref{fig:offset_distributions} for the distribution along
+the y-axis). 
+The offset $\Delta s_{\rm BCG}$ peaks sharply near zero but 
 contains outliers. Having outlier is possible 
 because the DM peak is chosen as the closest DM peak to match the
 brightest luminosity peak in a particular projection.
@@ -904,16 +916,16 @@ the brightest projected luminosity peak
 may shift from one subcluster to another subcluster between different projections,
 while the BCG identification is unchanged between projections.
 
-The offsets computed by the peak from the luminosity weighted KDE 
+For the full sample in table The offsets computed by the peak from the luminosity weighted KDE 
 has the second smallest variance. The 68\% percentile of $\Delta y_{\rm
 KDE}'$ is at around $\pm 25$ kpc. Using shrinking aperture to estimate
 the peak location from the luminosity map increased the 68-th percentile of the
 offset to more than double those of $\Delta y_{\rm KDE}'$ at $\pm 65$ kpc.
-While one may argue that the shrinking aperture may perform better when one 
-manually partition data in subclusters, it is hard for other studies to
-reproduce the results. Our results from the samples 
+
+Our results from the samples 
 with $\nu < 1.2$ also show that even for samples with one dominant component,
-substructures can still cause non-negligible biases of the peak estimate.
+substructures can still cause non-negligible biases of the peak estimate from
+the shrinking aperture method.
  
 The peak estimate from the number density map has even larger variance 
 (with its 68-th percentile at $\pm 84$ kpc). 
@@ -984,9 +996,6 @@ is $< 23$ kpc. Only 4 clusters have mid-variance $ > 40$ kpc.
 Physical quantities that have positive correlation $\sim 0.7$
 with the maximum $\Delta s_{\rm KDE}$ of each cluster include the two
 non-relaxedness criteria mentioned in section \ref{subsubsec:relaxedness},
-There is also very strong correlation of $\sim 0.8$ 
-between the two non-relaxedness quantity 
-and the median total density of the luminosity peaks $\nu$ of each cluster.
 The offset $\Delta s_{\rm KDE}$ also show a high
 correlation of 0.77 with $\nu$. 
 The FoF mass of clusters shows slight correlation of 0.28 with the median total density
@@ -1460,3 +1469,4 @@ number).
 % % the merger history of the cluster. 
 % 
 % 
+
