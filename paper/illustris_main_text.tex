@@ -735,8 +735,13 @@ that are below observed values of
 offsets in the literature.  
 This gives us a rough estimation of the probability 
 of seeing the offset from real observations under the null hypothesis of CDM 
-being true. We also provide some robust statistic characterizing the 
+being true. We also provide the biweight location and the density interval 
+characterizing the 
 distribution of offsets computed from each of the listed methods.
+For instance, the 95\% interval is computed as the density mass that encompasses
+95\% of total density (i.e. 2.5\% of mass at each end of the tail are
+excluded.) centered on the location estimate for the symmetrical distribution
+of $\Delta y$.
 
 The different representations of $\Delta s$ have different statistical power
 for the hypothesis test, i.e. the spread of the offset distribution in
@@ -872,6 +877,13 @@ substructure where the BCG is located.
 \end{center}
 \end{figure*}
 
+\subsection{Relaxedness of the clusters}
+Out of the $43 \times 768 = 33024$ projections, $\sim 45\%$ of the projections 
+have only one dominant subcluster $\nu \leq 1.2$, 
+while $\sim 50\%$ of the projections have approximately two dominant subclusters with
+$1.2 < \nu < 2.2$.   
+
+
 
 \subsection{Galaxy-DM Offset in Illustris}
 % talks about the overview of the offsets in the simulation
@@ -879,8 +891,8 @@ substructure where the BCG is located.
 \subsubsection{Two-dimensional (2D) offsets}
 The 2D distribution of $\Delta s$ from most methods peak at
 around zero ($\lesssim 4$ kpc) with rotational symmetry, 
-except the luminosity weighted centroid method (See table 
-\ref{tab:offset_distributions}).
+except the luminosity weighted centroid method with slight asymmetry along x-axis
+(See table \ref{tab:offset_distributions}).
 The spread of $\Delta s$ computed by each method 
 differ (See Fig. \ref{fig:offset_distributions} for the distribution along
 the y-axis). The offset $\Delta s_{\rm BCG}$ peaks sharply near zero but 
@@ -897,6 +909,12 @@ has the second smallest variance. The 68\% percentile of $\Delta y_{\rm
 KDE}'$ is at around $\pm 25$ kpc. Using shrinking aperture to estimate
 the peak location from the luminosity map increased the 68-th percentile of the
 offset to more than double those of $\Delta y_{\rm KDE}'$ at $\pm 65$ kpc.
+While one may argue that the shrinking aperture may perform better when one 
+manually partition data in subclusters, it is hard for other studies to
+reproduce the results. Our results from the samples 
+with $\nu < 1.2$ also show that even for samples with one dominant component,
+substructures can still cause non-negligible biases of the peak estimate.
+ 
 The peak estimate from the number density map has even larger variance 
 (with its 68-th percentile at $\pm 84$ kpc). 
 The ranking of the variance for different methods stay the same even if we only
@@ -1269,9 +1287,21 @@ offset are the following.
 
 There is no deterministic one-to-one mapping between $\Delta s$ and 
 $\sigma_{\rm SIDM}$.  
+This result does not mean that $\sigma_{\rm SIDM}$ is always overestimated from
+past literature. 
+On the contrary, it means that individual SIDM offset estimate may either
+experience a random increase or decrease due to the statistical noise of 
+ the data and different offset inference methods have different sensitivity to 
+ the noise.
+If the offset signal from SIDM is small enough, the offset distribution may be
+degenerate between different $\sigma_{SIDM}$.
+
+
+plagued by expensive observations and small number of cluster samples.
 
 not a statistically sound way of rejecting $\sigma_{\rm SIDM} = 0$
 warn against p-value 'hacking` using this Illustris data
+
 
 sound statistical analyses to claim discovery  
 
@@ -1409,6 +1439,7 @@ contour levels for spatial maps and inferring density peaks at
 % The main code are version controlled via Git and GitHub. 
 KN would like to thank Professor Thomas Lee for the helpful discussion of 
 the construction of the p-value hypothesis test. 
+
 Part of the work before the conception of this paper was discussed during 
 the AstroHack week 2014. 
 Part of this work was performed under HST grant (TODO ask Dave for grant
