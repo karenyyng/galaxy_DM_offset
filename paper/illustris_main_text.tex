@@ -666,7 +666,9 @@ particle data. We do not perform a cross-validated KDE that has
 $O(n^2)$ runtime on the DM data because the
 number of DM particles for each cluster is of 
 [TODO double check] the order of millions. The DM
-resolution is high enough for the smoothed histograms to be accurate.  
+resolution is high enough for the smoothed histograms to be accurate for peak
+detection.  
+
 Physically, the histograms of the dark matter of each cluster 
 is analogous to a convergence map from a lensing analysis. 
 
@@ -805,28 +807,31 @@ clusters in Appendix [TODO].
 	 error estimates may not have negligible uncertainties but the uncertainties were
 	 not reported from the observation. 
 	 \label{tab:offset_results}} 
-	 \begin{tabular}{@{}lcccccccc@{}}
+	 \begin{tabular}{@{}lccccccc@{}}
 	 \hline 
 	 Cluster & $\Delta s$ (kpc) & galaxy peak & DM peak &  p-value & subcluster &
-	 mass ($10^{14}$ M$_\odot$) & merger evidence &  reference\\
+	 mass ($10^{14}$ M$_\odot$)  &  reference\\
 	 \hline
 	 Bullet  & 25$~\pm~29$ & number or luminosity & strong \& weak lensing & $\gtrsim 0.32$ &
-	 northwest &2.6 & shock in X-ray & \citealt{Randall2008d}\\
-	 % Bullet & & & & & southeast & 2.5 & & \citealt{Bradac2008} \\
-	 Baby Bullet &&&&&& \\
-	 Musketball & 129 & number density & weak lensing & $>0.05$ & southern & 3.1 & DM-gas
-	 dissociation  & \citealt{Dawson2013}\\
-	 Musketball & 47 & number density & weak lensing & $>0.32$ &northern & 1.7 &  & \citealt{Dawson2013} \\
-	 Abell 3827 & 6 & BCG & strong lensing & $> 0.05$ & central & & & \citealt{Williams2011a}\\ 
-	 Abell 520 & & & & & & &  & \citealt{Clowe2012} \\
-	 Abell 1689 & & & & & & &  & \citealt{Mohammed2014} \\
-	 El Gordo & 570 & number density & weak lensing & $>0.01$ & southeast & 11 &
-	 radio relic &\citealt{Jee2014} \\
+	 northwest &  & \citealt{Randall2008d}\\
+	 Baby Bullet & $\sim 50 \pm 50 $  & luminosity & strong \& weak lensing &
+	 $\gtrsim 0.05 $ & northwest, Fig.4 in ref. & 2.6 & \citealt{Bradac2008} \\
+	 Baby Bullet & $\sim 50 \pm 75 $ & luminosity & & $\gtrsim 0.05 $& southeast,
+	 Fig. 4 in ref. & 2.5 & \citealt{Bradac2008} \\
+	 Musketball & 129 & number density & weak lensing & $>0.05$ & southern & 3.1 
+	 & \citealt{Dawson2013}\\
+	 Musketball & 47 & number density & weak lensing & $>0.32$ &northern & 1.7 &  
+	  \citealt{Dawson2013} \\
+	 Abell 3827 & 6 & BCG & strong lensing & $> 0.05$ & central & & \citealt{Williams2011a}\\ 
+	 Abell 520 & $\sim 50 \pm 50$ & luminosity & weak lensing & $\gtrsim 0.05$ & blue, 
+		Fig. 4 in ref. & 5.7 & \citealt{Clowe2012} \\
+	 Abell 1689  & & & & & &  & \citealt{Mohammed2014} \\
+	 El Gordo & 570 & number density & weak lensing & $>0.01$ & southeast & 11  &\citealt{Jee2014} \\
 	 Sausage & $\sim190 \pm 150$ & number density & weak lensing & $\gtrsim 0.05^\dagger$ & both
-	 & 11. \& 9.8 & radio relic &\citealt{Jee2015}\\ 
+	 & 11. \& 9.8 &\citealt{Jee2015}\\ 
 	 Sausage & $\sim190 \pm 150 $  & luminosity & weak lensing & $\lesssim
 	 0.01^\dagger$ & both
-	 & & &\citealt{Jee2015}\\ 
+	 &  &\citealt{Jee2015}\\ 
 	 \hline
 	 \end{tabular} 
 	 \end{center} 
@@ -887,9 +892,21 @@ the median of $\nu$ per cluster are indicated by the red central vertical line
 inside each box in Fig. 
 \ref{fig:total_peak_dens_distribution}).
 
+
+\subsection{Offset between the matched DM peaks and the corresponding most
+bound particle}
+There is no significant differences between the matched DM peaks and i
+the most gravitationally 
+bound particle (hereafter most bound particle).
+The median of the offset between the DM peak and the gravitationally bound
+particle is (0, 0) kpc. The 75-th percentile of the offsets are at (2, 2) kpc. 
+Most of the other offset values occur between (9, 9). Extreme offset outliers
+are only seen for clusters with $\nu > 1.2$. 
+
+
 \subsection{Offset between galaxy summary statistic and the most bound particle}
 As a sanity check, we computed the offsets between different galaxy summary
-statistic and the most gravitationally bound particle (aka most bound particle). 
+statistic and the most bound particle. 
 Interested reader can refer to table
 \ref{tab:most_bound_particle_offset_distributions} for the different
 percentile and robust estimates of the distribution of offsets from the most bound 
@@ -958,11 +975,14 @@ with its 68-th percentile being $\pm 84$ kpc.
 
 Most of the percentile intervals of the unrelaxed samples $ 1.2 < \nu < 2.2$ , 
 when compared to the relaxed samples, are around a factor of 2 larger. 
-With the relatively relaxed samples, the inferred offsets from different
-methods still show discrepancies. 
+With the relatively relaxed samples, the variance of the inferred offsets from different
+methods still show significant discrepancies. 
 The variance of the offset computed from the shrinking aperture method, 
 the number density map, and the weighted centroid are still at least a factor of 1.5
 larger than those computed using the luminosity-weighted KDE. 
+In particular, the 68\% percentile of the centroid method is $\pm 108$ kpc.
+This is around one-fourth the typical core radius of massive clusters
+\cite{Allen1998}.  
  
 The spread of the offsets inferred by each method affects their ability
 for constraining $\sigma_{\rm SIDM}$. We will further elaborate on this point
