@@ -799,13 +799,31 @@ distribution of $\Delta {\bf s}$ peaks at (0, 0).
 To illustrate how difficult it is to interpret the magnitude values $|\Delta
 s|$,  
 we can imagine the following transformation:
-The transformation of a radially symmetrical 
-2D Gaussian centered at (0, 0) and diagonal covariance matrix will result
-in a Rayleigh distribution with its mean as $\mu = \sigma \sqrt{\pi / 2}$, where
-$\sigma$ is the square root of the diagonal element of the covariance matrix 
-of the original 2D Gaussian. The dependency of $|\Delta s|$ on the parameters of
+The values drawn from: 
+\begin{equation}
+	\left(\begin{array}{c}
+			\bf{x}\\
+			\bf{y}
+		\end{array}
+	\right) \sim \mathcal{N}\left(
+	\left(
+		\begin{array}{c}
+			0 \\
+			0
+		\end{array}
+	\right),
+	\left(\begin{array}{cc}
+		\sigma^2, 0 \\
+		0, \sigma^2
+	 \end{array}
+	\right)
+\right),
+\end{equation}
+will result in $|\Delta s|$ values that follow the Rayleigh distribution, 
+those peak is at $|\Delta s| = \sigma$. 
+The dependency of $|\Delta s|$ on the parameters of
 the 2D distribution is even more
-complicated when the the 2D distribution do not approximate a Gaussian 
+complicated when the the 2D distribution does not approximate a Gaussian 
 or when there are actual peak offsets in the 2D space. 
 The shifting of the peak location due to variable transformation 
 is seen in the distribution of $|\Delta {\bf s}|$ recorded in table
@@ -1160,10 +1178,8 @@ When we gather the offsets $\Delta s_{\rm KDE}'$ of the
 768 projections for each cluster,
 we can find the offset uncertainty due to projection effects.
 The distributed are illustrated in the box plot of Fig. 
-\ref{fig:projected_KDE_offset_distribution}.
-
-
-The values of the biweight mid-variance of $\Delta y_{\rm KDE}'$ for half of the clusters
+\ref{fig:projected_KDE_offset_distribution}. The values of the biweight mid-
+variance of $\Delta y_{\rm KDE}'$ for half of the clusters
 are $< 23$ kpc. Of the ten clusters (ID = 3, 7, 12, 20, 21, 32, 33, 37, 40 and 46) 
 that have mid-variance $ > 40$ kpc, all of them have the median of $\nu > 1.2$.
  
@@ -1254,7 +1270,7 @@ While the compilation of the offset distribution suffers
 from the small number of high mass clusters in the Illustris simulation, 
 the distribution probes projection uncertainties comprehensively. 
 Possible discrepancies that affect our comparison can arise
-due to the high purity and completeness of the Illustris data.
+due to the high purity and completeness of the Illustris galaxy data.
 Most observations of massive galaxy clusters with total mass of M$_\odot
 \approx 10^{14}$ have richness $\lesssim 300$, while the most massive Illustris
 cluster (M$_{\rm FoF} = 3.23 \times 10^{14} M_\odot$) has a richness of 483.
@@ -1317,7 +1333,8 @@ As warned by the American Statistical Association in a statement [TODO],
 p-value can be misinterpreted easily, so
 we must take caution in the procedure of computing and interpreting the p-values. 
 For example, the high energy physics community deliberately set the detection
-threshold to be 5 $\sigma$ to account for how systematic and bootstrapped uncertainties can be
+threshold to be 5 $\sigma$ to account for how systematic and bootstrapped 
+uncertainties can be
 underestimated or unaccounted for. 
 If the reliability of each observation is 
 approximately the same, averaging the p-values can be one way of combining the p-values 
@@ -1387,7 +1404,7 @@ or the biweight location of 3 kpc for the full sample.
 Furthermore, \cite{Zitrin2012} reported a very longer tail for $\Delta_{\rm BCG}$ with its 95-th
 percentile estimate at $\log_{10}(|\Delta s_{\rm BCG}|) = 0.489 h^{-1}$ Mpc, which
 translates to $\sim$ 3 $h^{-1}$ Mpc. 
-The analysis of 25 galaxy clusters by \cite{Oguri2010} fitting elliptical NFW
+The analysis of 25 galaxy clusters of the LoCuSS survey by \cite{Oguri2010} fitting elliptical NFW
 models to the weak lensing data, also show a two
 component distribution for $|\Delta s_{\rm BCG}|$, a tight peak that describes the
 offset for most clusters and a long tail that spans around 1 Mpc.
@@ -1417,18 +1434,56 @@ In comparison, the median, mean, standard deviation and 75-th percentile of
 $|\Delta s_{\rm KDE}|$ from all the Illustris samples are all below 50 kpc. 
 
 \subsection{Comparison to other simulations}
-\subsubsection{Comparison to other cosmological simulations}
-\cite{Johnston2007b}
+\subsubsection{Comparison to CDM cosmological simulations}
+Our study is complementary to other cosmological simulations in understanding
+the effects of assuming different centers for galaxy clusters. 
+In particular, some studies using N-body hydrodynamical cosmological
+simulations have tried to characterized the 2D distances between the BCG and 
+the second most massive galaxies, to see the effects of misidentifications of 
+BCGs.  \cite{Johnston2007b} and 
+\cite{Hilbert2010} (using the Millenium simulation)  found 
+the one sigma level offsets at 380 $h^{-1}$ kpc, and 410 $h^{-1}$ kpc 
+respectively. 
 
- 
+\cite{Cui2015}, using 184 galaxy clusters with M$ > 10^{14}$ M$_\odot$ in a
+cosmological simulation suite, 
+% simulation suite with two types baryonic feedback prescription models,
+% including radiative cooling, start formation and supernovae feedback, but one with feedback from Active
+% Galactic Nuclei (AGN) and one without, \cite{Cui2015} 
+also identified the maximum SPH density peak with various summary location of
+the galaxy population of their cluster samples. \cite{Cui2015} found
+most offsets between BCGs and the most gravitationally bound particle to be
+mostly below 10 $h^{-1}$ kpc. They also reported  some extreme outliers 
+spanning up to several hundred $h^{-1}$ kpc due to disturbed clusters. Our 
+tight 68-th percentile of 
+$\Delta y_{\rm BCG } \pm 3$ kpc gives some confidence that 
+we have identified most of the BCGs correctly in the Illustris simulation.
 
-Complementary to our study 
-\cite{Hilbert2010}
-Comparison with the Eagle simulation   
-consistent with \cite{Cui2015} X-ray center, BCG
+So far, we have showed and discussed that there are several possible
+causes for the offsets, including the summary 
+methods for the galaxy population and how substructures affect the different
+inference methods. Those causes are, however, not exhaustive. 
+\cite{Dietrich2012} ray-traced through the substructures through the N-body 
+Millennium Simulation and showed that a combination of shape noise and 
+smoothing alone can lead to offsets between the most bound particle and the
+lensing peak. The offsets, do not simply depend on the smoothing bandwidth, 
+but also the number density of the source galaxies that are lensed. 
+Even at the source galaxy density of space-based optical data of n = 80
+arcmin$^{-1}$, smoothing can cause an offset distribution with the mode at
+15 arcsec in the presence of shape noise. While this source of uncertainty is
+relatively unimportant in this analysis due to the very high resolution of the
+DM particles, it explains why the observed offsets may not be created by 
+physical forces and why the uncertainties need to be properly accounted for.
 
-Another accurate way of inferring the DM distribution can be through 
-the Delaunay Tessellation Field Estimator which has no free parameter.
+% Although \cite{Cui2015} also made histograms for the offsets between the BCG
+% and the (gravitational) potential centers of various particle types, we 
+% cannot read off the distances between the (gravitational) 
+% potential centers of the DM and the galaxy particles because   of each 
+% cluster.  
+
+
+% Another accurate way of inferring the DM distribution can be through 
+% the Delaunay Tessellation Field Estimator which has no free parameter.
 
 % The severity of this problem of subjective parameter tuning for offset inference 
 % can be see in cluster Abell 520. \cite{Clowe2012} reported how different
@@ -1546,9 +1601,6 @@ high dimensional space suffers from the curse of dimensionality
 
 causes of offsets that are not SIDM 
 
-using the Millenium simulation \cite{Dietrich2012} also reported that 
- the peak offset is due to shape noise from 
-background galaxies used for lensing and the smoothing.  
 Imperfect characterization of substructures 
 contours - avoid any assertions of symmetry requirements  
 smoothing 
@@ -1593,7 +1645,7 @@ experience a random increase or decrease due to the statistical noise of
  the data and different offset inference methods have different sensitivity to 
  the noise.
 If the offset signal from SIDM is small enough, the offset distribution may be
-degenerate between different $\sigma_{SIDM}$ values.
+degenerate between different $\sigma_{\rm SIDM}$ values.
 
 
 plagued by expensive observations and small number of cluster samples.
