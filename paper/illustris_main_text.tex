@@ -1355,62 +1355,114 @@ of this study and improve the design of the
 analysis in section [TODO]. 
 
 \subsubsection{Comparison of the offset results to other studies}
-Our offset results are highly relevant to two other types of
+Our results showing offset distribution are highly relevant to two other types of
 observational studies: 
 The first type tries to map the DM distribution of galaxy clusters 
 using lensing techniques. 
 The second type focuses on finding the best way to stack galaxy groups for
 inferring cosmological parameters from the cluster mass abundance 
 relationship.
-In the following, we show that cosmological simulations generally show 
-the BCGs has the tightest offsets from the DM peaks.
-Some cosmological simulations show that misidentifying the BCG can reproduce
-the scatter found in observational studies of BCG-DM peak offset. 
-We then discuss the  is why the BCG or luminosity peak  
-do not have as tight of an agreement with some (weak) lensing studies,
-and why they may not maximize the stacked lensing signal.
-
-what other summary statistic 
-to use as a proxy of the DM peak when the BCG of a cluster cannot be
-identified. Here we compare and contrast the properties of second best proxy to the DM
-peak than the BCG. Then we discuss whether any of the galaxy summary statistic
-can minimize stacking error.
+In the following section, we will show that cosmological simulations generally show 
+the BCGs has the tightest offsets from the DM peaks, which is consistent with
+our finding.
+Observational studies, however, in general do not find offset as tight as the 
+simulations. We discuss some factors (other than SIDM) that other studies have
+shown to affect the observed offsets, including the lensing resolution, the
+choice of summary statistic for the member galaxy population and the field of
+view. A few observational
+studies have shown that bright member galaxies or luminosity peak approximates
+the BCG well. 
 
 To establish the baseline of the tightest $\Delta s$, we first discuss and 
 compare the $\Delta s_{\rm BCG}$ constraints.   
-Observations were performed with a much larger FOV from the Subaru Suprime-Cam 
-The bulk of the distribution of $\Delta s_{\rm BCG}$ is below 3 kpc. 
-This is consistent with only having smoothing noise of the DM map affecting the
-identification of the BCG. This offset distribution is found to be much tighter than most 
-of the observations. 
-The analysis of 25 massive galaxy clusters of the LoCuSS survey by \cite{Oguri2010} 
-fitting elliptical NFW
-models to the weak lensing data, also show a two
-component distribution for $\Delta s_{\rm BCG}$, with the 2D Gaussian standard
-deviation being 90
-$h^{-1}$ kpc that describes the
-offset for most clusters, and a long tail that spans around 1 Mpc.
- The most extreme value of $|\Delta s_{\rm
-BCG}|$ in our study is 2.3 Mpc for the full samples but it is clearly a
-mismatch to a substructure.  
+\cite{Cui2015}, using 184 galaxy clusters with M$ > 10^{14}$ M$_\odot$ in a
+N-body and hydrodynamical cosmological simulation suite powered by GADGET-3, 
+% simulation suite with two types baryonic feedback prescription models,
+% including radiative cooling, start formation and supernovae feedback, but one with feedback from Active
+% Galactic Nuclei (AGN) and one without, \cite{Cui2015} 
+also identified the maximum smoothed particle hydrodynamical (SPH) density peak with various summary location of
+the galaxy population of their cluster samples. \cite{Cui2015} found
+most offsets between BCGs and the most gravitationally bound particle to be
+mostly below 10 $h^{-1}$ kpc. They also reported some extreme outliers 
+spanning up to several hundred $h^{-1}$ kpc due to disturbed cluster morphology. Our 
+tight 68-th percentile of 
+$\Delta y_{\rm BCG}$ at $ \pm 3$ kpc gives some confidence that 
+we have identified most of the BCGs correctly in the Illustris simulation.
+Note that by subsetting to only consider relatively relaxed clusters, 
+there is a tight maximum bound $\pm$19 kpc for $\Delta y_{\rm BCG}$ in our study. 
 
-Despite strong pieces of evidence showing that the BCG having the tightest
-$\Delta s$, a unique BCG does not always exist for a cluster (or the subcluster).   
- The luminosity peak shows promise as a reliable second candidate as the proxy
- of the DM peak, especially when there is no clear BCG candidate. 
- When there is not enough time
-for BCGs to merge and form, it makes sense to trace the possible progenitors of
-the BCG, which are the bright galaxies in the dense region of the galaxy distribution. 
+The distributions of $\Delta s_{\rm BCG}$ derived from simulations, in general, 
+are tighter than most observational studies  
+For example, \cite{Oguri2010} have analyzed 25 X-ray luminous 
+massive galaxy clusters of the LoCuSS survey. 
+Observations were performed with a large FOV ($\sim 3 h^{-1}$ Mpc) 
+using the Subaru Suprime Camera. 
+By fitting elliptical NFW models to the weak lensing data, \cite{Oguri2010}
+showed a long tail
+ distribution for $\Delta s_{\rm BCG}$, which they fit with two 2D Gaussians.
+The first tighter 2D Gaussian had a standard deviation being 90
+$h^{-1}$ kpc for describing the
+offset for most clusters, the long tail spans around 1 Mpc was fit by a second 2D
+Gaussian with a standard deviation of 420 $h^{-1}$ kpc.
+
+One major source of uncertainties for computing $\Delta s_{\rm BCG}$ is the
+misidentification of BCG.
+To see the effects of misidentifications of 
+BCGs, some studies have made use of N-body hydrodynamical cosmological
+simulations to compute the 2D distances between the BCG and 
+the second most massive galaxies. \cite{Johnston2007b} and 
+\cite{Hilbert2010} (using the Millenium simulation)  found 
+the one sigma level offsets at 380 $h^{-1}$ kpc, and 410 $h^{-1}$ kpc 
+respectively. 
+
+Another source of uncertainty for $\Delta s_{\rm BCG}$ was from lensing. 
+\cite{Dietrich2012} performed an analogous analysis to \cite{Oguri2010} 
+using the N-body Millenium Run (MR) simulation.
+They showed that a combination of shape noise and modeling choices 
+alone can lead to hundred-kpc-level offsets between the most bound particle 
+(proxy of the BCG) and the lensing peak.  
+\cite{Dietrich2012} ray-traced through the DM substructures in the MR simulation 
+as mock lensing observation of 512 clusters.  
+Without any smoothing and shape noise, \cite{Dietrich2012} showed 
+90\% of the lensing peak and the 
+most bound particle, which is a proxy for the BCG, agree to 2.0 $h^{-1}$ kpc. 
+With shape noise,
+even at the source galaxy density of space-based quality optical data of n = 80
+arcmin$^{-1}$, fitting NFW halos and using the center as the DM gave the
+mode of the $|\Delta s_{\rm BCG}|$ distribution to be around 9 arcsecs (this is
+approximately the 1 standard deviation estimate in 2D).
+Lowering the source galaxy density to 30 arcmin$^{-1}$ increased the mode
+to 22 arcsec with a 95-th percentile at 85 arcsec 
+($\sim 90$ kpc and $\sim 400$ kpc at z = 0.3, comparable to \cite{Oguri2010}). 
+In addition, \cite{Dietrich2012} showed that smoothing resulted 
+in an offset distribution with the mode at
+15 arcsec in the presence of shape noise ($\sim 60$ kpc at z = 0.3). 
+The offsets do not simply depend on the smoothing bandwidth, 
+but also the number density of the source galaxies that are lensed. 
+While the uncertainty from smoothing the DM map is
+relatively unimportant in the Illustris analysis due to the very high resolution 
+of the DM particles than sparser source galaxies for lensing, it explains why 
+the bootstrapped uncertainties from the observed
+DM peak need to be accounted for during the comparison between the
+Illustris results and observations.
+
+Now we turn to exploring complementary methods for summarizing
+the galaxy population of a cluster, and show that observations in general agree 
+that the luminosity peak is the second best choice.
+A unique BCG does not always exist for a cluster (or the subcluster).   
+Bright galaxies in the dense region of the cluster are the possible progenitors 
+of the BCG and therefore a reasonable choice when there is no unique BCG. 
 \cite{George2012a}, for example, examined 129 X-ray selected non-merging galaxy 
 groups in the COSMOS field.
 They found that around 20\% to 30\% of groups have non-negligible discrepancies
-between different galaxy centers. 
+between different galaxy centroids. 
 By stacking on a bright galaxy near the X-ray centroid, they found  
 the resulting lensing strength is higher than the stacked lensing signal based
 on other galaxy centroids, including the BCG. 
 For groups with clear BCG candidate, \cite{George2012a} gave the range of
-offset between the BCG and the assumed halo center as $\lesssim 75 kpc$. 
-The luminosity peaks from the Illustris samples show a much tighter offset to the 
+offset between the BCG and the assumed halo center as $\lesssim 75$ kpc. 
+The KDE peaks from the luminosity maps of the Illustris samples show a much 
+tighter offset to the 
 lensing center than any other centroids that \cite{George2012a} investigated. 
 The weighted or unweighted centroid measurement from \cite{George2012a} has a 
 typical offset magnitude with standard deviation at 50 - 150 kpc from the
@@ -1419,7 +1471,8 @@ In comparison, the median (26 kpc), mean (37 kpc), standard deviation (35 kpc)
 and 75-th percentile (49 kpc) of 
 $|\Delta s_{\rm KDE}|$ from all the Illustris samples are all below 50 kpc. 
 
-We attribute the small amount of population bias of $\Delta s_{\rm KDE}$ 
+We attribute the small amount of population bias of $\Delta s_{\rm KDE}$ in our
+analysis due 
 to cross validation. Not only does the algorithm help
 determine the width, but also the optimal eigenvector direction of 
 the bandwidth matrix. 
@@ -1432,110 +1485,67 @@ avoid setting the bandwidth to fit the preconception of how the density
 contours of the cluster 
 should look like, and inadvertently biasing $\Delta s$.
 
-Although observational constraints may cause luminosity peak not to work as
-accurately as  advertised in this paper, 
-there is observational evidence that reaffirm that luminosity peaks can
-closely trace DM overdensities in real life.
-Using 10 000 Sloan Digital Sky Survey (SDSS) clusters in the GMBCG cataloygue, \cite{Zitrin2012}
-performed automated strong lensing (SL) analysis to determine a proxy for DM
-peak from galaxy data and compared them to the location of BCG. 
-Most cluster were observed with a small FOV of around 78 - 110 $h^{-1}$ kpc$^2$.
-The richness of the clusters span from several members to 150 members. 
-After testing for different degrees of smoothing polynomials carefully and an
-assumed power law spatial distribution of galaxies, \cite{Zitrin2012} found a
-24-th degree spline interpolation to best fit the galaxy data for a
-luminosity map.
-They found such close agreement between the densest luminosity peak
-(proxy of DM peak) and the BCG. The mode of the distribution of offset
-magnitude between the BCG and the luminosity peak is $\sim$ 4.2 $h^{-1}$ kpc, after removing
-a second artifact offsets peak at around the size of the FOV.
-Using the luminosity peak as a proxy of the DM peak, \cite{Zitrin2012}
-were able to recover strong lensing arcs. 
-% Despite the removal of outliers, 
-% \cite{Zitrin2012} reported a long tail spanning
-% $\sim$ 1 $h^{-1}$ Mpc. 
+% The feasibility of using luminosity peak as a complementary method to represent
+% the galaxy population has also been verified in observations.
+% Using 10 000 Sloan Digital Sky Survey (SDSS) galaxy groups and clusters 
+% in the Gaussian Mixture Brightest Cluster Galaxy (GMBCG) catalog \citep{Hao2009},
+% \cite{Zitrin2012} were able to use the smoothed luminosity maps of the red-sequence 
+% galaxies to locate the BCG, which the authors assumed to be the proxy of the DM peak. 
+% The richness of the groups range from tens of members to around 160 members. 
+% After optimizing the different degrees of smoothing polynomials and 
+% assuming a power-law spatial distribution of galaxies, \cite{Zitrin2012} found
+% a 24-th degree spline interpolation to best fit the galaxy data within a small
+% assumed FOV of
+% 120 arcsec$^{2}$  for a luminosity peak. (This FOV translates to 
+% $\sim$ 110 $h^{-1}$ kpc$^2$ for the redshift range in the
+% paper \citealt{Zitrin2012}). The densest luminosity peak from the spline interpolation had 
+% a very close agreement with the identified BCG those mode is $\sim$ 4.2
+% $h^{-1}$ kpc after removing 12\% of outliners those offsets are about as wide
+% as the FOV. 
+
 % There are also possible differences in the accuracy of our peak
 % estimation method and other studies. 
 % The population mid-variance of $\Delta y_{\rm KDE}$, which quantifies the
 % population bias from the DM peak estimation, is 23 kpc (the 68-th percentile is
 % $\pm$ 25 kpc).
 
-Finally, we have estimated the tight distribution of $\Delta s_{\rm BCG}$ and
-$\Delta s_{\rm KDE}$, from visualization, 
-For the BCG to work well for stacking, there needs to be rotational symmetry
-about the BCG. 
-we find neither of those galaxy summary statistic can
-characterize some of the asymmetrical or elongated 
-cluster distribution well for stacking. 
-Some clusters with noticeable substructures 
-do not fit the spherical or elliptical approximations that are often assumed 
-for clusters. 
-Both BCG and luminosity peak often land on top of one of the dense subcomponents. 
-The weighted centroids,  
-which are the proxies for the center of mass, on the other hand, 
-often land between dense substructures.
-Quoting the mass within a fixed radius may force the mass distribution to conform
-to the spherical / elliptical model assumption.  
+% Finally, we have estimated the tight distribution of $\Delta s_{\rm BCG}$ and
+% $\Delta s_{\rm KDE}$, from visualization, 
+% For the BCG to work well for stacking, there needs to be rotational symmetry
+% about the BCG. 
+% we find neither of those galaxy summary statistic can
+% characterize some of the asymmetrical or elongated 
+% cluster distribution well for stacking. 
+% Some clusters with noticeable substructures 
+% do not fit the spherical or elliptical approximations that are often assumed 
+% for clusters. 
+% Both BCG and luminosity peak often land on top of one of the dense subcomponents. 
+% The weighted centroids,  
+% which are the proxies for the center of mass, on the other hand, 
+% often land between dense substructures.
+% Quoting the mass within a fixed radius may force the mass distribution to conform
+% to the spherical / elliptical model assumption.  
 
-Our study is complementary to other cosmological simulations in understanding
-the effects of assuming different centers for galaxy clusters. 
-In particular, some studies using N-body hydrodynamical cosmological
-simulations have tried to characterized the 2D distances between the BCG and 
-the second most massive galaxies, to see the effects of misidentifications of 
-BCGs.  \cite{Johnston2007b} and 
-\cite{Hilbert2010} (using the Millenium simulation)  found 
-the one sigma level offsets at 380 $h^{-1}$ kpc, and 410 $h^{-1}$ kpc 
-respectively. 
+% Our study is complementary to other cosmological simulations in understanding
+% the effects of assuming different centers for galaxy clusters. 
 
-\cite{Cui2015}, using 184 galaxy clusters with M$ > 10^{14}$ M$_\odot$ in a
-cosmological simulation suite powered by GADGET2 and GADGET3, 
-% simulation suite with two types baryonic feedback prescription models,
-% including radiative cooling, start formation and supernovae feedback, but one with feedback from Active
-% Galactic Nuclei (AGN) and one without, \cite{Cui2015} 
-also identified the maximum smoothed particle hydrodynamical (SPH) density peak with various summary location of
-the galaxy population of their cluster samples. \cite{Cui2015} found
-most offsets between BCGs and the most gravitationally bound particle to be
-mostly below 10 $h^{-1}$ kpc. They also reported  some extreme outliers 
-spanning up to several hundred $h^{-1}$ kpc due to disturbed cluster morphology. Our 
-tight 68-th percentile of 
-$\Delta y_{\rm BCG }$ at $ \pm 3$ kpc gives some confidence that 
-we have identified most of the BCGs correctly in the Illustris simulation.
 
-So far, we have showed and discussed that there are several possible
-causes for the offsets, including the summary 
-methods for the galaxy population and how substructures affect the different
-inference methods. There is one other potential source of major contribution to the
-offset. 
-\cite{Dietrich2012} ray-traced through the DM substructures in the N-body 
-Millennium Run simulation as mock lensing observation for 512 clusters.  
-They showed that a combination of shape noise and 
-smoothing alone can lead to offsets between the most bound particle and the
-lensing peak. The offsets do not simply depend on the smoothing bandwidth, 
-but also the number density of the source galaxies that are lensed. 
-Even at the source galaxy density of space-based optical data of n = 80
-arcmin$^{-1}$, smoothing can cause an offset distribution with the mode at
-15 arcsec in the presence of shape noise ($\sim 60$ kpc at z = 0.3). 
-Using NFW
-halo centers as the DM peak on the Millenium Run simulation data, they showed
-that fitting NFW halos can also have comparable distribution of offsets
-from the most bound particle (the mode of the distribution at 9 arcsecs
-; \citealt{Dietrich2012}). 
-While this source of uncertainty is
-relatively unimportant in this analysis due to the very high resolution of the
-DM particles than sparser source galaxies for lensing, it explains why the uncertainties from the smoothing of the observed
-DM convergence maps need to be accounted for during the comparison between the
-Illustris results and observations.
-
-Any other morphological features from the smoothed DM map will be subject 
-to uncertainty of similar order of magnitude as the peak
-estimate, but with possibly lower signal-to-noise than the peak. 
-There is also a risk of seeing substructures that mimic the sought-after 
-morphological patterns. After all, other cosmological experiments 
-that have shown
-that it is possible to detect patterns once scientists look hard enough, 
-such as the initials of Stephen
-Hawking in the seventh-year Wilkinson Microwave Anisotropy Probe (WMAP) 
- Cosmic Microwave Background data \citep{Bennett2011}.
+% So far, we have showed and discussed that there are several possible
+% causes for the offsets, including the summary 
+% methods for the galaxy population and how substructures affect the different
+% inference methods. There is one other potential source of major contribution to the
+% offset. 
+% 
+% Any other morphological features from the smoothed DM map will be subject 
+% to uncertainty of similar order of magnitude as the peak
+% estimate, but with possibly lower signal-to-noise than the peak. 
+% There is also a risk of seeing substructures that mimic the sought-after 
+% morphological patterns. After all, other cosmological experiments 
+% that have shown
+% that it is possible to detect patterns once scientists look hard enough, 
+% such as the initials of Stephen
+% Hawking in the seventh-year Wilkinson Microwave Anisotropy Probe (WMAP) 
+%  Cosmic Microwave Background data \citep{Bennett2011}.
   
 \subsection{Comparison to staged simulations with SIDM}
 Staged simulation are valuable, ideal experiments for probing contribution
