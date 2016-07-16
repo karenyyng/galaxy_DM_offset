@@ -14,31 +14,6 @@
  		newCenter = weighted mean value of new data along each spatial dimension 
 	}   \hrulefill
 \end{algorithm}
-\section{Statistical aspect of representing the distribution of offsets}
-
-Another statistical aspect that needs attention for computing the
-significance level is the interpretation of the 
-projections. 
-We interpret the projections as the possible ways for observing 
-cluster of the Illustris simulation. 
-However, we also need to preserve the mass abundance of clusters, i.e. number
-of clusters in a certain cluster mass range. 
-When we try to draw conclusions from the full sample of the clusters with all
-the projections, the mass abundance is consistent with the original simulation. 
-However, when we subset the samples, the mass abundance will deviate.  
-
-If we assume the chosen projection of each cluster 
-to have negligible dependence of the projection of another cluster, the ways to
-choose all the projections proceed as follows:
-For each of the 43 clusters, there are 768 projections to draw from, 
-giving $768^{43}$ combinations of possible observations of the 
-Illustris simulation, which is a daunting number. In fact, the number of
-possible observations is daunting even
-if we reduce the number of projections per cluster to only 12, giving $12^{43}$
-possible observations. 
-We therefore pick a few special cases to discuss while keeping in mind that  
-the mass abundance should be preserved. 
-
 \begin{figure*}
 	\begin{center}
 	\includegraphics[width=0.7\linewidth]{Mass_abundance_relationship.pdf}
