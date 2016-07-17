@@ -116,7 +116,8 @@ foundation showing which observable would be the most sensitive to each
 possible type of SIDM. In fact, \cite{Kahlhoefer14} have argued that SIDM 
 does not cause
 significant offsets between the galaxy and DM peaks, and only cause an offset
-between the corresponding centroids for [TODO] a brief period of time after a merger. 
+between the corresponding centroids within the dynamical timescale for
+relaxation ($\sim$ several Gyr). 
 % To access if the offsets we observe is
 % completely explained by the method for computing the offset, we investigate   
 % the precision to which we can find the galaxy-DM offsets.  
@@ -251,7 +252,7 @@ includes star formation rate, and stellar evolution due to
 environmental effects of the intracluster medium, such as ram pressure stripping and
 strangulation and feedback from Active Galactic Nuclei (AGN) etc. \citep{Genel2014a}.
 The physics of stellar
-evolution were solved using a moving mesh code {\bf \texttt{AREPO}} \citep{Springel2010}.
+evolution were solved using a moving mesh code {\sc{AREPO}} \citep{Springel2010}.
 The observable properties of galaxies were statistically consistent
 with the Sloan Digital Sky Survey (SDSS) data
 \citep{Vogelsberger2014}. 
@@ -273,7 +274,7 @@ in a realistic, yet noise-free way. The softening length of the DM particles is
 
 The two sets of data catalogs in use are obtained through two types of halo
 finders. The catalog that maps particles to the halo of a certain cluster was 
-created by the {\bf \texttt{SUBFIND}} algorithm. The friends-of-friends (FoF) 
+created by the {\sc{SUBFIND}} algorithm. The friends-of-friends (FoF) 
 finder \citep{Davis1985} was further used to identify the affinity
 of galaxy-sized halos to a galaxy-cluster. 
 These galaxy-size halos are referred to as {\it subhalos} and 
@@ -371,18 +372,18 @@ discussed as results  & \ref{subsubsec:projections}\\
 \end{center} 
 \end{table*}
 
-We make use of the {\bf \texttt{SUBFIND}} member particle for the DM and the 
-{\bf \texttt{FoF}} subhalo identification as our
+We make use of the {\sc{SUBFIND}} member particle for the DM and the 
+{\sc{FoF}} subhalo identification as our
 default volume selection scheme for each cluster / group.
 We understand that this choice of volume selection can be more ideal than
 observational conditions. We make use of this volume selection scheme
 for baseline comparisons. 
 
 Assuming a conservative line-of-sight (los) distance 
-, i.e. cosmological redshift, with [TODO] $z = 0.3$, 
+, i.e. cosmological redshift, with  $z = 0.3$, 
 the projected extent for most of the Illustris galaxy clusters and groups, 
 fits inside the field of view of telescopes, such as the Subaru Suprime Camera,
-which covers a physical area of [TODO] $\sim 9$ Mpc $\times 7$ Mpc 
+which covers a physical area of $\sim 9$ Mpc $\times 7$ Mpc 
 (See \href{https://goo.gl/ClZNvM}{https://goo.gl/ClZNvM} for a Jupyter notebook 
 showing the extent of the Dark Matter distribution of the most massive 129
 clusters).
@@ -405,9 +406,9 @@ non-commutative, we first project the data before estimating any projected
 observable. 
 The computation of even angular orientation 
 is done by using HealPy, which is a Python wrapper for
-{\bf \texttt{HEALPix}} \footnote{HEALPix is
+{\sc{HEALPix}} \footnote{HEALPix is
 currently hosted at http://healpix.sourceforge.net}
-\citep{Gorski2005}. Each line-of-sight centers on a {\bf \texttt{HEALPix}} 
+\citep{Gorski2005}. Each line-of-sight centers on a {\sc{HEALPix}} 
 pixel.
 The number of projections that we employed is 768 for each cluster. With around 
 768 projections, the offset distributions of each cluster start to converge to a
@@ -547,9 +548,9 @@ Then it is possible to estimate and minimize the asymptotic mean-integrated squa
 for the best set of bandwidth matrix values, eliminating any free parameter. 
 
 Specifically, we made use of the smoothed-cross validation \citep{Hall1992} 
-bandwidth selector in the statistical package {\bf \texttt{ks}} \citep{Duong2007} 
-in the {\bf \texttt{R}} statistical computing environment \citep{R_core}. 
-Among all the different {\bf \texttt{R}} packages, {\bf \texttt{ks}} is the
+bandwidth selector in the statistical package {\sc{ks}} \citep{Duong2007} 
+in the {\sc{R}} statistical computing environment \citep{R_core}. 
+Among all the different {\sc{R}} packages, {\sc{ks}} is the
 only package capable of handling the magnitude weights of the data points 
 while inferring the density estimates \citep{Deng2011}. 
 Although the particular implementation of KDE has a computational runtime of $O(n^2)$, 
@@ -622,14 +623,14 @@ We used the $i-$band to pick the BCG for computing the plots and the final resul
 	The left column shows how 50 data points drawn from the fixed number of 
 	Gaussian mixtures look like. 
 	Due to the statistical nature of this exercise, we sampled the data and
-	performed the analyses [TODO: state how many times] many times to
+	performed the analyses 50 times to
 	create the 68\% and 95\% Monte Carlo confidence contours of the estimates in the
 	zoomed-in view of the data in the middle
 	column. The rightmost column shows how the size (median contour radius) 
 	of the confidence regions vary as a
 	function of the number of drawn data points from the Gaussian mixtures. 
 	From the middle and the rightmost
-	column, we can tell that the KDE peak estimate is the most accurate. [TODO] 
+	column, we can tell that the KDE peak estimate is the most accurate.  
 		\label{fig:toy_data_mixtures}}
 \end{figure*}
 
@@ -692,7 +693,7 @@ There are resolution differences between the smoothed and unsmoothed DM
 maps. The unsmoothed histograms tend to show many more local maxima around the major
 density peaks (i.e. show high variance). 
 The number of DM particles for each cluster is of 
-[TODO double check] the order of millions and densely packed in the region of
+the order of millions and densely packed in the region of
 interest. 
 Physically, the smoothed histograms of the dark matter of each cluster 
 is analogous to a convergence map from a lensing analysis. 
@@ -748,11 +749,8 @@ between the DM peaks, and the following spatial estimates, including
 Since there can be more than one number density peak from the corresponding KDE
 map, we also use a KD-tree to location the closest number density peak to the 
 identified DM peak.
-
-[TODO] Figure out how the Illustris simulation figure out the most bound 
-particle.
 The most bound particle is the location with minimum 
-gravitational potential of the {\bf \texttt{Subfind}} identified cluster.
+gravitational potential of the {\sc{Subfind}} identified cluster.
 Due to substructures, it is possible for there to be several minima of similar 
 gravitational potential level. 
 
@@ -864,7 +862,7 @@ location (analogous to the median)
 and the midvariance (robust standard deviation
 estimate). The biweight statistics are less susceptible to the effects of
 outliers \citep{Beers90}. We compute the robust statistics using the implementation
-from \cite{astropy} as part of {\bf \texttt{astropy}}. 
+from \cite{astropy} as part of {\sc{astropy}}. 
 
 In following sections of this paper, we use $\Delta {\bf s}$  to represent the
 two-dimensional offsets, $|\Delta {\bf s}|$ for the magnitude of the offset as calculated
@@ -1120,8 +1118,6 @@ sample and the unrelaxed sample exhibit noticeable asymmetry,
 but not the relaxed samples.
 Some field of views of the same cluster can be similar and happen to project the
 cluster along its longest extent.
-[TODO verify] It is likely that elongated clusters, such as cluster 7, and cluster 33,
-are responsible such asymmetry.
 We do not cut off the outliers nor fit any distribution to the $\Delta y_{\rm
 BCG}$. This is because the tight peak of 3 kpc is probably due to numerical noise, 
 (the softening length is around 1.4 kpc). There may not be a physical reason
@@ -1209,7 +1205,7 @@ We use the Pearson product-moment correlation coefficient to quantify linear
 relationship between the pairs of variables. 
 (aka Pearson's r,  hereafter $\rho$)
 We describe the significance of the correlation 
-based on the p-value reported by {\bf \texttt{Scipy}} of seeing the level of 
+based on the p-value reported by {\sc{Scipy}} of seeing the level of 
 correlation by chance assuming the pair of 
 quantities have no correlation. If the p-value is greater than 0.1, we call the
 correlation as insignificant.
@@ -1567,7 +1563,6 @@ should look like, and inadvertently biasing $\Delta s$.
 % population bias from the DM peak estimation, is 23 kpc (the 68-th percentile is
 % $\pm$ 25 kpc).
 
-[TODO revise this paragraph]
 % Finally, we try to conclude this subsection by discussing how the offset 
 % information of different summary statistic of a cluster can help center the cluster for
 % stacked lensing analysis. 
@@ -1758,8 +1753,9 @@ We have shown that
 Karen Ng would like to thank Professor Thomas Lee for the helpful discussion of 
 the construction of the p-value hypothesis test. 
 Part of the work before the conception of this paper was discussed during 
-the AstroHack week 2014. 
-This work was performed under HST grant (TODO ask Dave for grant
+the AstroHack week 2014. This work made used of {\sc IPython}
+\citep{Perez2007}.
+Part of this work was performed under HST grant (TODO ask Dave for grant
 number). 
 % 
 % 
