@@ -1,88 +1,257 @@
-\section{Algorithm of the Shrinking aperture estimates}
-\label{app:shrink_apert}
-\begin{algorithm}
-	\caption{Shrinking aperture algorithm with luminosity weights}
-	\KwData{subhalo that satisfy cuts as a galaxy}
-	 \hrulefill \\
-
-	 initial aperture centroid = weighted mean galaxy location in each spatial dimension\\
- 	distance array = euclidean distances between initial aperture center and each galaxy
-	location \\
- 	aperture radius = 90th percentile of the weighted distance array\\ 
-	\While{ (newCenterDist - oldCenterDist) / oldCenterDist $\geq$ 2e-2}{
- 		new data array = old data array within aperture\\
- 		newCenter = weighted mean value of new data along each spatial dimension 
-	}   \hrulefill
-\end{algorithm}
+\section{DEFAULT WEIGHTS USED FOR DAWSON'S MONTE CARLO SIMULATION}
+\label{app:priors}
+The default weight that we employed can be summarized as
+follows for most of the output variables: 
+\begin{equation}
+	w(v_{3D}(t_{\rm per})) = 0\text{ if }v_{3D}(t_{\rm per}) >
+	v_{\text{free fall}}. 
+\end{equation}
+\begin{equation}
+	w(TSP_{\rm out}) = 
+	\begin{cases}
+		& \text{const}~\text{if }TSP_{\rm out} < \text{age of universe at } z=0.87	\\
+		& 0~\text{otherwise}.
+	\end{cases}
+\end{equation}
+In addition, we apply the following weight on $TSP_{\rm ret}$:
+\begin{equation}
+	w(TSP_{\rm ret}) = 
+	\begin{cases}
+		& \text{const}~\text{if }TSP_{\rm ret} < \text{age of universe at } z=0.87	\\
+		& 0~\text{otherwise} \label{eqn:TSM_1}.
+	\end{cases}
+\end{equation}
+To correct for observational limitations, we further convolved the
+posterior probabilities of the different realizations with 
+\begin{equation}
+	w(TSP_{\rm out} | T) = 2 \frac{TSP_{\rm out}}{T},
+\end{equation}
+to account for how the subclusters move faster at lower $TSP$ and thus it
+is more probable to observe the subclusters at a stage with a larger $TSP$.
+\par 
+\section{PLOTS OF OUTPUTS OF THE MONTE CARLO SIMULATION}
+We present the PDFs of the inputs of the dynamical simulation and the
+marginalized PDFs of the outputs after applying the polarization weight in
+addition to the default weights. See Fig.~\ref{fig:plot_config} for explanations of
+the order that we present the figures containing the PDFs . 
+\begin{figure}
+	\begin{center}
+	\includegraphics[width=\linewidth]{ElGordo_plot_config.png}
+	\end{center}
+	\caption{Matrix of variables used in the simulations. We present them in
+	4 categories, including, inputs, geometry, time and velocity. Regions of
+	the same color represent one plot and the number
+indicates the corresponding figure number in this appendix.
+\label{fig:plot_config}
+}
+\end{figure}
+\label{app:results}
+%%%%%%%%%%%%% TASK --- 
+\clearpage
 \begin{figure*}
+	\begin{minipage}{180mm}
 	\begin{center}
-	\includegraphics[width=0.7\linewidth]{Mass_abundance_relationship.pdf}
-	\caption{Cumulative distribution of clusters above a certain mass threshold
-		for different samples.
-		Each distribution is normalized to the sample size.
-		The unrelaxed samples $1.2 < \nu < 2.2$ 
-		If the subsets have the same cluster mass abundance as the full sample,
-		the three plots should lie on top of one another.
-		\label{fig:mass_abundance_distribution}
-	}
-\end{center}
+	\includegraphics[width=0.65\linewidth]{TwoMnWBSG_inputsVsinput.png}
+	\caption{Marginalized 2-dimensional PDFs of original inputs (vertical axis) 
+		and the inputs after applying polarization weight and default weights 
+		(horizontal axis). The inner and outer contour
+denote the central 68\% and 95\% confidence regions respectively.
+The circular contours show that the application of weights did not introduce
+uneven sampling of inputs. }
+	\end{center}
+	\end{minipage}
 \end{figure*}
- 
-
-\section{Table of results}
-\label{app:table_of_results}
-\begin{landscape}
-\begin{table}
-	\begin{center}
-	\caption{Properties of the clusters used in the analysis. Richness is
-	computed based on $i-$band $< 24.4$ assuming $z=0.3$.\label{tab:cluster_prop}}
-	\input{clst_prop_table.tex}
-\end{center}
-\end{table}
-\end{landscape}
-
 \begin{figure*}
+\begin{minipage}{180mm}
 	\begin{center}
-	\includegraphics[width=0.85\linewidth]{fig8_total_normalized_peak_density.pdf}
-	\caption{A box plot showing the distribution of the total normalized peak density 
-		for each cluster 
-		based on 768 projections. The red line shows the median of the projections,
-		the box encompasses the 25\% and 75\% percentile of the distribution while
-		the whiskers mark the 5\% and the 95\% percentile. The other black crosses
-		are data points with extreme values beyond the 5\% and 95\% percentile.
-		\label{fig:total_peak_dens_distribution}
+	\includegraphics[width=0.5\linewidth]{TwoMnWBSG_tri_geo.png}
+	\caption{One-dimensional marginalized PDFs (panels on the diagonal) and
+		two-dimensional marginalized PDFs of variables
+		denoting characteristic distances and projection angle of the mergers.
+	\label{fig:geom_geom}
 	}
-\end{center}
+	\end{center}
+	\end{minipage}
+\end{figure*}
+\begin{figure*}
+\begin{minipage}{180mm}
+	\begin{center}
+	\includegraphics[width=0.7\linewidth]{TwoMnWBSG_geoVSinputs.png}
+	\caption{Marginalized PDFs of characteristic distances and projection
+		angle of the merger and the inputs of the simulation.}
+	\end{center}
+	\end{minipage}
+\end{figure*}
+\begin{figure*}
+\begin{minipage}{180mm}
+	\begin{center}
+	\includegraphics[width=0.5\linewidth]{TwoMnWBSG_tri_time.png}
+	\caption{One-dimensional PDFs of characteristic timescales of the simulation
+(panels on the diagonal) and the marginalized PDFs of different
+timescales. Note that there is a default weight for constraining $TSP_{\rm out}$ but
+not for $TSP_{\rm ret}$ and $T$, so $TSP_{\rm out}$ spans a smaller range.}
+	\end{center}
+\end{minipage}
+\end{figure*}
+\begin{figure*}
+\begin{minipage}{180mm}
+	\begin{center}
+	\includegraphics[width=0.5\linewidth]{TwoMnWBSG_timeVsgeo.png}
+	\caption{Marginalized PDFs of characteristic timescales of the simulation
+and the characteristic distances and the projection angle of the merger. }
+	\end{center}
+\end{minipage}
+\end{figure*}
+\begin{figure*}
+\begin{minipage}{180mm}
+	\begin{center}
+	\includegraphics[width=0.7\linewidth]{TwoMnWBSG_timeVSinput.png}
+	\caption{Marginalized PDFs of characteristic timescales of the simulation
+and the inputs.}
+	\end{center}
+\end{minipage}
+\end{figure*}
+\begin{figure*}
+\begin{minipage}{180mm}
+	\begin{center}
+	\includegraphics[width=0.5\linewidth]{TwoMnWBSG_tri_vel.png}
+	\caption{One-dimensional marginalized PDFs of velocities at
+	characteristic times (panels on the diagonal) and marginalized PDFs of
+different velocities.}
+	\end{center}
+\end{minipage}
+\end{figure*}
+\begin{figure*}
+\begin{minipage}{180mm}
+	\begin{center}
+	\includegraphics[width=0.5\linewidth]{TwoMnWBSG_velVStime.png}
+	\caption{Marginalized PDFs velocities and the characteristic timescales
+	of the simulation against the inputs.}
+	\end{center}
+\end{minipage}
+\end{figure*}
+\begin{figure*}
+\begin{minipage}{180mm}
+	\begin{center}
+	\includegraphics[width=0.5\linewidth]{TwoMnWBSG_velVSgeo.png}
+	\caption{Marginalized PDFs of the velocities at characteristic timescales
+		and the characteristic distances and the projection angle of the merger. }
+	\end{center}
+\end{minipage}
+\end{figure*}
+\begin{figure*}
+\begin{minipage}{180mm}
+	\begin{center}
+	\includegraphics[width=0.7\linewidth]{TwoMnWBSG_velVSinputs.png}
+	\caption{Marginalized PDFs of relative velocities characteristic
+	timescales of the simulation and the inputs.}
+	\end{center}
+\end{minipage}
 \end{figure*}
 
+\section{COMPARISON OF THE OUTGOING AND RETURNING SCENARIO}
+\label{app:Bayes_factor}
+Here, we compare the different merger scenarios using the two relics
+independently and show that they consistently give the conclusion that the returning
+scenario is favored for the plausible range of $\beta$. For each merger
+scenario, we compute
+the (marginalized) probability of producing simulated
+values ($s_{proj}$) compatible with the observed location of the radio
+relic ($s_{obs}$). 
 
-\begin{table*}
-	\begin{center}
-	\caption{Summary statistic characterizing the offset distributions
-		between the most bound particle and various summary statistics of 
-		the member galaxy population.
-	\label{tab:most_bound_particle_offset_distributions}}
-	\input{most_bound_particle_table.tex}
-\end{center}
-\small{The offsets represented with the prime $'$ symbols are estimated using the luminosity weighted galaxy 
-data.}
-\end{table*}
+Quantitatively, we want to compute and compare the probability:  
+\begin{align} 
+	&P(s_{proj} \text{ compatible with }s_{obs} | M)  \label{eqn:prob}\\
+	&=\iint f(S_{proj} \cap S_{obs} | M, \beta) f(\beta | M) d s_{proj} d\beta\\
+	&=\iint  f(s_{proj}|M, \beta) f(s_{obs}) f(\beta | M) d s_{proj}
+	d\beta, 
+\end{align}
+where $f$ indicates the corresponding PDF, $M$
+represents one of the merger scenarios, and $\beta$ is defined in equation
+~\ref{eqn:NW_speed}, $s_{proj} \in S_{proj}$ and $s_{obs} \in S_{obs}$. 
+We set our priors set to be uniform for the marginalization: 
+\begin{equation}
+	f(\beta | M_{ret}) = f(\beta | M_{out}) =  
+	\begin{cases}
+		& \text{const}~\text{if } 0.7 \leq \beta \leq 1.5 \\
+		& 0~\text{otherwise}.
+	\end{cases}
+\end{equation}
+which is more conservative than the most likely range of $\beta$, which is
+$0.7 < \beta < 1.1$.
+We found: 
+\begin{align}
+	&P(S_{proj} \cap S_{obs} | M_{ret}) / P(S_{proj} \cap S_{obs} |
+	M_{out})\\
+	&=
+ \begin{cases}
+  2.1 \text{ for the NW relic},\\
+  460 \text{ for the SE relic},
+ \end{cases}
+\end{align}
+which shows that the returning scenario is favored over the outgoing
+scenario. 
 
+This test quantity differs from the traditional hypothesis testing or model comparison in several ways: 
+\begin{enumerate}
+\item we did not compute a likelihood function.  We have adopted
+non-parametric PDFs in our Monte Carlo simulation,i.e. there is no well-known
+functional form of the likelihood in our context. We make use of
+$f(S_{proj} \cap S_{obs})$ to penalize the simulated values being different from our observed data
+\item with this quantity, we are not asking whether the expected value of
+	the radio relic such as the mean or median from each model match the
+	observation best. Those estimators take into account the values that do not match the observed location of the radio relic. 
+\item we marginalized the uncertainty in $\beta$ to be as conservative
+	as possible, instead of assuming a fixed value of $\beta$.
+\end{enumerate} \par
+%The second quantity that we compute is the Wald statistic at a range of possible $\beta$ values.
+%Wald statistic is usually used hypothesis testing.
+%Computing the Wald statisic allows us to ask, given a particular model (merger
+%scenario),
+%whether the null value (sample mean) is in the confidence
+%interval \citep{Wasserman04}. The Wald statistic that we compute for each model is: 
+%\begin{align}
+%	W(\beta) = \frac{\bar{s}_{obs} - \mu(\beta)}{\sigma / (n)^{1/2}} 
+%\end{align}
+%where $\bar{x}$ is the sample mean, $\mu(\beta)$, $\sigma$ and $n$ are the
+%population mean, population standard deviation and size of samples of the
+%simulated model respectively. A higher Wald statistic value would represent
+%a larger difference between the observed and model value, while taking into account the model uncertainty. Within the range of
+%most likely $0.7 < \beta < 1.5$, the Wald statistic shows that the observed
+%relic location is more compatible with the confidence interval of the returning
+%scenario. (See Figure~\ref{fig:waldtest})
 
-\begin{table}
-	\begin{center}
-	\caption{Summary statistic characterizing the offset distributions
-		for between the DM peak and the estimated galaxy location. 
-		All 43 clusters and all 768 projections are used in this table. 
-		The highest density values were used for the computation when there were more
-		than one peak value estimated from the KDE.
-	\label{tab:offset_distributions}}
-	\input{full_sum_stat_table}
-\end{center}
-\small{The offsets represented with the prime $'$ symbols are estimated using the luminosity weighted galaxy 
-data.}
-\end{table}
+\begin{figure}
+	\includegraphics[width=\linewidth]{prob_ratio.png}
+	\caption{Probability ratio between the returning model (numerator) and
+		the outgoing model at given $\beta$. We remind readers $\beta$ is a factor
+		relating the {\it time-averaged} shock velocity and the pericenter
+		velocity of the corresponding subcluster.  
+	\label{fig:prob_ratio}}
+\end{figure}
 
+\begin{figure}
+\includegraphics[width=\linewidth]{polar_prior_bounds_E.pdf}
+	\caption{Comparison of the PDFs of the observed position of the SE relic (red bar
+		includes 95\% confidence interval of location of relic in the center of
+		mass frame) with the predicted position from the two simulated merger scenarios (blue for outgoing and green for the returning scenario). 
+	For the plausible values of $\beta < 1.1$, the returning scenario is preferred. 
+	We obtained similar conclusion about the merger scenario as for the NW
+	relic calculation.
+	\label{fig:positionprior_SE}}
+\end{figure}
 
-
-
+\begin{figure}
+	\includegraphics[width=\linewidth]{polar_prior_bounds.pdf}
+	\caption{Comparison of the PDFs of the observed position of the NW relic (red bar
+		includes 95\% confidence interval of location of relic in the center of
+		mass frame) with the	predicted position from the two simulated merger scenarios (blue for outgoing and green for the returning scenario). 
+	For the plausible values of $\beta  < 1.1$, the returning model is
+	preferred. For comparison purpose, we also show that $\beta > 1.3$ (top
+	panel) for the outgoing scenario to be favored.  
+	Note that we made use of the polarization weight for producing this figure. 
+	\label{fig:positionprior}}
+\end{figure}
+\clearpage
+\bsp 
+\

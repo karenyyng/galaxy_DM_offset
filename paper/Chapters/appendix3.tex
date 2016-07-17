@@ -1,0 +1,88 @@
+\section{Algorithm of the Shrinking aperture estimates}
+\label{app:shrink_apert}
+\begin{algorithm}
+	\caption{Shrinking aperture algorithm with luminosity weights}
+	\KwData{subhalo that satisfy cuts as a galaxy}
+	 \hrulefill \\
+
+	 initial aperture centroid = weighted mean galaxy location in each spatial dimension\\
+ 	distance array = euclidean distances between initial aperture center and each galaxy
+	location \\
+ 	aperture radius = 90th percentile of the weighted distance array\\ 
+	\While{ (newCenterDist - oldCenterDist) / oldCenterDist $\geq$ 2e-2}{
+ 		new data array = old data array within aperture\\
+ 		newCenter = weighted mean value of new data along each spatial dimension 
+	}   \hrulefill
+\end{algorithm}
+\begin{figure*}
+	\begin{center}
+	\includegraphics[width=0.7\linewidth]{Mass_abundance_relationship.pdf}
+	\caption{Cumulative distribution of clusters above a certain mass threshold
+		for different samples.
+		Each distribution is normalized to the sample size.
+		The unrelaxed samples $1.2 < \nu < 2.2$ 
+		If the subsets have the same cluster mass abundance as the full sample,
+		the three plots should lie on top of one another.
+		\label{fig:mass_abundance_distribution}
+	}
+\end{center}
+\end{figure*}
+ 
+
+\section{Table of results}
+\label{app:table_of_results}
+\begin{landscape}
+\begin{table}
+	\begin{center}
+	\caption{Properties of the clusters used in the analysis. Richness is
+	computed based on $i-$band $< 24.4$ assuming $z=0.3$.\label{tab:cluster_prop}}
+	\input{Chapters/clst_prop_table.tex}
+\end{center}
+\end{table}
+\end{landscape}
+
+\begin{figure*}
+	\begin{center}
+	\includegraphics[width=0.85\linewidth]{fig8_total_normalized_peak_density.pdf}
+	\caption{A box plot showing the distribution of the total normalized peak density 
+		for each cluster 
+		based on 768 projections. The red line shows the median of the projections,
+		the box encompasses the 25\% and 75\% percentile of the distribution while
+		the whiskers mark the 5\% and the 95\% percentile. The other black crosses
+		are data points with extreme values beyond the 5\% and 95\% percentile.
+		\label{fig:total_peak_dens_distribution}
+	}
+\end{center}
+\end{figure*}
+
+
+\begin{table*}
+	\begin{center}
+	\caption{Summary statistic characterizing the offset distributions
+		between the most bound particle and various summary statistics of 
+		the member galaxy population.
+	\label{tab:most_bound_particle_offset_distributions}}
+	\input{Chapters/most_bound_particle_table.tex}
+\end{center}
+\small{The offsets represented with the prime $'$ symbols are estimated using the luminosity weighted galaxy 
+data.}
+\end{table*}
+
+
+\begin{table}
+	\begin{center}
+	\caption{Summary statistic characterizing the offset distributions
+		for between the DM peak and the estimated galaxy location. 
+		All 43 clusters and all 768 projections are used in this table. 
+		The highest density values were used for the computation when there were more
+		than one peak value estimated from the KDE.
+	\label{tab:offset_distributions}}
+	\input{Chapters/full_sum_stat_table}
+\end{center}
+\small{The offsets represented with the prime $'$ symbols are estimated using the luminosity weighted galaxy 
+data.}
+\end{table}
+
+
+
+

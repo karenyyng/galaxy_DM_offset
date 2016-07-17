@@ -33,7 +33,7 @@ all: $(PROJECT).pdf
 # -interactive=nonstopmode keeps the pdflatex backend from stopping at a
 # missing file reference and interactively asking you for an alternative.
 
-$(PROJECT).pdf:$(PROJECT).tex illustris_main_text.tex illustris_appendix.tex $(FIGURES)
+$(PROJECT).pdf:$(PROJECT).tex $(PWD)/Chapters/chapter3.tex $(PWD)/Chapters/appendix3.tex $(FIGURES)
 	latexmk -pdf -pdflatex="pdflatex -interaction=nonstopmode " -use-make  $(PROJECT).tex 
 
 # make sure that .aux files are not removed since they tell latex 
