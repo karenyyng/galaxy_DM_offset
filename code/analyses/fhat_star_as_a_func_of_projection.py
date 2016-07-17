@@ -29,8 +29,8 @@ output_keys = [
     # "estimate",
     # "bandwidth_matrix_H",
     "shrink_cent",
-    # "centroid",
-    # 'BCG',
+    "centroid",
+    'BCG',
     "peaks_dens",
     "peaks_xcoords",
     "peaks_ycoords"
@@ -41,7 +41,7 @@ assert total_clstNo <=128 and total_clstNo > 0, \
     "0 < total_clstNo <= 128"
 
 output_fhat_filename = \
-    "stars_fhat_clst_no_density_{0}_{1}.h5".format(
+    "stars_fhat_clst_{0}_{1}.h5".format(
         total_clstNo, datetime_stamp)
 logging.basicConfig(filename=logging_filename, level=logging.INFO)
 
@@ -94,12 +94,12 @@ cut_cols = {"mag": "apparent_i_band"}
 metadata["cut"] = {"mag": cut_kwargs}
 
 # weights
-# metadata["weights"] = {
-#     "i_band": getg.mag_to_lum
-#     }
 metadata["weights"] = {
-    "None": None
-}
+    "i_band": getg.mag_to_lum
+    }
+# metadata["weights"] = {
+#     "None": None
+# }
 
 # projections
 # metadata["los_axis"] = [str(1)]  # use y-axis as los axis
