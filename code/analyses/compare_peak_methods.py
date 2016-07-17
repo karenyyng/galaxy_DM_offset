@@ -29,6 +29,13 @@ g_colors = [(0./255, 158./255, 115./255), (0./255, 100./255, 60./255)]
 
 # ------------------data sampling -----------------------------
 
+def get_truth_data_set():
+    return { "gauss": np.array([1., 1.]),
+             "dumb": np.array([2., 2.]),
+             "bimodal": np.array([2., 2.])
+            }
+
+
 def draw_gaussian(mean=np.ones(2),
                   cov=np.eye(2),
                   data_size=300):
@@ -316,17 +323,65 @@ def plot_grid_spec(gauss_data, bimodal_data, dumb_data, f, figsize=(13, 13),
                                  ax=axArr2[2][0])
 
     # first row rightmost column
-    plot_error_as_a_func_of_data_pts(f, "gauss",
+    plot_bias_as_a_func_of_data_pts(f, "gauss",
                                      ax=axArr2[0][1])
-    plot_error_as_a_func_of_data_pts(f, "bimodal",
+    plot_bias_as_a_func_of_data_pts(f, "bimodal",
                                      ax=axArr2[1][1])
-    plot_error_as_a_func_of_data_pts(f, "dumb",
+    plot_bias_as_a_func_of_data_pts(f, "dumb",
                                      ax=axArr2[2][1],
                                      methods=["KDE1", "shrink", "cent"],
                                      legend=True)
 
     plt.savefig(output_path + name, bbox_inches='tight')
 
+    return
+
+
+def plot_bias_as_a_func_of_data_pts(f, data_set,
+                                     ax=None, methods=["KDE",
+                                                       "shrink",
+                                                       "cent"],
+                                     show_xlabel=True,
+                                     legend=True,
+                                    ):
+    if ax is None:
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+
+    data_size = [20, 50, 100, 500]
+
+    # if len(colors) != len(methods):
+    #     raise ValueError("Number of color supplied for plotting must\n" +
+    #                      "match number of peak finding methods")
+
+    errs = compute_bias_from_data(f, data_set, methods=methods,
+                                  data_size=data_size)
+
+    colors = {"KDE": b_colors[0],
+              "shrink": g_colors[0],
+              "cent": r_colors[0],
+              "KDE1": b_colors[0],
+              }
+    for i, method in enumerate(methods):
+        color = colors[method]
+        cf68 = [errs[str(size)][method].values()[0]
+                for size in data_size]
+        ax.plot(data_size, cf68, 'x-',
+                mew=2, ms=10, color=color,
+                label=method)
+
+    ax.set_xlim(0, 550)
+    ax.set_ylim(0, ax.get_ylim()[-1] * 1.1)
+    ax.set_ylabel("Bias", size=15)
+    if show_xlabel and data_set == "dumb":
+        ax.set_xlabel(
+            "Total no. of data points\ndrawn from Gaussian mixture(s)", size=12)
+
+    ax.tick_params(labeltop='off', labelright='off')
+    ax.yaxis.set_ticks_position('left')
+    ax.xaxis.set_ticks_position('bottom')
+
+    ax.legend(loc='lower right', frameon=True, bbox_to_anchor=(.6, -0.55))
     return
 
 
@@ -376,6 +431,33 @@ def plot_error_as_a_func_of_data_pts(f, data_set,
 
     ax.legend(loc='lower right', frameon=True, bbox_to_anchor=(.6, -0.55))
     return
+
+
+def compute_bias_from_data(f, data_set, methods,
+                           data_size=[20, 50, 100, 500],
+                           ):
+    truth = get_truth_data_set()[data_set]
+    errs = {}
+    for size in data_size:
+        errs[str(size)] = {}
+        gp = f[str(size) + "/" + data_set]
+
+        for method in methods:
+            errs[str(size)][method] = {}
+            est = gp[method]["estimate"][:]
+            eval_pts1 = gp[method]["eval_points"][:][0]
+            eval_pts2 = gp[method]["eval_points"][:][1]
+            contours = plot_cf_contour(est, eval_pts1, eval_pts2)
+            plt.clf()
+            plt.close()
+            peaks = np.array([gp[method]["peaks_xcoords"][:][0],
+                              gp[method]["peaks_ycoords"][:][0]])
+            for k, ctr in contours.iteritems():
+                errs[str(size)][method][k] = \
+                    np.sqrt(np.dot(truth - peaks,
+                                   truth - peaks))
+
+    return errs
 
 
 def compute_errors_from_data(f, data_set, methods,
