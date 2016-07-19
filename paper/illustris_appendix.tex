@@ -1,4 +1,4 @@
-\section{DEFAULT WEIGHTS USED FOR DAWSON'S MONTE CARLO SIMULATION}
+\section{Default weights used for Dawson's Monte Carlo simulation}
 \label{app:priors}
 The default weight that we employed can be summarized as
 follows for most of the output variables: 
@@ -29,7 +29,7 @@ posterior probabilities of the different realizations with
 to account for how the subclusters move faster at lower $TSP$ and thus it
 is more probable to observe the subclusters at a stage with a larger $TSP$.
 \par 
-\section{PLOTS OF OUTPUTS OF THE MONTE CARLO SIMULATION}
+\section{Plots of outputs of the Monte Carlo simulation}
 We present the PDFs of the inputs of the dynamical simulation and the
 marginalized PDFs of the outputs after applying the polarization weight in
 addition to the default weights. See Fig.~\ref{fig:plot_config} for explanations of
@@ -49,7 +49,7 @@ indicates the corresponding figure number in this appendix.
 %%%%%%%%%%%%% TASK --- 
 \clearpage
 \begin{figure*}
-	\begin{minipage}{180mm}
+%	\begin{minipage}{180mm}
 	\begin{center}
 	\includegraphics[width=0.65\linewidth]{TwoMnWBSG_inputsVsinput.png}
 	\caption{Marginalized 2-dimensional PDFs of original inputs (vertical axis) 
@@ -59,10 +59,9 @@ denote the central 68\% and 95\% confidence regions respectively.
 The circular contours show that the application of weights did not introduce
 uneven sampling of inputs. }
 	\end{center}
-	\end{minipage}
+	%\end{minipage}
 \end{figure*}
 \begin{figure*}
-\begin{minipage}{180mm}
 	\begin{center}
 	\includegraphics[width=0.5\linewidth]{TwoMnWBSG_tri_geo.png}
 	\caption{One-dimensional marginalized PDFs (panels on the diagonal) and
@@ -71,19 +70,15 @@ uneven sampling of inputs. }
 	\label{fig:geom_geom}
 	}
 	\end{center}
-	\end{minipage}
 \end{figure*}
 \begin{figure*}
-\begin{minipage}{180mm}
 	\begin{center}
 	\includegraphics[width=0.7\linewidth]{TwoMnWBSG_geoVSinputs.png}
 	\caption{Marginalized PDFs of characteristic distances and projection
 		angle of the merger and the inputs of the simulation.}
 	\end{center}
-	\end{minipage}
 \end{figure*}
 \begin{figure*}
-\begin{minipage}{180mm}
 	\begin{center}
 	\includegraphics[width=0.5\linewidth]{TwoMnWBSG_tri_time.png}
 	\caption{One-dimensional PDFs of characteristic timescales of the simulation
@@ -91,65 +86,52 @@ uneven sampling of inputs. }
 timescales. Note that there is a default weight for constraining $TSP_{\rm out}$ but
 not for $TSP_{\rm ret}$ and $T$, so $TSP_{\rm out}$ spans a smaller range.}
 	\end{center}
-\end{minipage}
 \end{figure*}
 \begin{figure*}
-\begin{minipage}{180mm}
 	\begin{center}
 	\includegraphics[width=0.5\linewidth]{TwoMnWBSG_timeVsgeo.png}
 	\caption{Marginalized PDFs of characteristic timescales of the simulation
 and the characteristic distances and the projection angle of the merger. }
 	\end{center}
-\end{minipage}
 \end{figure*}
 \begin{figure*}
-\begin{minipage}{180mm}
 	\begin{center}
 	\includegraphics[width=0.7\linewidth]{TwoMnWBSG_timeVSinput.png}
 	\caption{Marginalized PDFs of characteristic timescales of the simulation
 and the inputs.}
 	\end{center}
-\end{minipage}
 \end{figure*}
 \begin{figure*}
-\begin{minipage}{180mm}
 	\begin{center}
 	\includegraphics[width=0.5\linewidth]{TwoMnWBSG_tri_vel.png}
 	\caption{One-dimensional marginalized PDFs of velocities at
 	characteristic times (panels on the diagonal) and marginalized PDFs of
 different velocities.}
 	\end{center}
-\end{minipage}
 \end{figure*}
 \begin{figure*}
-\begin{minipage}{180mm}
 	\begin{center}
 	\includegraphics[width=0.5\linewidth]{TwoMnWBSG_velVStime.png}
 	\caption{Marginalized PDFs velocities and the characteristic timescales
 	of the simulation against the inputs.}
 	\end{center}
-\end{minipage}
 \end{figure*}
 \begin{figure*}
-\begin{minipage}{180mm}
 	\begin{center}
 	\includegraphics[width=0.5\linewidth]{TwoMnWBSG_velVSgeo.png}
 	\caption{Marginalized PDFs of the velocities at characteristic timescales
 		and the characteristic distances and the projection angle of the merger. }
 	\end{center}
-\end{minipage}
 \end{figure*}
 \begin{figure*}
-\begin{minipage}{180mm}
 	\begin{center}
 	\includegraphics[width=0.7\linewidth]{TwoMnWBSG_velVSinputs.png}
 	\caption{Marginalized PDFs of relative velocities characteristic
 	timescales of the simulation and the inputs.}
 	\end{center}
-\end{minipage}
 \end{figure*}
 
-\section{COMPARISON OF THE OUTGOING AND RETURNING SCENARIO}
+\section{Comparison of the outgoing and returning scenario}
 \label{app:Bayes_factor}
 Here, we compare the different merger scenarios using the two relics
 independently and show that they consistently give the conclusion that the returning
@@ -231,7 +213,8 @@ $f(S_{proj} \cap S_{obs})$ to penalize the simulated values being different from
 \end{figure}
 
 \begin{figure}
-\includegraphics[width=\linewidth]{polar_prior_bounds_E.pdf}
+	\centering
+\includegraphics[width=.8\linewidth]{polar_prior_bounds_E.pdf}
 	\caption{Comparison of the PDFs of the observed position of the SE relic (red bar
 		includes 95\% confidence interval of location of relic in the center of
 		mass frame) with the predicted position from the two simulated merger scenarios (blue for outgoing and green for the returning scenario). 
@@ -242,7 +225,8 @@ $f(S_{proj} \cap S_{obs})$ to penalize the simulated values being different from
 \end{figure}
 
 \begin{figure}
-	\includegraphics[width=\linewidth]{polar_prior_bounds.pdf}
+	\centering
+	\includegraphics[width=.8\linewidth]{polar_prior_bounds.pdf}
 	\caption{Comparison of the PDFs of the observed position of the NW relic (red bar
 		includes 95\% confidence interval of location of relic in the center of
 		mass frame) with the	predicted position from the two simulated merger scenarios (blue for outgoing and green for the returning scenario). 

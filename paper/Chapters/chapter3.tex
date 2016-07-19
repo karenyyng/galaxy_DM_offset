@@ -9,9 +9,6 @@ environments. Bright galaxies that belong to a galaxy cluster or group, in
 particular, highlight the overdensities of the underlying dark matter (DM) 
 distribution. 
 
-% Peaks, summary statistics 
-% Modeling galaxy clusters - distributions, peaks, centroids 
-
 In these dense regions of the clusters, the rates of particle
 interactions can be enhanced, including the long-suspected self-interaction of DM
 particles (hereafter, SIDM).  
@@ -701,7 +698,7 @@ For right panel of fig. \ref{fig:toy_data_mixtures},
 we present how the population bias of each method shrinks as the
 number of data points increases. For the data generated with more than one mixture, 
 KDE peak consistently show less population bias than the shrinking aperture method. 
-The performance of the shrinking aperture method fluctuate and is unstable when
+The performance of the shrinking aperture method fluctuates and is unstable when
 the number of data points is increased.
 
 \subsection{Modeling the DM map in Illustris-1 and the lensing kernel}
@@ -792,6 +789,20 @@ identified DM peak.
 % Due to substructures, it is possible for there to be several minima of similar 
 % gravitational potential level. 
 
+After matching the peaks to compute the offsets, 
+we report the percentile for the offset distributions.
+For instance, the 95\% interval is computed as the narrowest interval that encompasses
+95\% of total density (2.5\% of density mass at each end of the tail is
+excluded). In case of degeneracy, the interval is also required to cover the 
+central location estimate for the distribution.
+Additionally, we report other statistic of interest, such as the biweight 
+location (analogous to the median)
+and the midvariance (robust standard deviation
+estimate) to minimize the effects of outliers. 
+\citep{Beers90}. We compute the robust statistics using the implementation
+from \cite{astropy} as part of {\sc{astropy}}. 
+
+
 \begin{figure*}
 	\centering
 	\begin{minipage}[b]{0.45\textwidth}
@@ -839,28 +850,6 @@ identified DM peak.
 \end{center}
 \end{figure*}
 \subsection{Constructing the hypothesis test} 
-
-After matching the peaks, we use the offsets as the basis of our 
- hypothesis test. 
-We compute the p-value as the narrowest density interval of simulated offsets 
-that are below observed values of 
-offsets in the literature. The distribution of offsets in the Illustris
-simulation represents the possible ways that offsets would be observed in a CDM
-universe.
-This gives us a rough estimation of the probability 
-of seeing the offset from observations under the null hypothesis of CDM 
-being true. 
-We report the percentile for the offset distributions, and also the biweight 
-statistical estimates such as the biweight 
-location (analogous to the median)
-and the midvariance (robust standard deviation
-estimate). The biweight statistics are less susceptible to the effects of
-outliers \citep{Beers90}. We compute the robust statistics using the implementation
-from \cite{astropy} as part of {\sc{astropy}}. 
-For instance, the 95\% interval is computed as the interval that encompasses
-95\% of total density (2.5\% of density mass at each end of the tail is
-excluded). In case of degeneracy, the interval is also required to cover the 
-location estimate for the distribution.
 
 The representations of the distributions of $\Delta s$ carry
 different information and allow different types of statistical tests. 
@@ -933,7 +922,7 @@ each with a support of $\mathbb{R}$, will not exhibit a discontinuity at zero.
 Any shift or asymmetry in the 2D peak location is still obvious. 
 The distributions represented by $\Delta x$ or $\Delta y$ 
 can be symmetrical so 
-the highest density interval is easier to find.
+the narrowest density interval (aka highest density interval) is easier to find.
 Since we have enough samples for there to be
 rotational symmetry for the distribution of $(\Delta {\bf x}, \Delta {\bf y})$,
 we will show that it does not
@@ -968,6 +957,23 @@ using $|\Delta s_{\rm obs}|$ instead of $\Delta y_{\rm obs}$ to come
 up with a p-value from the distribution of 
 $\Delta y$ will lead to a spurious increase in significance.
 
+The actual significance of each observation is computed by comparing the
+observed offset to the distribution of $\Delta y$ computed from our data. 
+The distributions of $\Delta y$ represent the possible ways that offsets can be observed in a CDM
+universe, giving us a rough estimation of the probability 
+of seeing the offset from observations under the null hypothesis of CDM 
+being true. 
+We compute the two-tailed 
+p-value from the narrowest density interval (C) of simulated offsets 
+that is above the observed values of offsets in the literature, 
+i.e. the significance of each observed offset is rounded up to the nearest 68\%, 95\% or 99\%
+interval of corresponding offset distribution from the Illustris data. 
+\begin{equation}
+	p = 1 - C(|\Delta y| > \Delta y_{obs})
+\end{equation}
+This underestimates the probability that the
+observed offset is compatible with the CDM model so
+any disagreement with the CDM model will be more obvious. 
 
 % There is a more comprehensive discussion of the representation of offset 
 % distributions and the complications due to the different projections of the
@@ -1012,42 +1018,42 @@ $\Delta y$ will lead to a spurious increase in significance.
 	 Cluster &$\Delta y$ (kpc) & $\Delta x$ (kpc) & $|\Delta s|$ (kpc) & galaxy peak & DM peak &  p-value & subcluster &
 	 mass ($10^{14}$ M$_\odot$)  &  reference\\
 	 \hline
-	 Bullet  & 9  & -23 & 25$~\pm~29$ & num. or lum. & SL \& WL & $\gtrsim 0.32$ &
+	 Bullet  & 9  & -23 & 25$~\pm~29$ & num. or lum. & SL \& WL & $0.32$ &
 	 northwest & 1.5 & \citealt{Randall2008d}\\
 	 Baby Bullet & -40&  0 & $\sim 40 \pm \sim 50 $  & lum. & SL \& WL &
-	 $\gtrsim 0.05 $ & northwest & 2.6 &
+	 $ 0.05 $ & northwest & 2.6 &
 	 \citealt{Bradac2008}:Fig.4 \\
-	 Baby Bullet & 30  & 0 & $\sim 30 \pm \sim 75 $ & lum. & & $\gtrsim
+	 Baby Bullet & 30  & 0 & $\sim 30 \pm \sim 75 $ & lum. & & $
 	 0.32 $&
 	 southeast
 	  & 2.5 & \citealt{Bradac2008}:Fig.4 \\
-	 Musketball &  129 & 0 & 129 $\pm \sim 63$ & num. & WL & $>0.05$ &
+	 Musketball &  129 & 0 & 129 $\pm \sim63$ & num. & WL & $0.05$ &
 	southern & 3.1 
 	 & \citealt{Dawson2013}:Fig.4.7\\
-	 Musketball & -47 & 0 & 47 $\pm \sim 50$ & num. & & $>0.32$ &
+	 Musketball & -47 & 0 & 47 $\pm \sim50$ & num. & & $0.32$ &
 	 northern & 1.7 &  
 	  \citealt{Dawson2013}:Fig.4.7\\
-		Abell 3827 & 6 & 0 & 6 & BCG & SL & $> 0.05$ & central & & \citealt{Williams2011a}\\ 
-		Abell 520 & 0 & 50& $\sim 50 \pm \sim 50$ & lum. & WL & $\gtrsim 0.32$ & blue 
+		Abell 3827 & 6 & 0 & 6 & BCG & SL & $0.05$ & central & & \citealt{Williams2011a}\\ 
+		Abell 520 & 0 & 50& $\sim50 \pm \sim50$ & lum. & WL & $0.32$ & blue 
 		 & 5.7 & \citealt{Clowe2012}:Fig. 4 \\
 	 % Abell 1689  & & & & & &  & \citealt{Mohammed2014} \\
-		El Gordo &  58 &0 & $\sim 58 \pm \sim 100$ & lum. & WL & $>0.05$ & 
+		El Gordo &  58 &0 & $\sim58 \pm \sim100$ & lum. & WL & $0.05$ & 
 		northwest& 11  &\citealt{Jee2014}:Fig.7,8  \\
-		El Gordo & 30 & 110 & $ 115 \pm \sim 60$ & num. & & $>0.32$ & 
+		El Gordo & 30 & 110 & $ 115 \pm \sim60$ & num. & & $0.32$ & 
 		northwest&   &\citealt{Jee2014}:Fig.7,8  \\
-		El Gordo & 6 & 25& $\sim 26 \pm \sim 50$ & lum. & & $>0.32$ & northwest & 7.9   
+		El Gordo & 6 & 25& $\sim26 \pm \sim50$ & lum. & & $0.32$ & northwest & 7.9   
 		&\citealt{Jee2014}:Fig.7, 8  \\
-		El Gordo & 280 & 280 & 400 $\pm \sim 40$ & num. & & $>0.05$ &
+		El Gordo & 280 & 280 & 400 $\pm \sim40$ & num. & & $0.05$ &
 		southeast &   &\citealt{Jee2014}:Fig.7, 8  \\
-		Sausage &160 & 100& $\sim 190\pm \sim 150$ & num. & WL & $\gtrsim
+		Sausage &160 & 100& $\sim190\pm \sim150$ & num. & WL & $
 		0.05$ & north & 11.  &\citealt{Jee2015}:Fig.10\\ 
-		Sausage &160 & 160& $ \sim 190\pm \sim 150 $  & num. &  & $\gtrsim
+		Sausage &160 & 160& $ \sim190\pm \sim150 $  & num. &  & $
 		0.05$ & south & 9.8 & \citealt{Jee2015}:Fig.10\\ 
 
-		Sausage & 320 & 130 & $\sim340 \pm \sim 150 $  & lum. & & $\lesssim
+		Sausage & 320 & 130 & $\sim340 \pm \sim150 $  & lum. & & $\lesssim
 		0.01$ & north & 11. & \citealt{Jee2015}:Fig.10\\ 
 
-		Sausage & 160 & 160 &$\sim230 \pm \sim 150 $  & lum. & & $\lesssim
+		Sausage & 160 & 160 &$\sim230 \pm \sim150 $  & lum. & & $\lesssim
 		0.01$ & south & 9.8 &\citealt{Jee2015}:Fig.10\\ 
 	 \hline
 	 \end{tabular} 
@@ -1663,8 +1669,7 @@ aperture method simply overwhelm the signal.
 A offset level of 50 kpc is within the one-sigma level of $\Delta s_{\rm num.
 dens}$, $\Delta s_{\rm shrink}$, and $\Delta s_{\rm centroid}$, and the two-sigma
 level of the $\Delta s_{\rm KDE}$. 
- Despite $\Delta s_{\rm BCG}$. 
- has tight distribution for relaxed clusters, misidentification of the BCG 
+Even though $\Delta s_{\rm BCG}$ has tight distribution for relaxed clusters, misidentification of the BCG 
 may increase the tail of the distribution to render it unsuitable to be used 
 for secure constraints. To sample the tight distribution of $\Delta s_{\rm
 BCG}$ at a higher
@@ -1734,7 +1739,7 @@ the following improvements:
 		\item improving the peak detection threshold from the KDE luminosity map based on
 			the flux per area at the peak location and compare that to observational
 			limitations
-		\item examining the effects of incompleteness removing some member galaxies randomly 
+		\item examining the effects of incompleteness by removing some member galaxies randomly 
 		\item computing the velocity dispersion of the galaxies along different
 			line-of-sight to see how the velocity dispersion correlates the different
 			measures of unrelaxedness for different projections
