@@ -12,7 +12,7 @@ import os
 from scipy import ndimage
 # from datetime import datetime
 # datetime_stamp = datetime.now().strftime("%D").replace('/', '_')
-datetime_stamp = '07_16_16'
+datetime_stamp = '07_17_16'
 data_path = "../../data/"
 
 # ------- specify output file paths  -----------------------
@@ -56,7 +56,7 @@ DM_fstream = h5py.File(DM_h5file)
 #         data_path, input_star_file, input_h5_key)
 
 input_star_fhat_file = data_path + \
-    "stars_fhat_clst{}_{}.h5".format(
+    "stars_fhat_clst_{}_{}.h5".format(
         total_clstNo, input_datetime_stamp)
 fhats_stars = h5py.File(input_star_fhat_file, "r")
 logging.info ("input_star_file = " + input_star_fhat_file)
