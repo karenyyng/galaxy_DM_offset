@@ -7,41 +7,63 @@ These clusters, made up of dark matter, galaxies and hot gas,
 are constantly accreting mass, merging and evolving with their
 environments. Bright galaxies that belong to a galaxy cluster or group, in 
 particular, highlight the overdensities of the underlying dark matter (DM) 
-distribution. 
-
-In these dense regions of the clusters, the rates of particle
-interactions can be enhanced, including the long-suspected self-interaction of DM
+distribution. In these dense regions of the clusters, the rates of particle
+interactions may be enhanced, including the long-suspected self-interaction of DM
 particles (hereafter, SIDM).  
-Many papers have used the offsets between the summary statistics of the DM
-density and the galaxy density to give constraints on 
-the self-interaction cross
-section, i.e. $\sigma_{\rm SIDM}$, of dark matter. 
-A lot of observational studies focus on using merging galaxy clusters
-as they assume the high collisional velocity should increase the chance
-of detecting the effects of SIDM.
-By assuming galaxies being relatively collisionless $\sigma_{\rm gal} \approx 0$, 
-any offset of the DM population from the galaxy provides $\sigma_{\rm SIDM}$ 
-relative to $\sigma_{\rm gal} \approx 0~\centi\meter^2$. 
-These observational studies include \cite{Markevitch2004} and \cite{Bradac2006b}  
-reporting an offset of 25 kpc for the Bullet Cluster;  
-\cite{Dawson2013} reporting an offset of 129 kpc and 47 kpc for the southern
-and the northern subcluster respectively;
+There have been two fronts for inferring the self-interaction cross-section of 
+dark matter, i.e. $\sigma_{\rm SIDM}$.
+
+We propose a third aspect in this noise dominated 
+
+
+
+
+
+Many papers have used the offsets between the `center' of the DM 
+distribution and those of the member galaxies to give constraints on 
+the self-interaction cross section of DM, i.e. $\sigma_{\rm SIDM}$.
+In particular, a large portion of these studies 
+have made use of merging galaxy clusters.
+By assuming the galaxies being collisionless in simulated merging clusters,
+\cite{Randall2008d} used the offset of the DM population 
+from the member galaxies can provide estimates of $\sigma_{\rm SIDM}$. 
+
+
+
+The first constraints was derived using the offsets of 25 kpc between the DM and the member
+the analysis of the Bullet cluster (\citealt{Markevitch2004} and \citealt{Bradac2006b}). 
+Many other studies of merging galaxy clusters followed, 
+including \cite{Dawson2013} reporting offsets of 129 kpc and 47 kpc for the southern
+and the northern subcluster of the Musketball cluster;
 \cite{Jee2015} reporting an offset of 190 kpc for MACSJ1752, and others that we
 list in detail in table \ref{tab:offset_results}.
-However, other studies using 129 X-ray selected relaxed galaxy groups, 
-such as \cite{George2012a} also report offsets of the same order of magnitude,
-at around $50 - 150$ kpc. 
+% However, other studies using 129 X-ray selected relaxed galaxy groups, 
+% such as \cite{George2012a} also report galaxy-DM offsets of the same order of magnitude,
+% at around $50 - 150$ kpc. 
 
-Simulators have also joined hands to study the velocity dependence of the
-effects of SIDM. There are many staged simulations of mergers of galaxy
-clusters that focused on detecting the signal from
-SIDM. The `staging' step of these simulations usually involve prescribing a parametric  
-spatial distribution of galaxies  
+Simulators have also joined hands to study the dependence 
+of the observables of SIDM on cluster configurations. 
+
+incorporate suitable implementations of the DM self-interaction
+
+
+In `staged' simulations where 
+merging galaxy clusters 
+in what we call . 
+
+
+
+The initialization (or staging) of the 
+mergers are often made more ideal to maximize the
+observables of SIDM than realistic observational conditions.  
+ 
+The initial conditions include 
+the spatial and velocity distributions of the different components 
+of the clusters. Often times, galaxies were initialized under a parametric  
+spatial distribution   
 (\citealt{Randall2008d}, \citealt{Kahlhoefer14}, \citealt{Robertson2016}), 
-such as an NFW profile, 
-and may not simulate the galaxy morphology, nor include dynamical
-friction. 
-They try to show the level of offsets solely due to SIDM \citep{Kahlhoefer14}  
+such as an Navarro-Frenk-White (NFW) profile. 
+Details such as galaxy morphology, or dynamical friction are sometimes ignored. 
 by initializing the galaxy-DM offset to be zero at the beginning of their 
 simulations. Furthermore, these staged simulations commonly use a much higher number of 
 galaxy particles than the realistic observable number of galaxies. 
@@ -615,7 +637,7 @@ We used the $i-$band to pick the BCG for computing the plots and the final resul
 \begin{figure*}
 	\includegraphics[width=.85\linewidth]{fig3_toy_data_mixtures.eps}
 	\caption{Comparison of peak finding performances of the shrinking aperture
-		peak (shrink peak), KDE peak estimate, and centroid, by
+		peak (shrink peak), dominant peak estimate from the KDE map (KDE1), and the centroid (cent), by
 		drawing data points (i.e. 20, 50, 100, 500) from known number of 
 		Gaussian mixtures. 
 		Panels from the top row contain data drawn from a single Gaussian mixture. The
@@ -826,7 +848,9 @@ from \cite{astropy} as part of {\sc{astropy}}.
 		the box encompasses the 25\% and 75\% percentile of the distribution while
 		the whiskers mark the 5\% and the 95\% percentile. The other black crosses
 		are data points with extreme values beyond the 5\% and 95\% percentile.
-		\label{fig:projected_KDE_offset_distribution}
+		\label{fig:projected_KDE_offset_distribution}. The median of $\nu$ show on the
+		left and the max($\Delta y_{\rm KDE}$) values on right plot 
+		show a correlation as high as 0.77.
 	}
 \end{figure*}
 
@@ -1526,6 +1550,10 @@ around 1 arcmin.
 Any other morphological features from the smoothed DM map will be subject 
 to uncertainty of similar order of magnitude as the peak
 estimate, but with a lower signal. 
+In fact, there have been several contentious lensing studies (\citealt{Clowe2012},
+\citealt{Jee2014b}, \citealt{Wittman2014}, \citealt{Cook2012})
+reporting how mass peaks of DM can appear or disappear based on
+different selection and treatment of the source galaxies for lensing. 
 It is therefore hard to use other morphological features, such as tail or shape 
 of a peak,
 as suggested by \cite{Kahlhoefer14} for constraining SIDM.
@@ -1730,14 +1758,14 @@ concern is the forbidding computational cost of a cosmological simulation with S
  
  
 \subsection{Possible improvements to better understand clusters}
-The data in the Illustris simulation has proven to be an excellent source of
+The data in the Illustris simulation has proven to be an excellent source for
 understanding observational uncertainties of galaxy clusters.
 Further work can be done to make mock observations more realistic with some of
 the following improvements:
 \begin{itemize}
-		\item adding foreground structures 
+		\item adding foreground structures in the analysis 
 		\item improving the peak detection threshold from the KDE luminosity map based on
-			the flux per area at the peak location and compare that to observational
+			the flux per area at the peak location and comparing that to observational
 			limitations
 		\item examining the effects of incompleteness by removing some member galaxies randomly 
 		\item computing the velocity dispersion of the galaxies along different
@@ -1820,7 +1848,8 @@ Part of the work before the conception of this paper was discussed during
 the AstroHack week 2014. This work made used of {\sc IPython}
 \citep{Perez2007}.
 Part of this work was performed under HST grant (TODO ask Dave for grant
-number). 
+number) and under the auspices of the U.S. DOE by LLNL under Contract DE-AC52-07NA27344; 
+LLNL-JRNL-XXXXXX-Draft.
 % 
 % 
 % 
