@@ -566,7 +566,7 @@ which takes the form of a matrix in the 2D case.
 %  We illustrate the choice of kernel width with Fig.
 % \ref{fig:bias_variance_tradeoff}. 
 When the kernel width is
-too large (bottom left panel), the data is over-smoothed, 
+too large, the data is over-smoothed, 
 resulting in a bias of the peak estimate. On the other hand, when the kernel
 width is too small, it results in high variances of the estimate and 
 too many peaks due to noise. 
@@ -717,8 +717,7 @@ We used the $i-$band to pick the BCG for computing the plots and the final resul
 		\sc SUBFIND } and the radius of the circle indicates the 
 		R$_{\rm 200C}$. The luminosity peaks (square markers) are colored
 		by the relative density to the densest peak, and the relative density  
-		is shown by the color bar.  
-		See \href{http://goo.gl/WiDijQ}{http://goo.gl/WiDijQ} 
+		is shown by the color bar. See \href{http://goo.gl/WiDijQ}{http://goo.gl/WiDijQ} 
 		and \href{http://goo.gl/89edcM}{http://goo.gl/89edcM} for the 
 	visualization of the selected clusters inside two Jupyter notebooks.
 		\label{fig:select_peak_visualization}
@@ -770,11 +769,15 @@ of 11 arcseconds translates to an angular diameter distance of 50
 kpc assuming a cosmological redshift of $z \approx 0.3$. 
 In order to match the resolution of lensing data,
 we also employed a smoothing kernel of a similar physical size of 50 kpc.  
+It should be noted that this is one of the best-studied clusters, 
+with many strong lensing constraints. 
+A cluster without strong lensing constraints will be mapped with 
+lower resolution.
 
-To compute the DM spatial distribution from our data, we first make histogram with 2 kpc
+To compute the DM spatial distribution from our data, we first make a histogram with 2 kpc
 $\times$ 2 kpc bin size which is slightly larger than the DM softening length of 1.4 kpc. 
 After that, we use a (50, 50) kpc 2D radial Gaussian kernel 
-to smooth the DM histogram Illustris DM
+to smooth the DM histogram made from the Illustris DM
 particle data. 
 There are resolution differences between the smoothed and unsmoothed DM
 maps. The unsmoothed histograms tend to show many more local maxima around the major
@@ -794,7 +797,7 @@ the peaks according to their densities. We only match luminosity
 peaks that are at 
 least 20\% as dense as the brightest galaxy-luminosity peak to avoid 
 computing the offsets of spurious substructures, such as the peaks due to 
-small number of galaxies that are located far away from the main concentration of mass.
+a small number of galaxies that are located far away from the main concentration of mass.
 
 In general, there are many more DM peaks because there are many more dark 
 subhalos than galaxies for each cluster and the resolution of the DM data is
@@ -821,7 +824,8 @@ From inspection of figures similar to Fig. \ref{fig:select_peak_visualization}, 
 appropriate peaks. 
 To avoid peak matching from affecting the offset results,
 we will only use the offsets with the dominant DM peak for the final results.
-We show in the result section that most of the chosen DM peaks
+We show in the result section \ref{subsec:offset_from_most_bound_particle} 
+that most of the chosen DM peaks
 do not have significant deviation from the most gravitationally bound particles.
 After identifying the DM peaks, we compute the 
 offsets between the matched DM peaks, and the following spatial estimates, including 
@@ -835,7 +839,7 @@ offsets between the matched DM peaks, and the following spatial estimates, inclu
 \item the luminosity weighted centroid, the corresponding offset is $\Delta s_{\rm BCG}$.
 \end{itemize}
 Since there can be more than one number density peak from the corresponding KDE
-map, we also use a KD-tree to location the closest number density peak to the 
+map, we also use a KD-tree to match the closest number density peak to the 
 identified DM peak.
 % The most bound particle is the location with minimum 
 % gravitational potential of the {\sc{Subfind}} identified cluster.
@@ -871,17 +875,18 @@ from \cite{astropy} as part of {\sc{astropy}}.
 		for each cluster. Clusters with only one dominant peak has $\nu = 1.0$,
 		values bigger than 1 indicate  density fraction contributed by other
 		peak(s). 
-	  Right: A box plot showing the distribution of $\Delta y_{\rm KDE}$ for each cluster 
-		based on 768 projections. 
+	  Right: A box plot showing the distribution of $\Delta y_{\rm KDE}$ for each cluster. 
+		The distributions from both plots are based on 768 projections. 
 		The offsets were computed between the closest DM 
 		peak to the brightest luminosity peak of each cluster. 		
 		The red line of each box shows the median of the projections,
 		the box encompasses the 25\% and 75\% percentile of the distribution while
 		the whiskers mark the 5\% and the 95\% percentile. The other black crosses
 		are data points with extreme values beyond the 5\% and 95\% percentile.
-		\label{fig:projected_KDE_offset_distribution}. The median of $\nu$ show on the
+		The median of $\nu$ show on the
 		left and the max($\Delta y_{\rm KDE}$) values on right plot 
 		show a correlation as high as 0.77.
+		\label{fig:projected_KDE_offset_distribution} 
 	}
 \end{figure*}
 
@@ -967,8 +972,11 @@ The shifting of the peak location due to variable transformation
 is seen in the distribution of $|\Delta {\bf s}|$ recorded in table
 \ref{tab:offset_distributions}.
 For a non-parametrical, asymmetrical 1D distribution due to taking the magnitude, 
-finding the narrowest 68\% and 95\% interval
-is not a standard statistical procedure and can be more prone to error.
+finding the {\it narrowest} 68\% and 95\% interval
+is not a standard statistical procedure. The 68\% or 95\% interval needs to
+span the smallest range of $\Delta y$ values to be used for a hypothesis test.
+It is wrong to pick any 68\% and 95\% interval manually because such a choice
+directly affects the conclusion of the hypothesis test.
 
 On the other hand, 
 the 1D distributions of offsets along a particular spatial axis, 
@@ -1125,9 +1133,6 @@ any disagreement with the CDM model will be more obvious.
 \end{table*}
 % \end{landscape}
 
-
-
-
 \subsection{The dynamical states (relaxedness) of the clusters}
 Out of the $43 \times 768 = 33 024$ projections, $\sim 45\%$ of the projections 
 have one dominant luminosity peak and negligible substructures, with the total peak density of the
@@ -1139,13 +1144,13 @@ estimate over different projections per cluster indicates
 most clusters show signs of other subdominant peaks.
 Visually, the spread of the $\nu$ distribution is indicated by the horizontal 
 length of the blue box. 
-the median of $\nu$ per cluster are indicated by the red central vertical line
-inside each box in Fig. 
+The median $\nu$ per cluster is indicated by the red central vertical line
+inside each box in the left column of Fig. 
 \ref{fig:projected_KDE_offset_distribution}.
 Only 7 clusters (with ID = 15, 16, 17, 22, 31, 35, 51) out of 43 clusters have $\nu
 \lesssim 1.2$ for most of the projections.
 Clusters with median values of $\nu > 2.2$ usually have multiple subclusters.
-Cluster with ID = 7, for instance, is made up of around 4 disconnected clusters that span
+The cluster with ID = 7, for instance, is made up of around 4 disconnected clusters that span
 several Mpc.  
 There is also a strong correlation of $\sim 0.8$ between $\nu$ and 
 each of the two unrelaxedness quantities defined in section 
@@ -1156,29 +1161,30 @@ cluster.
 
 \subsection{Offset between the matched DM peaks and the corresponding most
 bound particle}
-There is no significant differences between the matched DM peaks and 
+\label{subsec:offset_from_most_bound_particle}
+There is no significant difference between the matched DM peaks and 
 the most gravitationally 
 bound particle (hereafter most bound particle).
 The median of the offset between the DM peak and the gravitationally bound
 particle is (0, 0) kpc. The 75-th percentile of the offsets are at ($\pm2,\pm2$) kpc. 
-Most of the other offset values occur below ($\pm 9, \pm 9$). Large offsets
+Most of the other offset values occur below ($\pm 9, \pm 9$) kpc. Large offsets
 are only seen for clusters with $\nu > 1.2$. The densest DM peak in 3D where
-the most bound particle is located, does not
-necessarily correspond the densest projected peak in 2D in the presence of 
+the most bound particle is located does not
+necessarily correspond to the densest projected peak in 2D in the presence of 
 significant DM substructures.   
 
 \subsection{Offset between galaxy summary statistic and the most bound particle}
 As another sanity check, we computed the offsets between different galaxy summary
-statistic and the most bound particle. 
+statistics and the most bound particle. 
 Interested reader can refer to table
 \ref{tab:most_bound_particle_offset_distributions} for the different
 percentile and robust estimates of the distribution of offsets from the most bound 
 particle. 
 The ranking in terms of increasing distance 
-to the most bound particle computed by different method is as follows:
+to the most bound particle computed by each method is as follows:
 \begin{itemize}
 	\item the BCG 
-	\item the densest peak of the luminosity map created by weighted the KDE 
+	\item the densest peak of the luminosity map created by weighted KDE 
 		\item the shrinking aperture center from the luminosity weighted galaxy data
 		\item the densest peak of the number density map created by the unweighted KDE 
 		\item the centroid estimate using luminosity weights, which is a proxy for the
@@ -1205,10 +1211,10 @@ The possible sources of offset asymmetry come from clusters with unusual configu
 those clusters with more distinct, spatially separated subcomponents.
 They are the clusters with higher offset variance over different projections. 
 Their outlier offsets are in general more extreme than other clusters.
-Since there are a limited number of projections,
-clusters with such unusual configurations and offset levels 
-can leave patterns outside the main concentration of 2D offset data, such as rings. 
-This is due to projections that give similar views of the cluster. 
+% Since there are a limited number of projections,
+% clusters with such unusual configurations and offset levels 
+% can leave patterns outside the main concentration of 2D offset data, such as rings. 
+% This is due to projections that give similar views of the cluster. 
 The luminosity weighted centroid offset, i.e. median($\Delta x_{\rm
 centroid}'$) = -37 kpc, has the highest asymmetry along x-axis for the peak.
 These offsets distributions are recorded in detail in table
@@ -1238,15 +1244,6 @@ The finite number of projections, combined with the substructures, have caused
 the 95-th and 99-th percentile tails of $\Delta y_{\rm BCG}$ of both the full
 sample and the unrelaxed sample exhibit noticeable asymmetry, 
 but not the relaxed samples.
-% Some field of views of the same cluster can be similar and happen to project the
-% cluster along its longest extent.
-% We do not cut off the outliers nor fit any distribution to the $\Delta y_{\rm
-% BCG}$. This is because the tight peak of 3 kpc is probably due to numerical noise, 
-% (the softening length is around 1.4 kpc). There may not be a physical reason
-% why the BCG center is offset from the DM peak. 
-% While we trust our 68\% limit for the BCG for the relaxed sample, 
-% the percentile estimates for the 95\% and 99\% seem noisy for the unrelaxed sample.
-
 
 It is noteworthy that the population spread of $\Delta s$ computed by each method 
 differ enough that one needs to know which offset method an astronomical study
@@ -1272,7 +1269,7 @@ In particular, the 68\% percentile of the centroid method is $\pm 108$ kpc.
 This is around one-fourth the typical core radius of massive clusters
 \citep{Allen1998}. Our centroid estimates can be more extreme than observations
 because we do not restrict the field of view.
- The spread of the offsets inferred by each method affects their ability
+The spread of the offsets inferred by each method affects their ability
 for constraining $\sigmaSIDM$. We will further elaborate on this point
 when we compare our results with staged simulations of SIDM in section
 \ref{subsec:SIDM_sim}. 
@@ -1333,20 +1330,6 @@ and weakly
 Overall, other than substructures, the offsets do not seem to be affected by
 other physical attributes of the clusters.
 
-% We subset the data and visually inspected the samples with the largest 
-% galaxy-DM offsets $\Delta s_{\rm KDE}$. We found that ...  
-% 
-% \subsubsection{Correlations between the offsets and properties of the 
-% cluster / groups}
-% [TODO] examine the relationship between
-% \begin{itemize}
-% \item 3D relaxedness
-% \item mass 
-% \item richness  
-% \end{itemize}
- 
- 
- 
 \section{Discussion}\label{sec:discussion}
 
 \subsection{How to best visualize the cluster galaxy data?}
