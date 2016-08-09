@@ -399,36 +399,26 @@ quantities in the method section \ref{subsubsec:KDE}.
 \subsection{Selection of the field-of-view}
 \label{sec:FOV}
 
-% \begin{landscape}
+% put this in landscape mode if this is compiled for my thesis 
+\ifthenelse{\boolean{thesis}}{\begin{landscape}}{}
+
 \begin{table*}
 \begin{center}
-	%\begin{minipage}{180mm} 
 	\caption{ Selection criteria for stellar subhalos (member galaxies) for each
 		cluster / group 
 \label{tab:member_galaxy_selections}} 
-
-% \resizebox{1.35\textwidth}{!}{
-	\begin{tabular}{@{}lcccc@{}}
-\hline 
-Data &  Selection strategy  & Sensitivity & Relevant section  \\ \hline
-Field of view (FOV) & FoF halo finder& comparable to FOV of the Subaru
-Suprime camera & \ref{sec:FOV}  \\ 
-Observed filter & $i$-band & consistent among the redder $r, i, z$ bands &   
-\ref{subsec:galaxy_properties}
-\\ 
-Cluster richness  & $i \leq 24.4$ and $z = 0.3$  & sensitive to
-the assumed cosmological redshift of cluster and & \ref{sec:illustris_sim} \\ 
-& & the assumed limiting magnitude of telescope &   \\
-Two-dimensional projections & uniform HEALPix samples over a sphere &
-discussed in the result section \ref{subsec:projections} & \ref{subsubsec:projections}\\  
-\hline
-\end{tabular} 
-% }
-% \end{minipage}
-
+  
+\ifthenelse{\boolean{thesis}}{
+	\resizebox{1.35\textwidth}{!}{
+	\input{./Chapters/chapter3_table1}
+	}
+}{
+	\input{./Chapters/chapter3_table1}
+}
 \end{center} 
 \end{table*}
-% \end{landscape}
+% put this in landscape mode if this is compiled for my thesis 
+\ifthenelse{\boolean{thesis}}{\end{landscape}}{}
 
 We used {\sc{SUBFIND}} for member particle identification of the DM and the 
 {\sc{FoF}} finder for subhalo identification.
@@ -579,12 +569,6 @@ bias or high variance estimates is also known as the bias-variance tradeoff.
 All other smoothing procedures, including interpolation with splines,
 polynomials, and filter convolutions, also face the same tradeoff. 
 
-% \begin{figure*}
-% 	% \includegraphics[width=\linewidth]{figN_mass_richness.eps}
-% 	\caption{This figure is adapted from \citealt{Vanderplas2012} from
-% \href{http://www.astroml.org/book\_figures/chapter6/fig\_hist\_to\_kernel.html}{http://www.astroml.org/book\_figures/chapter6/fig\_hist\_to\_kernel.html}
-% under the fair use of the BSD license. \label{fig:bias_variance_tradeoff} }
-% \end{figure*}
 A well-known way to minimize the fitting error from the density estimate is through
 a data-based approach called cross-validation to obtain 
 the optimal 2D smoothing
@@ -670,6 +654,7 @@ bands and found that they give consistent results for all selected clusters.
 We used the $i-$band to pick the BCG for computing the plots and the final results. 
  
 \begin{figure*}
+	\centering
 	\includegraphics[width=.85\linewidth]{fig3_toy_data_mixtures.png}
 	\caption{Comparison of peak finding performances of the shrinking aperture
 		peak (shrink peak), dominant peak estimate from the KDE map (KDE1), and the centroid (cent), by
@@ -698,7 +683,9 @@ We used the $i-$band to pick the BCG for computing the plots and the final resul
 
 \begin{figure*}
 	\begin{center}
-	\includegraphics[width=0.85\linewidth]{Fig4_clst1_48_225.png}
+	
+	% put this in landscape mode if this is compiled for my thesis 
+	\ifthenelse{\NOT \boolean{thesis}}{\includegraphics[width=0.85\linewidth]{Fig4_clst1_48_225.png}}{}
 	\includegraphics[width=0.85\linewidth]{Fig4_clst1_48_135.png}
 	\includegraphics[width=0.85\linewidth]{Fig4_clst12_48_135.png}
 	\caption{Visualization of clusters (each row is for the same projection
@@ -868,13 +855,22 @@ estimate) to minimize the effects of outliers.
 \citep{Beers90}. We compute the robust statistics using the implementation
 from \cite{astropy} as part of {\sc{astropy}}. 
 
-
+\ifthenelse{\boolean{thesis}}{\begin{landscape}}{}
 \begin{figure*}
 	\centering
-	\begin{minipage}[b]{0.45\textwidth}
+
+	\ifthenelse{\boolean{thesis}}{
+			\begin{minipage}[b]{0.6\textwidth}
+	}{
+			\begin{minipage}[b]{0.45\textwidth}
+		}
 	\includegraphics[width=0.85\linewidth]{fig8_total_normalized_peak_density.pdf}
 	\end{minipage}
-	\begin{minipage}[b]{0.45\textwidth}
+	\ifthenelse{\boolean{thesis}}{
+			\begin{minipage}[b]{0.6\textwidth}
+	}{
+			\begin{minipage}[b]{0.45\textwidth}
+		}
 	\includegraphics[width=0.85\linewidth]{fig7_projected_KDE_offset_distribution.pdf}
 
 	\end{minipage}
@@ -898,28 +894,25 @@ from \cite{astropy} as part of {\sc{astropy}}.
 		\label{fig:projected_KDE_offset_distribution} 
 	}
 \end{figure*}
-
+\ifthenelse{\boolean{thesis}}{\end{landscape}}{}
 
 \begin{figure*}
-	\begin{center}
+	\centering
 	\includegraphics[width=0.65\linewidth]{fig5_symmetrical_1D_pdf.png}
-	\caption{ 		
-		The smoothed distribution of different offsets of 43 clusters with all 768
-		projections. The smoothing bandwidth is determined by Scott's rule for 
-		visualization.
-		For estimates where several peaks of galaxy data are 
-		possible, only the densest peak is matched to the DM peak for computing
-		the offsets in this figure. 
-		The dark blue area indicates the 68\% density interval
-		while the light blue area shows the 95\% density interval. 
-		The table summarizing the statistic of each distribution is available in
-		table \ref{tab:p_val_table}. 
-		\label{fig:offset_distributions}
-	}
-\end{center}
+	\caption{The smoothed distribution of different offsets of 43 clusters with all 768
+	projections. The smoothing bandwidth is determined by Scott's rule for 
+	visualization.
+	For estimates where several peaks of galaxy data are 
+	possible, only the densest peak is matched to the DM peak for computing
+	the offsets in this figure. 
+	The dark blue area indicates the 68\% density interval
+	while the light blue area shows the 95\% density interval. 
+	The table summarizing the statistic of each distribution is available in
+	table \ref{tab:p_val_table}. 
+		\label{fig:offset_distributions}}
 \end{figure*}
-\subsection{Constructing the hypothesis test} 
 
+\subsection{Constructing the hypothesis test} 
 The representations of the distributions of $\Delta s$ carry
 different information and allow different types of statistical tests. 
 The most faithful representation of the offsets without any information loss
@@ -983,7 +976,7 @@ is seen in the distribution of $|\Delta {\bf s}|$ recorded in table
 For a non-parametrical, asymmetrical 1D distribution due to taking the magnitude, 
 finding the {\it narrowest} 68\% and 95\% interval
 is not a standard statistical procedure. The 68\% or 95\% interval needs to
-span the smallest range of $\Delta y$ values to be used for a hypothesis test.
+span the smallest range of $|\Delta s|$ values to be used for a hypothesis test.
 It is wrong to pick any 68\% and 95\% interval manually because such a choice
 directly affects the conclusion of the hypothesis test.
 
@@ -1047,15 +1040,12 @@ This underestimates the probability that the
 observed offset is compatible with the CDM model so
 any disagreement with the CDM model will be more obvious. 
 
-% There is a more comprehensive discussion of the representation of offset 
-% distributions and the complications due to the different projections of the
-% clusters in Appendix [TODO]. 
  
 \section{Results} 
 \label{sec:results}
 
+\ifthenelse{\boolean{thesis}}{\begin{landscape}}{}
 \begin{table*}
-	%\begin{minipage}{170mm}
 	\begin{center}
 		\caption{Robust estimates and the distribution of offsets along the y-axis
 			(This is different from the magnitude which has discontinuity at zero).
@@ -1063,13 +1053,12 @@ any disagreement with the CDM model will be more obvious.
 	}
 	\input{Chapters/p_val_table.tex}
 	\end{center}
-	% \end{minipage}
 \end{table*}
+\ifthenelse{\boolean{thesis}}{\end{landscape}}{}
 
-% \begin{landscape}
+\ifthenelse{\boolean{thesis}}{\begin{landscape}}{}
 \begin{table*}
 	\small
-	% \begin{minipage}{180mm} 
 	\centering
 	 \caption{Observed offsets from clusters with reported evidence of mergers
 		 along line connecting two subclusters ($\Delta y$) and the approximate 
@@ -1138,9 +1127,8 @@ any disagreement with the CDM model will be more obvious.
 		 {\it SL} is a short hand for strong lensing. \\
 		 {\it WL} is a short hand for weak lensing. \\
 	 }
-
 \end{table*}
-% \end{landscape}
+\ifthenelse{\boolean{thesis}}{\end{landscape}}{}
 
 \subsection{The dynamical states (relaxedness) of the clusters}
 Out of the $43 \times 768 = 33 024$ projections, $\sim 45\%$ of the projections 
@@ -1861,8 +1849,6 @@ We have shown that
 			luminosity map can also be used to characterize the amount of substructures in
 			the cluster.\\ 
 		
-
-	
 \end{itemize}
 
 
@@ -1881,20 +1867,3 @@ HST-GO-13343.01-A, the National Science Foundation grant
 Lawrence Livermore National Laboratory (LLNL) 
 under Contract DE-AC52-07NA27344; 
 LLNL-JRNL-XXXXXX-Draft.
-% 
-% 
-% 
-% % alternative ways of characterizing differences between DM and galaxy
-% % distributions.
-% 
-% % \section{The Physical properties of a galaxy cluster}
-% % State variables are missing.
-% % A galaxy cluster is not a closed system. 
-% 
-% % correct for multiple comparisons
-% % High number of latent variables 
-% % have to rule out the possibility that observables of SIDM being affected by
-% % the merger history of the cluster. 
-% 
-% 
-
