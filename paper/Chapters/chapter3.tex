@@ -26,14 +26,15 @@ In particular, efforts have focused on studying SIDM observables
 using simulations of in merging galaxy clusters.
 As the SIDM scattering rates can be shown to depend on the 
 relative velocities of the DM particles \citep{Markevitch2004}, the high velocities 
-in cluster mergers should produce an SIDM signal. This idea was verified by 
+in cluster mergers was speculated to produce an SIDM signal. This idea was verified by 
 \cite{Randall2008d}, who used the first suites of simulations of the
 Bullet Cluster that included SIDM physics. 
 \cite{Randall2008d} showed that the scattering events of SIDM can cause the DM
 to lag behind the relatively collisionless galaxies, thus resulting in an offset.
 Throughout this work, we denote this offset as:
 \begin{equation}
-	\offset \equiv \offset_{\rm gal} - \offset_{\rm DM}.
+	\offset \equiv {\bf s}_{\rm gal} - {\bf s}_{\rm DM}.
+	\label{eq:offset}
 \end{equation}
 where $\bf{s}_{gal}$ and $\bf{s}_{DM}$ are the two-dimensional (2D) spatial
 locations of the summary statistic of the galaxy population, and the density
@@ -69,7 +70,7 @@ offset, we can decompose $\Delta s_{\rm obs}$  as
 \end{equation}
 with $\offset_{\SIDM}$ being the offset caused by SIDM , 
 $\offset_{\rm dyn}$ being the offset due to other physical causes such as
-dynamical friction, and $n$ being the observational noise.
+dynamical friction, and $n$ being the observational uncertainties and noise.
 At best the simulated offset from these staged simulations 
 can approximate the $\offset_{\SIDM}$ term.
 
@@ -172,7 +173,7 @@ perturbations. In section \ref{sec:illustris_sim},
 we will show that the galaxy clusters from the Illustris simulation 
 are realistic enough to mitigate the problems that we have mentioned 
 for staged simulations. Since the Illustris simulation assumes no SIDM but 
-includes other physical effects and noise, 
+includes other physical effects and statistical noise, 
 this study is complementary to the 
 staged simulations for understanding $\offset_{\rm dyn}$ and $n$. 
 
@@ -206,13 +207,13 @@ relaxation ($\sim$ several Gyr).
 % To access if the offsets we observe is
 % completely explained by the method for computing the offset, we investigate   
 % the precision to which we can find the galaxy-DM offsets.  
-Popular choices for computing the offsets often involve first inferring the summary
-statistic of the DM population and those of the galaxy population of a cluster
-independently before taking a difference.
-While there are well established procedures driven by lensing physics for 
-inferring the DM spatial distribution, there is no standard procedure for
+Popular methods for computing the offsets is shown in eq. \ref{eq:offset}.
+It involves first inferring ${\bf s}_{\rm DM}$ 
+and ${\bf s}_{\rm gal}$ independently before taking a difference.
+While the inference procedures of ${\bf s}_{\rm DM}$ are driven by lensing 
+physics, there is no standard procedure for
 mapping the sparse member galaxy distribution. 
-We quantify the bias and uncertainty associated with the
+We try to quantify the bias and uncertainty associated with the
 statistic for summarizing the member galaxy population. 
 
 Understanding the characteristics of different galaxy
@@ -725,8 +726,10 @@ We used the $i-$band to pick the BCG for computing the plots and the final resul
 \subsection{Comparison of the methods from Gaussian mixture data}
 In order to examine the statistical properties of commonly used point-
 estimates of the distribution of the galaxy data, we test them on data drawn 
-from Gaussian mixtures with known mean and variance. (See Fig.
-\ref{fig:toy_data_mixtures}). The main factors that affect the performance of 
+from Gaussian mixtures with known mean and variance. 
+(See Fig.
+\ref{fig:toy_data_mixtures}). 
+The main factors that affect the performance of 
 the methods are due to the statistical properties of the data, 
 including 1) the density profile and 2) the
 location(s) of subdominant mixtures, and 3) the number of data points that we draw.
@@ -734,6 +737,11 @@ Due to statistical fluctuations, it is also not enough to
 compare the performance by applying each method for just one realization of the
 data. We provide the 68\% and the 95\% confidence regions by applying the
 each method for 500 Monte Carlo realizations.
+We estimate the population estimate from the 500 realizations of each method, 
+and show it on the middle column of Fig. \ref{fig:toy_data_mixtures}.
+The difference betwene this population estimate and the peak of the dominant mixture 
+is shown as the bias on the right hand column of Fig.
+\ref{fig:toy_data_mixtures}.
 In general, the peak identified from the KDE density is closer to the 
 peak of the dominant mixture (more accurate) than 
 both the weighted centroid method and the shrinking aperture method.
@@ -1354,8 +1362,8 @@ web page before they are rendered properly.)
 In real observations, missing selection of member galaxies, or 
 foreground objects can both affect the inference of the galaxy spatial 
 distribution. The number density map can be less susceptible to bias from bright 
-foreground objects. It is less clear about the effect of missing member galaxies 
-for computing the luminosity map because there is a selection bias favoring 
+foreground objects. The effect of missing member galaxies 
+for computing the luminosity map is unclear because there is a selection bias favoring 
 bright member galaxies.
 
 \subsection{Comparison to merging cluster observations}
@@ -1737,7 +1745,7 @@ At this point, it is unclear that the analysis with a population of
 merging clusters, can provide an excess in population offset signal at a
 characteristic scale above the noise level, and give 
 better estimates for $\sigma_{\rm
-SIDM}$ than the study of individual cluster.  
+SIDM}$ than the study of an individual cluster.  
 
 
 \subsection{Prospect of detecting SIDM with confidence based on our results} 
@@ -1829,7 +1837,6 @@ We have shown that
 		 and observational noise level as estimated by our study.   
 			\\
 
-
 		\item the locations of the most gravitationally bound particle are consistent 
 			with the BCG for systems with little substructures.  \\
 
@@ -1850,6 +1857,7 @@ We have shown that
 			the number density map of member galaxies. The significant peaks from the 
 			luminosity map can also be used to characterize the amount of substructures in
 			the cluster.\\ 
+		
 
 	
 \end{itemize}
