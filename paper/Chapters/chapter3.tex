@@ -368,6 +368,7 @@ masses ranging from $10^{13}$ M$_\odot $ to $10^{14}$ M$_\odot$.
 	} 
 \end{figure}
 
+
 \subsection{Cluster properties}
 \label{subsec:cluster_properties}
 
@@ -381,6 +382,26 @@ computed from observations. We use several measures of unrelaxedness to characte
 the dynamical history.
 We quantify the state of the cluster by providing several quantitative
 definitions of unrelaxedness and see how they correlate with $\Delta s$.
+
+% put this in landscape mode if this is compiled for my thesis 
+\ifthenelse{\boolean{thesis}}{\begin{landscape}}{}
+\begin{table*}
+\begin{center}
+	\caption{ Selection criteria for stellar subhalos (member galaxies) for each
+		cluster / group 
+\label{tab:member_galaxy_selections}} 
+  
+\ifthenelse{\boolean{thesis}}{
+	\resizebox{1.35\textwidth}{!}{
+	\input{./Chapters/chapter3_table1}
+	}
+}{
+	\input{./Chapters/chapter3_table1}
+}
+\end{center} 
+\end{table*}
+% put this in landscape mode if this is compiled for my thesis 
+\ifthenelse{\boolean{thesis}}{\end{landscape}}{}
 Some possible definitions of unrelaxedness referred by the simulation community
 include:
 \begin{itemize}
@@ -399,26 +420,6 @@ quantities in the method section \ref{subsubsec:KDE}.
 \subsection{Selection of the field-of-view}
 \label{sec:FOV}
 
-% put this in landscape mode if this is compiled for my thesis 
-\ifthenelse{\boolean{thesis}}{\begin{landscape}}{}
-
-\begin{table*}
-\begin{center}
-	\caption{ Selection criteria for stellar subhalos (member galaxies) for each
-		cluster / group 
-\label{tab:member_galaxy_selections}} 
-  
-\ifthenelse{\boolean{thesis}}{
-	\resizebox{1.35\textwidth}{!}{
-	\input{./Chapters/chapter3_table1}
-	}
-}{
-	\input{./Chapters/chapter3_table1}
-}
-\end{center} 
-\end{table*}
-% put this in landscape mode if this is compiled for my thesis 
-\ifthenelse{\boolean{thesis}}{\end{landscape}}{}
 
 We used {\sc{SUBFIND}} for member particle identification of the DM and the 
 {\sc{FoF}} finder for subhalo identification.
@@ -855,63 +856,6 @@ estimate) to minimize the effects of outliers.
 \citep{Beers90}. We compute the robust statistics using the implementation
 from \cite{astropy} as part of {\sc{astropy}}. 
 
-\ifthenelse{\boolean{thesis}}{\begin{landscape}}{}
-\begin{figure*}
-	\centering
-
-	\ifthenelse{\boolean{thesis}}{
-			\begin{minipage}[b]{0.6\textwidth}
-	}{
-			\begin{minipage}[b]{0.45\textwidth}
-		}
-	\includegraphics[width=0.85\linewidth]{fig8_total_normalized_peak_density.pdf}
-	\end{minipage}
-	\ifthenelse{\boolean{thesis}}{
-			\begin{minipage}[b]{0.6\textwidth}
-	}{
-			\begin{minipage}[b]{0.45\textwidth}
-		}
-	\includegraphics[width=0.85\linewidth]{fig7_projected_KDE_offset_distribution.pdf}
-
-	\end{minipage}
-
-	\caption{Left: A box plot showing the distribution of the total normalized
-		peak density ($\nu$)
-		for each cluster. Clusters with only one dominant peak has $\nu = 1.0$,
-		values bigger than 1 indicate  density fraction contributed by other
-		peak(s). 
-	  Right: A box plot showing the distribution of $\Delta y_{\rm KDE}$ for each cluster. 
-		The distributions from both plots are based on 768 projections. 
-		The offsets were computed between the closest DM 
-		peak to the brightest luminosity peak of each cluster. 		
-		The red line of each box shows the median of the projections,
-		the box encompasses the 25\% and 75\% percentile of the distribution while
-		the whiskers mark the 5\% and the 95\% percentile. The other black crosses
-		are data points with extreme values beyond the 5\% and 95\% percentile.
-		The median of $\nu$ show on the
-		left and the max($\Delta y_{\rm KDE}$) values on right plot 
-		show a correlation as high as 0.77.
-		\label{fig:projected_KDE_offset_distribution} 
-	}
-\end{figure*}
-\ifthenelse{\boolean{thesis}}{\end{landscape}}{}
-
-\begin{figure*}
-	\centering
-	\includegraphics[width=0.65\linewidth]{fig5_symmetrical_1D_pdf.png}
-	\caption{The smoothed distribution of different offsets of 43 clusters with all 768
-	projections. The smoothing bandwidth is determined by Scott's rule for 
-	visualization.
-	For estimates where several peaks of galaxy data are 
-	possible, only the densest peak is matched to the DM peak for computing
-	the offsets in this figure. 
-	The dark blue area indicates the 68\% density interval
-	while the light blue area shows the 95\% density interval. 
-	The table summarizing the statistic of each distribution is available in
-	table \ref{tab:p_val_table}. 
-		\label{fig:offset_distributions}}
-\end{figure*}
-
 \subsection{Constructing the hypothesis test} 
 The representations of the distributions of $\Delta s$ carry
 different information and allow different types of statistical tests. 
@@ -1011,8 +955,67 @@ We make our best attempt to measure $\Delta y_{\rm obs}$, the spatial component 
 observed offset along the axis connecting the subclusters if subcomponents exist. 
 In our observed samples, Abell 3827 is the only exception that has no
 subclusters but only four bright galaxy peaks in the central region. 
+\ifthenelse{\boolean{thesis}}{\begin{landscape}}{}
+\begin{figure*}
+	\centering
+
+	\ifthenelse{\boolean{thesis}}{
+			\begin{minipage}[b]{0.6\textwidth}
+	}{
+			\begin{minipage}[b]{0.45\textwidth}
+		}
+	\includegraphics[width=0.85\linewidth]{fig8_total_normalized_peak_density.pdf}
+	\end{minipage}
+	\ifthenelse{\boolean{thesis}}{
+			\begin{minipage}[b]{0.6\textwidth}
+	}{
+			\begin{minipage}[b]{0.45\textwidth}
+		}
+	\includegraphics[width=0.85\linewidth]{fig7_projected_KDE_offset_distribution.pdf}
+
+	\end{minipage}
+
+	\caption{Left: A box plot showing the distribution of the total normalized
+		peak density ($\nu$)
+		for each cluster. Clusters with only one dominant peak has $\nu = 1.0$,
+		values bigger than 1 indicate  density fraction contributed by other
+		peak(s). 
+	  Right: A box plot showing the distribution of $\Delta y_{\rm KDE}$ for each cluster. 
+		The distributions from both plots are based on 768 projections. 
+		The offsets were computed between the closest DM 
+		peak to the brightest luminosity peak of each cluster. 		
+		The red line of each box shows the median of the projections,
+		the box encompasses the 25\% and 75\% percentile of the distribution while
+		the whiskers mark the 5\% and the 95\% percentile. The other black crosses
+		are data points with extreme values beyond the 5\% and 95\% percentile.
+		The median of $\nu$ show on the
+		left and the max($\Delta y_{\rm KDE}$) values on right plot 
+		show a correlation as high as 0.77.
+		\label{fig:projected_KDE_offset_distribution} 
+	}
+\end{figure*}
+\ifthenelse{\boolean{thesis}}{\end{landscape}}{}
+
+\begin{figure*}
+	\centering
+	\includegraphics[width=0.65\linewidth]{fig5_symmetrical_1D_pdf.png}
+	\caption{The smoothed distribution of different offsets of 43 clusters with all 768
+	projections. The smoothing bandwidth is determined by Scott's rule for 
+	visualization.
+	For estimates where several peaks of galaxy data are 
+	possible, only the densest peak is matched to the DM peak for computing
+	the offsets in this figure. 
+	The dark blue area indicates the 68\% density interval
+	while the light blue area shows the 95\% density interval. 
+	The table summarizing the statistic of each distribution is available in
+	table \ref{tab:p_val_table}. 
+		\label{fig:offset_distributions}}
+\end{figure*}
+
+
 We also show $\Delta x_{\rm obs}$ components, the offset perpendicular to
 $\Delta y_{\rm obs}$ for comparison.
+
 For most of the observed offsets, we obtain the estimates from the contour plots 
 and descriptions of the corresponding papers. 
 For the offsets that are roughly in line with the axis connecting the two subclusters,
@@ -1073,52 +1076,14 @@ any disagreement with the CDM model will be more obvious.
 	 All p-value lower bounds are reported by matching to the corresponding method for
 	 estimating galaxy summary statistic in table \ref{tab:p_val_table}.
 	 \label{tab:offset_results}} 
-% \resizebox{1.35\textwidth}{!}{
-	 \begin{tabular}{@{}lccccccccc@{}}
-	 \hline 
-	 Cluster &$\Delta y$ (kpc) & $\Delta x$ (kpc) & $|\Delta s|$ (kpc) & galaxy peak & DM peak &  p-value & subcluster &
-	 mass ($10^{14}$ M$_\odot$)  &  reference\\
-	 \hline
-	 Bullet  & 9  & -23 & 25$~\pm~29$ & num. or lum. & SL \& WL & $0.32$ &
-	 northwest & 1.5 & \citealt{Randall2008d}\\
-	 Baby Bullet & -40&  0 & $\sim 40 \pm \sim 50 $  & lum. & SL \& WL &
-	 $ 0.05 $ & northwest & 2.6 &
-	 \citealt{Bradac2008}:Fig.4 \\
-	 Baby Bullet & 30  & 0 & $\sim 30 \pm \sim 75 $ & lum. & & $
-	 0.32 $&
-	 southeast
-	  & 2.5 & \citealt{Bradac2008}:Fig.4 \\
-	 Musketball &  129 & 0 & 129 $\pm \sim63$ & num. & WL & $0.05$ &
-	southern & 3.1 
-	 & \citealt{Dawson2013}:Fig.4.7\\
-	 Musketball & -47 & 0 & 47 $\pm \sim50$ & num. & & $0.32$ &
-	 northern & 1.7 &  
-	  \citealt{Dawson2013}:Fig.4.7\\
-		Abell 3827 & 6 & 0 & 6 & BCG & SL & $0.05$ & central & & \citealt{Williams2011a}\\ 
-		Abell 520 & 0 & 50& $\sim50 \pm \sim50$ & lum. & WL & $0.32$ & blue 
-		 & 5.7 & \citealt{Clowe2012}:Fig. 4 \\
-	 % Abell 1689  & & & & & &  & \citealt{Mohammed2014} \\
-		El Gordo &  58 &0 & $\sim58 \pm \sim100$ & lum. & WL & $0.05$ & 
-		northwest& 11  &\citealt{Jee2014}:Fig.7,8  \\
-		El Gordo & 30 & 110 & $ 115 \pm \sim60$ & num. & & $0.32$ & 
-		northwest&   &\citealt{Jee2014}:Fig.7,8  \\
-		El Gordo & 6 & 25& $\sim26 \pm \sim50$ & lum. & & $0.32$ & northwest & 7.9   
-		&\citealt{Jee2014}:Fig.7, 8  \\
-		El Gordo & 280 & 280 & 400 $\pm \sim40$ & num. & & $0.05$ &
-		southeast &   &\citealt{Jee2014}:Fig.7, 8  \\
-		Sausage &160 & 100& $\sim190\pm \sim150$ & num. & WL & $
-		0.05$ & north & 11.  &\citealt{Jee2015}:Fig.10\\ 
-		Sausage &160 & 160& $ \sim190\pm \sim150 $  & num. &  & $
-		0.05$ & south & 9.8 & \citealt{Jee2015}:Fig.10\\ 
+		\ifthenelse{\boolean{thesis}}{
+			\resizebox{1.35\textwidth}{!}{
+			\input{./Chapters/chapter3_offset_results}
+			}
+		}{
+			\input{./Chapters/chapter3_offset_results}
+		}
 
-		Sausage & 320 & 130 & $\sim340 \pm \sim150 $  & lum. & & $\lesssim
-		0.01$ & north & 11. & \citealt{Jee2015}:Fig.10\\ 
-
-		Sausage & 160 & 160 &$\sim230 \pm \sim150 $  & lum. & & $\lesssim
-		0.01$ & south & 9.8 &\citealt{Jee2015}:Fig.10\\ 
-	 \hline
-	 \end{tabular} 
-%  }
 	 \raggedright{
 		 {\it num.} is a short hand for the peak estimate from the number
 		 density map. \\
