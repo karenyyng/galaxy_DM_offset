@@ -288,24 +288,26 @@ def plot_KDE_peaks(fhat, lvls=range(2, 100, 10), allPeaks=True,
     ax.legend(loc='upper right', frameon=True, numpoints=1, fontsize=14,
               bbox_to_anchor=legend_box_anchor, markerscale=legend_markerscale)
 
+    low_xlim, up_xlim = ax.get_xlim()
+    low_ylim, up_ylim = ax.get_ylim()
+    ell = plot_bandwidth_matrix(fhat["bandwidth_matrix_H"][:],
+                          up_xlim= up_xlim - 400,
+                          up_ylim=up_ylim,
+                          low_xlim=low_xlim,
+                          low_ylim= 300 + low_ylim,
+                          ax=ax,
+                          flip_y=flip_y,
+                          unit_conversion=unit_conversion
+                          )
+    ax.add_artist(ell)
+
+
 
     if xlims is not None:
         ax.set_xlim(xlims)
     if ylims is not None:
         ylims = sorted([ylim * flip_y for ylim in ylims])
         ax.set_ylim(ylims)
-
-    low_xlim, up_xlim = ax.get_xlim()
-    low_ylim, up_ylim = ax.get_ylim()
-    plot_bandwidth_matrix(fhat["bandwidth_matrix_H"][:],
-                          up_xlim=0.8 * up_xlim,
-                          up_ylim=up_ylim,
-                          low_xlim=low_xlim,
-                          low_ylim=0.8 * low_ylim,
-                          ax=ax,
-                          flip_y=flip_y,
-                          unit_conversion=unit_conversion
-                          )
 
     if save and clstNo is not None:
         plt.savefig(fileDir + fileName + str(clstNo) + ".png",
@@ -378,8 +380,8 @@ def plot_bandwidth_matrix(mtx, up_xlim, up_ylim, low_xlim, low_ylim, ax,
                   width=width * unit_conversion,
                   height=height * unit_conversion,
                   angle=angle, color="m", edgecolor='none')
-    ax.text(mux - 1.7 * width, muy - 1.3 * height, 'kernel size')
-    ax = plt.gca()
-    ax.add_artist(ell)
+    # ax.text(mux - 1.5 * width, muy - 1.35 * height, 'kernel size')
+    # ax = plt.gca()
+    # ax.add_artist(ell)
 
     return ell
