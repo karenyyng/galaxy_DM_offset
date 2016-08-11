@@ -280,10 +280,10 @@ def plot_KDE_peaks(fhat, lvls=range(2, 100, 10), allPeaks=True,
     if R200C is not None:
         R200_circl = plt.Circle((0, 0), radius=R200C, color='k', lw=2,
                                 ls='solid', fill=False, label="R200C")
-        plt.plot(0, 0, 'ko', fillstyle='none', label='center of R200C circle',
+        ax.plot(0, 0, 'ko', fillstyle='none', label='center of R200C circle',
                  mew=1.5, ms=10)
         # fig = plt.gcf()
-        fig.gca().add_artist(R200_circl)
+        ax.add_artist(R200_circl)
 
     ax.legend(loc='upper right', frameon=True, numpoints=1, fontsize=14,
               bbox_to_anchor=legend_box_anchor, markerscale=legend_markerscale)
