@@ -200,7 +200,7 @@ def plot_KDE_peaks(fhat, lvls=range(2, 100, 10), allPeaks=True,
                    legend_box_anchor=(1., 1.4),
                    convert_kpc_over_h_to_kpc=False, flip_y=1.,
                    legend_markerscale=0.5, unit_conversion=1./0.704,
-                   xlims=None, ylims=None
+                   xlims=None, ylims=None, colorbar_ax=None
                    ):
     """make a plot of the fhat along with other important info
     :param fhat: dictionary or hdf5 filestream,
@@ -257,7 +257,8 @@ def plot_KDE_peaks(fhat, lvls=range(2, 100, 10), allPeaks=True,
                             c=fhat["peaks_dens"][i],
                             cmap=cm, vmin=0, vmax=1.0, edgecolor='k',
                             s=35, marker='s')
-        # fig.colorbar(sc)
+        if colorbar_ax is not None:
+            fig.colorbar(sc, cax=colorbar_ax)
 
     if showDomPeak:
         ax.plot(fhat["peaks_xcoords"][0] * unit_conversion,
@@ -284,7 +285,7 @@ def plot_KDE_peaks(fhat, lvls=range(2, 100, 10), allPeaks=True,
         # fig = plt.gcf()
         fig.gca().add_artist(R200_circl)
 
-    ax.legend(loc='upper right', frameon=True, numpoints=1,
+    ax.legend(loc='upper right', frameon=True, numpoints=1, fontsize=14,
               bbox_to_anchor=legend_box_anchor, markerscale=legend_markerscale)
 
 

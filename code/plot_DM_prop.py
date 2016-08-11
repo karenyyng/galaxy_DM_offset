@@ -89,7 +89,7 @@ def plot_DM_fhat(fhat, fhat_stars, clstNo, threshold=0.3,
     offset_string = ', '.join(offset_string)
     ax.set_title('Cluster {0}: gal-DM offset(s) = {1} kpc'.format(
         clstNo, offset_string) +
-        ", \n kernel size= {0} kpc".format(kernel_width * 2.)
+        ", \n kernel size= {0} kpc".format(kernel_width * 2.))
     ax.tick_params(axis='both', which='both', labelsize=fontsize)
     # xtickslabels = ax.get_xticklabels()
     #     , size=fontsize*1.2)
