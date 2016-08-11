@@ -12,8 +12,8 @@ def plot_DM_fhat(fhat, fhat_stars, clstNo, threshold=0.3,
                  unit_conversion = 1. / .704, ax=None, markersize=25,
                  log_scale=True, legend_box_anchor=(1.0, 1.2),
                  legend_markerscale=0.7, kernel_width=1, flip_y=-1.,
-                 xlabel_rotate_angle=45, verbose=False, origin='lower',
-                 show_legend=True, power=1./20.):
+                 xlabel_rotate_angle=90, verbose=False, origin='lower',
+                 show_legend=True, power=1./10.):
     """
     :param kernel_width: float, the number times the histogram size = 2 kpc
     """
@@ -90,7 +90,9 @@ def plot_DM_fhat(fhat, fhat_stars, clstNo, threshold=0.3,
     ax.set_title('Cluster {0}: gal-DM offset(s) = {1} kpc'.format(
         clstNo, offset_string) +
         ", \n kernel size= {0} kpc".format(kernel_width * 2.)
-        , size=fontsize*1.2)
+    ax.tick_params(axis='both', which='both', labelsize=fontsize)
+    # xtickslabels = ax.get_xticklabels()
+    #     , size=fontsize*1.2)
 
     # Make ticks bigger
     ax.tick_params(axis='both', which='both', labelsize=fontsize)
@@ -113,10 +115,10 @@ def plot_DM_fhat(fhat, fhat_stars, clstNo, threshold=0.3,
     # plot the smoothing scale
     xlims = ax.get_xlim()
     ylims = ax.get_ylim()
-    lower_x_bar = xlims[1] - np.diff(xlims) * 0.2
-    y_bar_location = ylims[0] + np.diff(ylims) * 0.20
-    ax.plot((lower_x_bar, lower_x_bar + kernel_width * 2),
-            (y_bar_location, y_bar_location), 'w', linewidth=5)
+    # lower_x_bar = xlims[1] - np.diff(xlims) * 0.2
+    # y_bar_location = ylims[0] + np.diff(ylims) * 0.20
+    # ax.plot((lower_x_bar, lower_x_bar + kernel_width * 2),
+    #         (y_bar_location, y_bar_location), 'w', linewidth=5)
 
     # rotate tick label
     map(lambda x: x.set_rotation(xlabel_rotate_angle),

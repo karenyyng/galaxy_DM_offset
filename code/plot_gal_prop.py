@@ -196,7 +196,7 @@ def plot_KDE_peaks(fhat, lvls=range(2, 100, 10), allPeaks=True,
                    clabel=False, showData=False, xlabel="x (kpc / h)",
                    ylabel="y (kpc / h)", showDomPeak=True,
                    fileDir="../plots/", fill=False, showContour=True,
-                   ax=None, fig=None, xlabel_rotate_angle=45,
+                   ax=None, fig=None, xlabel_rotate_angle=90,
                    legend_box_anchor=(1., 1.4),
                    convert_kpc_over_h_to_kpc=False, flip_y=1.,
                    legend_markerscale=0.5, unit_conversion=1./0.704,
@@ -205,6 +205,7 @@ def plot_KDE_peaks(fhat, lvls=range(2, 100, 10), allPeaks=True,
     """make a plot of the fhat along with other important info
     :param fhat: dictionary or hdf5 filestream,
         that is generated from `do_KDE_and_get_peaks`
+    :returns: color bar instance
     """
     if not convert_kpc_over_h_to_kpc:
         unit_conversion = 1.
@@ -256,7 +257,7 @@ def plot_KDE_peaks(fhat, lvls=range(2, 100, 10), allPeaks=True,
                             c=fhat["peaks_dens"][i],
                             cmap=cm, vmin=0, vmax=1.0, edgecolor='k',
                             s=35, marker='s')
-        fig.colorbar(sc)
+        # fig.colorbar(sc)
 
     if showDomPeak:
         ax.plot(fhat["peaks_xcoords"][0] * unit_conversion,
@@ -296,10 +297,10 @@ def plot_KDE_peaks(fhat, lvls=range(2, 100, 10), allPeaks=True,
     low_xlim, up_xlim = ax.get_xlim()
     low_ylim, up_ylim = ax.get_ylim()
     plot_bandwidth_matrix(fhat["bandwidth_matrix_H"][:],
-                          up_xlim=up_xlim,
+                          up_xlim=0.8 * up_xlim,
                           up_ylim=up_ylim,
                           low_xlim=low_xlim,
-                          low_ylim=low_ylim,
+                          low_ylim=0.8 * low_ylim,
                           ax=ax,
                           flip_y=flip_y,
                           unit_conversion=unit_conversion
@@ -312,7 +313,7 @@ def plot_KDE_peaks(fhat, lvls=range(2, 100, 10), allPeaks=True,
     if showData:
         plt.show()
 
-    return
+    return sc
 
 
 def plot_data_and_peak(df, peaks, R200C=None, save=False, title=None,
