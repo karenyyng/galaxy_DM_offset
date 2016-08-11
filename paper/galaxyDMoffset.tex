@@ -12,6 +12,18 @@
 \def\gsim{ \lower .75ex \hbox{$\sim$} \llap{\raise .27ex \hbox{$>$}} }
 \def\lsim{ \lower .75ex \hbox{$\sim$} \llap{\raise .27ex \hbox{$<$}} }
 
+
+% set custom commands 
+
+\newcommand{\sigmaSIDM}{\sigma_{\rm SIDM}}
+\newcommand{\offset}{\Delta {\bf s}}
+\newcommand{\SIDM}{{\rm SIDM}}
+
+% ifthenelse
+\usepackage{ifthen}
+\newboolean{thesis}
+\setboolean{thesis}{false}
+
 % landscape table
 \usepackage{lscape}
 
@@ -96,22 +108,34 @@
 \providecommand{\ISBN}[1]{\href{http://cosmologist.info/ISBN/#1}{ISBN: #1}} 
 %-----------------------------------------------------------------------
 \title[
-	The offsets between the galaxies and the dark matter in the galaxy clusters of the Illustris simulation]
-{The offsets between the galaxies and the dark matter	in the galaxy clusters of
-the Illustris simulation}
-\author[Karen Y. Ng et al.]{Karen Y. Ng,$^{1}$
-	Annalisa P. Pillepich,$^{2}$ 
-	D. Wittman,$^{1}$
-	William A. Dawson,$^{3}$ 
-	\newauthor Lars Hernquist$^{2}$
-}
+	Offsets between member galaxies and dark matter in clusters: a
+test with the Illustris simulation]
+{Offsets between member galaxies and dark matter in clusters: a
+	test with the Illustris simulation}
+\author[Karen Y. Ng et al.]{Karen Y. Ng,$^1$
+	Annalisa P. Pillepich,$^2$ 
+	D. Wittman,$^1$
+	William A. Dawson,$^3$ 
+	\newauthor Lars Hernquist,$^{2}$
+	Dylan Nelson$^{2}$ \\ 
+$^{1}$Department of Physics, University of California Davis, One Shields
+Avenue, Davis, CA 95616, USA\\ 
+$^{2}$Harvard-Smithsonian Center for Astrophysics, 60 Garden Street, Cambidge,
+MA 02138, USA\\
+$^{3}$Lawrence Livermore National Laboratory, P.O. Box 808, Livermore, CA 94551-0808, USA \\}
 \begin{document}
 \date{arXiv} \pagerange{\pageref{firstpage}--\pageref{lastpage}}
 \pubyear{2015} \maketitle\label{firstpage}
 \begin{abstract} 
-	Assuming that dark matter has a zero self-interacting cross section, how likely is
-	it for us to see the reported offset values between dark matter and galaxies 
-	from real data of merging galaxy clusters? 
+	Dark matter with a non-zero self-interacting cross section ($\sigma_{\rm
+	SIDM}$) has been posited
+	as a solution to a number of outstanding astrophysical mysteries.
+	Many studies of merging galaxy clusters have given constraints of
+	$\sigma_{\rm SIDM}$ based on some spatial offsets of the member galaxy
+	population and the dark matter population.      
+	Assuming $\sigma_{\rm SIDM} = 0$, how likely is
+	it for us to see the observed offset values between the member galaxies and
+	the dark matter from merging clusters of galaxies? 
 	This paper formulates a hypothesis test using cluster data in the cosmological 
 	simulation, the Illustris simulation to answer the question. 
 	In the process,
@@ -123,15 +147,15 @@ the Illustris simulation}
 	We found that the choice of summary statistic to affect the offset
 	value significantly, with the BCG and the luminosity peak giving the tightest
 	68-th percentile offsets levels.  
-	Out of the 15 reported offset from observed merging clusters
+	Out of the 15 reported offsets from observed merging clusters
 	that we examined, 13 of
 	them are consistent with the Illustris offset levels to 2-sigma 
 	(95-th percentile) level. Although two of the reported offsets from inferred
 	from luminosity peaks lie outside the 99-th percentile level, it is unclear
 	if the large reported offset discrepancy is due to different ways of
 	determining the smoothing kernel width for the luminosity map. 
-	We also identified that the long
-	tail of the offset distribution of the BCG to be due to projected 
+	We also found a long
+	tail of the offset distribution of the BCG due to projected 
 	substructures. In general, galaxy summary statistics such as
 	shrinking aperture, number density and centroid give a large bias of $\sim$ 50
 	$-$ 100 kpc at
@@ -139,7 +163,7 @@ the Illustris simulation}
 	mass component. Excluding the BCG, 
 	the luminosity peak is the most 
 	robust to the bias from substructures, 
-	if a proper statistical procedure is used to determine
+	if cross validation is used to determine
 	the smoothing bandwidth for the luminosity map.
 \end{abstract}
 
