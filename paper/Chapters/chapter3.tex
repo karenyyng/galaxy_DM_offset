@@ -15,18 +15,15 @@ between our current cosmological model and observations. These discrepancies inc
 ``core vs cusp" problem, which describes the observation of cores instead of
 cuspy density profiles in the central regions of
 (dwarf) galaxies that CDM predicts (\citealt{Rocha2013a},
-\citealt{Peter2013b}, \citealt{Buckley2014}). Having SIDM can also resolve 
-``the missing satellite problem'' (\citealt{Moore1999}, \citealt{Klypin1999}),
-which describes how the CDM model 
-overpredicts the number of satellite galaxy halos for Milky-Way size galaxies. 
 Studying systems of larger scales such as galaxy clusters, may provide independent 
 evidence on whether SIDM fits observations better. 
 
 In particular, efforts have focused on studying SIDM observables 
-using simulations of in merging galaxy clusters.
+using simulations of merging galaxy clusters.
 As the SIDM scattering rates can be shown to depend on the 
-relative velocities of the DM particles \citep{Markevitch2004}, the high velocities 
-in cluster mergers was speculated to produce an SIDM signal. This idea was verified by 
+relative velocities of the DM particles \citep{Markevitch2004}, the high
+velocities and column densities 
+in cluster mergers may produce an SIDM signal. This idea was verified by 
 \cite{Randall2008d}, who used the first suites of simulations of the
 Bullet Cluster that included SIDM physics. 
 \cite{Randall2008d} showed that the scattering events of SIDM can cause the DM
@@ -41,7 +38,7 @@ where $\bf{s}_{gal}$ and $\bf{s}_{DM}$ are the two-dimensional (2D) spatial
 locations of the summary statistic of the galaxy population, and the density
 peak of DM respectively. 
 It is also noteworthy that \cite{Randall2008d} showed an almost linear dependence of
-$\offset_{\SIDM}$ on $\sigmaSIDM$. 
+$\offset_{\SIDM}$ on $\sigmaSIDM$ in Bullet Cluster simulations. 
 % To probe the possible self-interaction cross section $\offset_{\SIDM}$ of DM,
 % many papers have used the spatial offsets between the `center' of the DM 
 % distribution and those of the member galaxies (\citealt{Markevitch2004}, 
@@ -57,7 +54,7 @@ the observations of the Bullet Cluster
 \cite{Randall2008d} were able to derive a constraint of $\sigmaSIDM <$ 
 1.25 cm$^2$ g$^{-1}$.  
 
-While similar staged simulations provide the best settings 
+While similar staged simulations provide suitable settings 
 for understanding of the physical origin and statistical distribution of $\offset_{\SIDM}$
 for merging galaxy clusters, 
 we argue that the simulated offsets should not be interpreted as the observed
@@ -66,22 +63,22 @@ If we assume (statistical) independence of
 the different possible contributions of the observed 
 offset, we can decompose the model of $\Delta s_{\rm obs}$ to be:
 \begin{equation}
-	\offset_{\rm obs} = \offset_{\SIDM} + \offset_{\rm dyn} + n + \cdots,
+	\offset_{\rm obs} = \offset_{\SIDM} + n + \cdots,
 	\label{eq:signal_and_noise}
 \end{equation}
 with $\offset_{\SIDM}$ being the offset distribution caused by SIDM, 
-$\offset_{\rm dyn}$ being the offset distribution due to other physical causes such as
-dynamical friction, and $n$ being the observational uncertainties and statistical noise.
+and $n$ being the distribution of observational uncertainties and statistical noise.
+We do not exclude the possibility of other contributions to the observed
+offsets due to physical causes such as dynamical friction.
 % Also, each of the terms in eq. \ref{eq:signal_and_noise} are two-dimensional
 % (2D) vector quantities. 
-The simulated offsets from these staged merger simulations can be treated as 
-values drawn from the distribution of the $\offset_{\SIDM}$ term.
-
+These staged merger simulations give estimates of 
+the distribution of the $\offset_{\SIDM}$ term, with
+a highly suppressed $n$ term. 
+  
 There are various settings that the staged merger simulations put in place to maximize
-$\offset_{\SIDM}$ and minimize the noise $n$, where as  
-dynamical friction was not included in some of these
-simulations to begin with. 
-We list the optimistic assumptions from the staged merger simulations as follows: 
+$\offset_{\SIDM}$ and minimize the noise $n$. 
+We list the assumptions from the staged merger simulations as follows: 
 First, the physical properties of the galaxy
 clusters are known to much higher certainty than possible as they are
 controllable aspects of the simulations. e.g. both the DM and 
@@ -93,7 +90,7 @@ such as an Navarro-Frenk-White (NFW) profile. For real observations,
 substructures and foreground
 contaminations can all make the inference of the spatial distribution 
 of the galaxy population more uncertain. 
-Second, physical details such as dynamical friction, feedback from supernovae and Active
+Second, physical processes such as feedback from Active
 Galactic Nuclei (AGN) are also sometimes ignored in these simulations, 
 even though these physical process can affect the spatial distributions of the
 galaxies \citep{Cui2015}.  
@@ -102,32 +99,39 @@ galaxies than is observable. \cite{Randall2008d} used
 $10^5$ galaxies, \cite{Kahlhoefer14} used as many galaxy proxies as DM particles, 
 while Kim et al. (in prep.) used either 5.7k or 57k galaxies. 
 Fourth, the mergers are usually initialized with conditions that maximize SIDM
-interaction rates, such as a zero impact parameter. There is currently no
-method for giving high precision estimates for the impact parameters of observed mergers. 
+interaction rates, such as a zero impact parameter. However, the impact
+parameter in any given observed merger is highly uncertain. 
 Fifth, at the beginning of the simulated mergers, the galaxy and the DM
 population are set to have zero offsets for any $\sigmaSIDM$ value. 
 This assures that the offsets obtained from the merger simulations are due to SIDM. 
 While this initial condition 
 is a reasonable choice for making the effects of SIDM stand out from the simulations, 
-the real $\offset_{\SIDM}$ of a cluster does not have to be zero at the beginning of a merger.  
+the real $\offset_{\SIDM}$ of a cluster does not have to be zero at the 
+beginning of a merger. We call this the intrinsic offset $\offset_{\rm
+intrinsic}$.
 
 Most importantly, we argue that the estimated $\offset$ 
 from the aforementioned staged simulations cannot be
 {\it directly}
 compared to $\offset_{\rm obs}$ due to the following reason --- 
-By tuning the cluster configurations, the simulations have {\it asserted}
-the two implicit assumptions for cluster mergers under a CDM model, \\
+the simulations have shown that for the cluster mergers under a CDM model
+\\
 1) the offset from other physical effects $\offset_{\rm dyn}$ over time 
 is both constant and negligible, 
 and \\ 
 2) the noise term is approximately zero.\\ 
 For instance, \cite{Randall2008d} reported the offset from their CDM simulation 
-as a constant number, i.e. $\sim 1.8$ kpc, without reporting any time variation or error bars. 
+as a constant number, i.e. $\sim 1.8$ kpc. 
 Both \cite{Robertson2016} and
 \cite{Kahlhoefer14} also showed approximately zero $\offset$ throughout their CDM 
 simulation runs.   
+Again, these settings from staged simulations facilitate an accurate estimation
+of $\offset_\SIDM$. It is unclear that these settings hold in a CDM simulation
+with realistic cluster substructures and galaxy spatial distributions, 
+non-negligible impact parameters and physical feedback.
 
-These assumptions may lead to problems when we assume all the observed offset
+The ideal settings from staged simulations 
+may lead to problems when we assume all the observed offset
 as the signal of SIDM, and use it to infer $\sigmaSIDM$.  
 When the staged simulations set $\sigmaSIDM$ to observationally motivated 
 levels of $< 3$ \centi\meter$^2 / \gram$, 
@@ -149,9 +153,10 @@ To match the observed offset values of $\sim 100$ kpc, it is possible
 to increase $\sigmaSIDM$ further. However, such big $\sigmaSIDM$ values will
 cause a large rate of halo evaporation (Kim et al. in prep), which is not seen
 in observations.
-With the discrepancies of maximum $\offset$ values inferred between simulations and observations,
-these simulations have raised questions about the procedures that were used for
-the comparisons.
+With the discrepancies of maximum $\offset$ values inferred between simulations 
+and observations,
+these simulations have raised questions about how the observed offset should be
+compared to simulations.
 
 On the observational side, the list of observed merging galaxy 
 clusters has been growing.
@@ -162,27 +167,27 @@ and others that we list in more detail in Table \ref{tab:offset_results}.
 Without understanding the various contributions of the noise term, 
 we should not attribute all the offset to an SIDM signal. 
 
-An alternative explanation for the observed galaxy-DM offset signal is due to 
+An alternative explanation for the observed level of galaxy-DM offset is due to 
 statistical and observational uncertainties. Galaxies are
 sparse samples of the underlying DM overdensities --- it is possible that the 
-summary statistics of the sparse sample to be different from those of the 
+summary statistics of the sparse sample are different from those of the 
 underlying distribution. It is not clear if there is any physical
 origin of the galaxy-DM offset in a CDM universe, 
 but any statistical noise leading to an offset can influence this method of 
 inferring $\sigmaSIDM$. 
 
 To bridge the gap between observations and staged simulations, we
-study $\offset$ from a cosmological simulation, the Illustris simulation
+study $n_{\rm CDM}$ from a cosmological simulation, the Illustris simulation
 (\citealt{Vogelsberger2014}, \citealt{Genel2014a}). 
 The Illustris simulation contains a sample of galaxy clusters that are evolved
 from initial conditions similar to the primordial
-perturbations. In section \ref{sec:illustris_sim},
+matter density field. In section \ref{sec:illustris_sim},
 we will show that the galaxy clusters from the Illustris simulation 
 are realistic enough to examine some of the aforementioned assumptions made by the
 staged simulations of galaxy clusters. Since the Illustris simulation assumes no SIDM but 
 includes other physical effects and statistical noise, 
 this study is complementary to the 
-staged simulations for understanding $\offset_{\rm dyn}$ and $n$. 
+staged simulations for understanding $n$ and $\offset_{\rm intrinsic}$. 
 
 Additionally, we propose a hypothesis test with the galaxy-DM offsets in
 the Illustris simulation directly corresponding to our null hypothesis
@@ -212,27 +217,27 @@ relaxation ($\sim$ several Gyr).
 % To access if the offsets we observe is
 % completely explained by the method for computing the offset, we investigate   
 % the precision to which we can find the galaxy-DM offsets.  
-Popular methods for computing the offsets is shown in eq. \ref{eq:offset}.
-It involves first inferring ${\bf s}_{\rm DM}$ 
+Popular methods for computing the offsets are shown in eq. \ref{eq:offset}.
+They involve first inferring ${\bf s}_{\rm DM}$ 
 and ${\bf s}_{\rm gal}$ independently before taking a difference.
 While the inference procedures of ${\bf s}_{\rm DM}$ are driven by lensing 
 physics, there is no standard procedure for
-mapping the sparse member galaxy distribution. 
+summarizing the sparse member galaxy distribution. 
 We try to quantify the bias and uncertainty associated with the
 statistic for summarizing the member galaxy population. 
 
 Understanding the characteristics of different galaxy
 summary statistics of clusters is also important for  
 probing the matter fluctuations in the universe. 
-One such type of studies is done by performing lensing analyses on the stacked images of 
+One such type of study is done by performing lensing analyses on the stacked images of 
 many small galaxy groups and clusters. 
 The derived cluster mass function can provide constraints to cosmological
 parameters such as $\sigma_8$ \citep{George2012a}. 
-For such studies, stacking on the `wrong' centers is a commonly cited
+For such studies, stacking on the `wrong' centers or miscentering, is a commonly cited
 source of uncertainties (\citealt{Johnston2007b},
 \citealt{Ford2014}). By comparing the discrepancies of different galaxy
-summary statistic, we can find out what can help maximize the lensing signal and 
-the possible cause(s) of miscentering. 
+summary statistics, we can possibly determine the  
+cause(s) of miscentering and ways to maximize the stacked signal. 
 
 In this paper, we 
 1) extract realistic observables from the Illustris simulation for
@@ -240,8 +245,15 @@ comparison with observations, 2) explore the pros and cons of various statistics
 summarizing {\it the member galaxy population} of a galaxy cluster, and 3)	
 give estimates for the offsets between the summary statistics of the galaxy  
 population and the DM population under $\Lambda$CDM cosmology.
-This gives
-an estimate of the baseline scatter of offsets without any SIDM. And finally we 
+This gives an estimate of the baseline scatter of offsets without any SIDM.
+This baseline scatter is due
+to both the observational noise and uncertainty $n$ and also the intrinsic offsets 
+$\offset_{\rm intrinsic}$. We call this combined offset contribution as:
+\begin{equation}
+	n_{\rm CDM} = n + \offset_{\rm intrinsic}
+\end{equation}
+
+And finally we 
 4) examine the properties of the clusters that give outliers in 
 the offset distribution and 5) investigate the  
 correlations between the physical properties of a cluster and the projected 
@@ -277,7 +289,7 @@ quantities that we examine resemble observables but without noise and
 systematics from observations. 
 Then in Section \ref{sec:methods}, 
 we explain the methods for computing various 
-summary statistics of the spatial distribution of galaxies how we prepare our dark
+summary statistics of the spatial distribution of galaxies and how we prepare our dark
 matter spatial data to resemble convergence maps. We show the statistical performance
 of the different summary statistics before we show the main results
 in Section \ref{sec:results}. In the discussion in Section \ref{sec:discussion}, 
@@ -338,7 +350,7 @@ SUBFIND} catalog using stellar population synthesis models.
 
 For our analyses, we make use of galaxy clusters / groups 
 with at least 50 member galaxies that are within a reasonable observational limit, 
-i.e. apparent $i \leq 24.4$ which is the limiting magnitude of the DEIMOS
+i.e. apparent $i \leq 24.4$ which is feasible for spectroscopic confirmation with the DEIMOS
 spectrometer on the Keck telescope when we assume a cosmological redshift of $z = 0.3$
 in the $i$ band. % This represents a spectroscopic selection of member galaxies. 
 % The limiting magnitude of 24.2 in the
@@ -378,10 +390,7 @@ masses ranging from $10^{13}$ M$_\odot $ to $10^{14}$ M$_\odot$.
 Clusters undergo merger activities at a large range of physical scales and 
 on time scales of millions of years. 
 The dynamical history cannot be directly 
-computed from observations. We use several measures of unrelaxedness to characterize 
-the dynamical state of the clusters.
-We quantify the state of the cluster by providing several quantitative
-definitions of unrelaxedness and see how they correlate with $\Delta s$.
+computed from observations. 
 
 % put this in landscape mode if this is compiled for my thesis 
 \ifthenelse{\boolean{thesis}}{\begin{landscape}}{}
@@ -402,6 +411,8 @@ definitions of unrelaxedness and see how they correlate with $\Delta s$.
 \end{table*}
 % put this in landscape mode if this is compiled for my thesis 
 \ifthenelse{\boolean{thesis}}{\end{landscape}}{}
+We use several measures of unrelaxedness to characterize 
+the dynamical state of the clusters and see how they correlate with $\Delta s$.
 Some possible definitions of unrelaxedness referred by the simulation community
 include:
 \begin{itemize}
@@ -415,7 +426,7 @@ include:
 \end{itemize}
 To relate these simulation quantities to observation, 
 we compute more observation-oriented 
-quantities in the method Section \ref{subsubsec:nu}. 
+quantities in the method section (Section \ref{subsubsec:nu}). 
 
 \subsection{Selection of the field-of-view}
 \label{sec:FOV}
@@ -456,16 +467,16 @@ We used {\sc HealPy} to compute the angular projections,
 which is a {\sc Python} wrapper for
 {\sc{HEALPix}} \footnote{HEALPix is
 currently hosted at http://healpix.sourceforge.net}
-\citep{Gorski2005}. The software {\sc HealPy} gives different
-lines-of-sight, each centers on a {\sc{HEALPix}} 
+\citep{Gorski2005}. {\sc HealPy} gives different
+lines-of-sight, each centered on a {\sc{HEALPix}} 
 pixel. Each pixel covers the same amount of area on a sphere. 
-The number of projections that we employed is 768 for each cluster. With around 
-768 projections, the offset distributions of each cluster start to converge to a
+The number of projections that we employed is 768 for each cluster. With this
+many projections, the offset distributions of each cluster start to converge to a
 stable distribution. 
 Even though there are at least 2 identical projections for each cluster due to
 one possible line-of-sight from the front and one from the back, it does not
 affect any summary statistic. We do not remove the duplication as it breaks
-the rotational symmetry in the 2D plane when we try to compute the 2D population
+the rotational symmetry in the 2D plane when we compute the 2D population
 distribution of offsets.  
 % Details of the implementation of the projection is available in Appendix
 % \ref{app:projections}.
@@ -483,6 +494,7 @@ We pick the $i-$band magnitude
 associated with each subhalo as the weight. Since the $i-$band is
 one of the redder bands, the mass-to-light ratio is not skewed as much due to star
 formation activities. 
+
 We further examined if the color distribution of galaxies in Illustris-1 are
 similar to the observed color-magnitude diagrams for clusters.
 The Illustris cluster galaxies are realistic enough that it is easy to
@@ -521,7 +533,7 @@ the same methods across the different snapshots of the (Illustris) simulations t
 examine the variability of $\Delta s$ across time in future studies. 
 
 
-\subsection{Finding the galaxy summary statistic }
+\subsection{Finding the galaxy summary statistic}
 \subsubsection{Computing the weighted centroid}
 \label{subsubsec:weighted_centroid}
 We follow the usual definition of the weighted centroid: 
@@ -547,9 +559,11 @@ A histogram is not good for peak estimate for {\it sparse} data for two reasons:
 choice of laying down the bin boundaries affects the count in each bin, 2) the choice of
 bin width also affects the count in the bin. Only when the available number of data points
 for binning is large are the estimates of histograms and smoothed density
-estimates approximately the same. The number of member galaxies ($< 500$) 
-is sparse enough for the uncertainty introduced by histogramming to bias our
-peak estimate. For the density estimate of galaxy luminosity, 
+estimates approximately the same. The number density of member galaxies  
+is sparse enough ($< 500$) for the uncertainty introduced by histogramming 
+to bias our peak estimate. We therefore perform a kernel density estimation
+instead of histogramming. 
+For the density estimate of galaxy luminosity, 
 we adopt a Gaussian kernel. 
 The exact choice of the functional form of the smoothing kernel does
 not dominate the density estimate as long as the chosen kernel is
@@ -565,10 +579,10 @@ too large, the data is over-smoothed,
 resulting in a bias of the peak estimate. On the other hand, when the kernel
 width is too small, it results in high variances of the estimate and 
 too many peaks due to noise. 
-A good illustration can be seen in \citealt{Vanderplas2012} from 
-\href{http://www.astroml.org/book\_figures/chapter6/fig\_hist\_to\_kernel.html}{http://goo.gl/jvsfcv}.
 The parameter decision for balancing between the portion of
 bias or variance in an estimate is also known as the bias-variance tradeoff. 
+A good illustration can be seen in \citealt{Vanderplas2012} from 
+\href{http://www.astroml.org/book\_figures/chapter6/fig\_hist\_to\_kernel.html}{http://goo.gl/jvsfcv}.
 All other smoothing procedures, including interpolation with splines,
 polynomials, and filter convolutions, also face the same tradeoff. 
 
@@ -600,7 +614,7 @@ in the {\sc{R}} statistical computing environment \citep{R_core}.
 Among all the different {\sc{R}} packages, {\sc{ks}} is the
 only package capable of handling the magnitude weights of the data points 
 while inferring the density estimates \citep{Deng2011}. 
-Although the particular implementation of KDE has a computational runtime of $O(n^2)$, 
+Although this particular implementation of KDE has a computational runtime of $O(n^2)$, 
 the number of cluster galaxies is
 small enough for this method to finish quickly ($\lesssim 0.65$ second per
 projection per cluster). 
@@ -623,7 +637,7 @@ comparable to those of the brightest peak.
 Then we sum the density of all the galaxy peaks for a cluster and call this value
 $\nu$. When the value of $\nu$ much gets bigger than 1, it indicates the presence 
 of projected substructure(s). Even though 
-$\nu$ is not expressed in terms of masses, it can be computed using galaxies
+$\nu$ is not expressed in terms of masses, it can be computed using galaxy
 magnitudes from optical survey data. 
 % Another possible quantification of relaxedness can be computed based on the
 % (morphology) ratio of eigenvalues of the galaxy luminosity map bandwidth matrix. 
@@ -631,18 +645,19 @@ magnitudes from optical survey data.
 \subsubsection{Shrinking aperture estimates}
 
 Another popular method among astronomers for finding the peak of a spatial
-distribution is what we call the shrinking aperture method.
+distribution is what we call the shrinking aperture method, which iteratively
+computes the centroid over successively smaller apertures.
 We test if the shrinking aperture method is able to reliably recover the 
 peak of the luminosity map.
 This method is dependent on the initial diameter and the initial center 
-location of the aperture.
-This method does not evaluate if the cluster is made up of
+location of the aperture, and 
+ does not evaluate if the cluster is made up of
 several components.
 The estimate using the shrinking aperture algorithm can be biased by
 substructures. The only way to inform the algorithm about substructures would
 be to introduce another parameter to restrict the extent of the aperture, or to
 partition the data with another (statistical) algorithm.
-More to the point, the convergence of results of this method is unstable. We use a
+More to the point, the convergence of results of this method is not guaranteed. We use a
 convergence criterion of having the aperture distance not change more than 2\% 
 between successive iterations as a reference. The actual implementation in
 {\sc Python} can be found at \href{https://goo.gl/nqxJl8}{https://goo.gl/nqxJl8} while
@@ -650,9 +665,7 @@ the pseudo-code can be found in Appendix \ref{app:shrink_apert}.
 
 \subsubsection{Brightest Cluster Galaxies (BCG)}
 The BCGs are formed by the merger of many smaller
-galaxies. The galaxy cannibalism makes BCGs typically brighter than the rest of 
-the cluster galaxy population. 
-However, star formation can cause
+galaxies. However, star formation can cause
 less massive galaxies to be brighter in the bluer photometric bands.
 To avoid star formation from biasing our algorithm for identifying the
 BCG, we find the brightest galaxies in redder bands i.e. the $r, i, z$
@@ -676,7 +689,7 @@ We used the $i-$band to pick the BCG for computing the plots and the final resul
 	boxes with dashed-outlines are present in the middle
 	column.
 	Due to the statistical nature of this exercise, we sampled the data and
-	performed the analyses 50 times to
+	performed the analyses 1000 times to
 	create the 68\% and 95\% Monte Carlo confidence contours of the estimates in the
 	middle column. The rightmost column shows how the population bias varies as a
 	function of the number of drawn data points from the Gaussian mixtures. 
@@ -722,7 +735,7 @@ We used the $i-$band to pick the BCG for computing the plots and the final resul
 \end{center}
 \end{figure*}
 
-\subsection{Comparison of the methods from Gaussian mixture data}
+\subsection{Comparison of the methods using Gaussian mixture data}
 In order to examine the statistical properties of commonly used point-estimates 
 of the distribution of the galaxy data, we test them on data drawn 
 from Gaussian mixtures with known mean and variance. 
@@ -736,7 +749,7 @@ Due to statistical fluctuations, it is also not enough to
 compare the performance by applying each method for just one realization of the
 data. We provide the 68\% and the 95\% confidence regions by applying the
 each method for 1000 realizations from the Gaussian mixtures.
-We compute the population location from the 1000 realization for each method 
+We compute the population location from the 1000 realizations for each method 
 and indicate it as a cross on the middle column of Fig. \ref{fig:toy_data_mixtures}.
 The difference between this population estimate and the peak of the dominant mixture 
 is shown as the bias on the right hand column of Fig.
@@ -753,7 +766,7 @@ In the right panel of Fig. \ref{fig:toy_data_mixtures},
 we present how the population bias of each method shrinks as the
 number of data points increases. With enough data points ($> 50$), 
 for the data generated with more than one mixture, 
-the KDE peak consistently show less population bias than the shrinking aperture method. 
+the KDE peak consistently shows less population bias than the shrinking aperture method. 
 The performance of the shrinking aperture method fluctuates and is unstable when
 the number of data points is increased.
 
@@ -790,13 +803,13 @@ The number of DM particles for each cluster is of
 the order of millions and densely packed in the region of
 interest. 
 Physically, the smoothed histograms of the dark matter of each cluster 
-is analogous to a convergence map from a lensing analysis. 
+is analogous to a convergence map from a high-resolution lensing analysis. 
 
 
 \subsection{Finding the offsets} \label{subsec:offsets}
 Finding the offsets between the peaks of the DM map and the peaks of the 
-luminosity map is not a well-defined process. Different peak identification
-criteria and matching
+luminosity map is not a well-defined process in the presence of multiple peaks. 
+Different peak identification criteria and matching
 procedures can lead to different offset values. 
 We refer the readers to Fig. \ref{fig:select_peak_visualization} for a comparison
 between the DM maps (e.g. the left and middle columns), and 
@@ -809,7 +822,7 @@ than luminosity peaks (indicated by the squared markers on the right column).
 This is because there are many more dark subhalos than galaxies for each cluster and 
 the resolution of the DM data is much higher. 
 
-Furthermore, not all peaks corresponds to actual substructures.
+Furthermore, due to projection, not all peaks correspond to actual substructures.
 We try to determine the importance of the peaks according to the density 
 estimates at each luminosity peak. For the convenience of the readers, 
 in the right hand panels of Fig. \ref{fig:select_peak_visualization},
@@ -818,10 +831,10 @@ by the color of the squared markers.
 The color bar shows the color mapping to the density estimate.
 The density estimate at each peak ($\nu$) is normalized according to the density
 estimate of the brightest peak of each cluster projection. 
-We only match DM peaks to luminosity 
-peaks that are at least 20\% as dense as the brightest luminosity peak to avoid 
-computing the offsets of spurious substructures.
-These spurious substructures correspond to some of 
+% We only match DM peaks to luminosity 
+% peaks that are at least 20\% as dense as the brightest luminosity peak to avoid 
+% computing the offsets of spurious substructures.
+There are some spurious substructures as indicated by 
 the deep blue squared markers in the right hand panels of Fig.
 \ref{fig:select_peak_visualization}.
 They represent peaks created by a small number of galaxies that
@@ -829,28 +842,31 @@ are located far away from the main concentration of mass.
 
 We write our peak matching algorithm to mimic how humans would
 find the closest DM peak to the galaxies peak. 
-This peak-matching process can be visualized in the middle column of 
+This peak-matching process (described in detail in the following paragraph) 
+can be visualized in the middle column of 
 Fig. \ref{fig:select_peak_visualization}.
 From the computation of the KDE luminosity map,
 we have used the KDE method from Section \ref{subsubsec:KDE} to compute 
-where the significant luminosity peaks are. 
+the significant luminosity peaks locations. 
 The luminosity peaks are indicated by the magenta circles in the middle column
 of Fig. \ref{fig:select_peak_visualization}.
-From Section \ref{subsec:DM_map}, we have also computed where the DM peaks are, 
+From Section \ref{subsec:DM_map}, we have also computed the DM peak locations, 
 as indicated by the cyan or blue circles.
 
 To find the closest match between the DM and luminosity peak, 
 we compute the distances between the densest DM peaks
-and the significant luminosity peaks using a data structure called 
-a k-dimensional tree (KD-Tree; in
+and the significant luminosity peaks (peaks with $\nu > 0.2$) 
+using a data structure called a k-dimensional tree (KD-Tree; in
 our case, k = 2). A tree stores the locations of the DM peaks in a sorted
 manner and can speed up the identification of the closest DM peak from the
 location of the luminosity peaks.
 But we do not compute the distances
 between all possible pairs of DM peaks and galaxy peaks.  
-We only compute the distances of the significant luminosity peak(s) with $\nu >
-0.2$  and 
-the densest $n_{\rm DM}$ number of DM peaks:
+We only compute the distances of the most significant luminosity peak and 
+the densest $n_{\rm DM}$ number of DM peaks. 
+During the matching, we allow more DM peak
+candidates for clusters that have subclusters indicated by
+multiple significant luminosity peaks (peaks with $\nu > 0.2$):
 \begin{equation}
 	n_{\rm DM} = \begin{cases}		
 		3 \times (n_{lum} + 1) & {\rm if~} n_{lum} < 3 \\
@@ -858,9 +874,8 @@ the densest $n_{\rm DM}$ number of DM peaks:
 	\end{cases}
 	\label{eq:peak_threshold}
 \end{equation}
-where $n_{lum}$ is the number of significant luminosity peak, and $n_{\rm DM}$
+where $n_{lum}$ is the number of significant luminosity peaks, and $n_{\rm DM}$
 is the number of DM peaks that went into the construction of the KD-tree.
-
 When there are several dense galaxy peaks located far away from one another, 
 the top few densest DM peaks (subhalos) can locate around the same galaxy
 peak (see the cyan circles in Fig. \ref{fig:select_peak_visualization} for the
@@ -875,8 +890,9 @@ appropriate peaks, i.e. the blue circle which indicates the matched DM peak
 in the left and middle columns 
 often overlaps the magenta circle which is the luminosity peak.  
 
-To avoid peak matching from affecting the offset results,
-we will only use the offsets with the dominant DM peak for the final results.
+To prevent peak matching from affecting the offset results,
+we will only use the offsets with the DM peak matched to the brightest
+luminosity peak for the final results.
 And we call this offset $\offset_{\rm KDE}'$, where $'$ indicates that the
 luminosity weighted data was used to compute the offset. 
 We show in the result section \ref{subsec:offset_from_most_bound_particle} 
@@ -908,7 +924,7 @@ For instance, the 95\% interval is computed as the narrowest interval that encom
 95\% of total density (2.5\% of density mass at each end of the tail is
 excluded). In case of degeneracy, the interval is also required to cover the 
 central location estimate for the distribution.
-Additionally, we report other statistic of interest, such as the biweight 
+Additionally, we report other statistics of interest, such as the biweight 
 location (analogous to the median)
 and the midvariance (robust standard deviation
 estimate) to minimize the effects of outliers \citep{Beers90}. 
@@ -939,7 +955,7 @@ However, when one takes the magnitude of $\Delta {\bf s}$, i.e.:
 	\label{eq:magnitude_offsets}
 \end{equation}
 the resulting 1D distribution of $|\Delta {\bf s}|$, 
-those support being [0, $\infty$),
+whose support being [0, $\infty$),
 will not peak at zero even if the original
 distribution of $\Delta {\bf s}$ peaks at (0, 0). 
 To illustrate how difficult it is to interpret the magnitude values $|\Delta
@@ -970,7 +986,7 @@ will result in $|\Delta s|$ values that follow the Rayleigh distribution:
 	f(\Delta s | \sigma) = \Delta s /  \sigma^2 \exp(-\Delta s^2 / 2 \sigma^2)
 	\label{eq:rayleigh_distro}
 \end{equation}
-those peak is at $|\Delta s| = \sigma$, the same standard deviation value of the 2D
+whose peak is at $|\Delta s| = \sigma$, the same standard deviation value of the 2D
 Gaussian. Note that this representation in  
 eq. \ref{eq:rayleigh_distro}
 rules out any probability mass at $|\Delta s|$ = 0 by construction. 
@@ -985,8 +1001,8 @@ For a non-parametrical, asymmetrical 1D distribution due to taking the magnitude
 finding the {\it narrowest} 68\% and 95\% interval
 is not a standard statistical procedure. The 68\% or 95\% interval needs to
 span the smallest range of $|\Delta s|$ values to be used for a hypothesis test.
-It is wrong to pick any 68\% and 95\% interval manually because such a choice
-directly affects the conclusion of the hypothesis test.
+The conclusion of the hypothesis test can be directly affected by 
+a manual choice of the 68\% and 95\% interval.
 
 On the other hand, 
 the 1D distributions of offsets along a particular spatial axis, 
@@ -999,7 +1015,7 @@ the narrowest density interval (aka highest density interval) is easier to find.
 Since we have enough samples for there to be
 rotational symmetry for the distribution of $(\Delta {\bf x}, \Delta {\bf y})$,
 we will show that it does not
-matter much if we picked $\Delta {\bf x}$ or $\Delta {\bf y}$ for the 1D representation.
+matter if we pick $\Delta {\bf x}$ or $\Delta {\bf y}$ for the 1D representation.
 We compute the hypothesis test significance level with the 
  offset $\Delta {\bf x}$ along one of the spatial axes. 
 To report the statistics, we also make use of estimates that do not make any
@@ -1065,22 +1081,23 @@ subclusters but only four bright galaxy peaks in the central region.
 	\centering
 	\includegraphics[width=0.65\linewidth]{fig5_symmetrical_1D_pdf.png}
 	\caption{The smoothed distribution of different offsets of 43 clusters with all 768
-	projections. The smoothing bandwidth is determined by Scott's rule for 
+		projections. The smoothing bandwidth is determined by Scott's rule
+		\citep{Scott2010} for 
 	visualization.
 	For estimates where several peaks of galaxy data are 
 	possible, only the densest peak is matched to the DM peak for computing
 	the offsets in this figure. 
 	The dark blue area indicates the 68\% density interval
 	while the light blue area shows the 95\% density interval. 
-	The summary of the statistic of each distribution is available in
+	A summary of the statistic of each distribution is available in
 	Table \ref{tab:p_val_table}. 
 		\label{fig:offset_distributions}}
 \end{figure*}
-We also show $\Delta x_{\rm obs}$ components, the offset perpendicular to
-$\Delta y_{\rm obs}$ for comparison.
+We also show $\Delta x_{\rm obs}$, the offset perpendicular to
+$\Delta y_{\rm obs}$, for comparison.
 
 For most of the observed offsets, we obtain the estimates from the contour plots 
-and descriptions of the corresponding papers. 
+and descriptions in the corresponding papers. 
 For the offsets that are roughly in line with the axis connecting the two subclusters,
 we let $\Delta y = |\Delta {\bf s}|$. 
 If $\Delta s_{\rm obs}$ is not aligned along the line joining the subclusters,
@@ -1091,14 +1108,14 @@ $\Delta y$ will lead to a spurious increase in significance.
 The actual significance of each observation is computed by comparing the
 observed offset to the distribution of $\Delta y$ computed from our data. 
 The distributions of $\Delta y$ represent the possible ways that offsets can be observed in a CDM
-universe, giving us a rough estimation of the probability 
+universe, giving us a rough estimate of the probability 
 of seeing the offset from observations under the null hypothesis of CDM 
 being true. 
 We compute the two-tailed 
 p-value from the narrowest density interval (C) of simulated offsets 
 that is above the observed values of offsets in the literature, 
 i.e. the significance of each observed offset is rounded up to the nearest 68\%, 95\% or 99\%
-interval of corresponding offset distribution from the Illustris data. 
+interval of the corresponding offset distribution from the Illustris data. 
 \begin{equation}
 	p = 1 - C(|\Delta y| > \Delta y_{obs})
 \end{equation}
@@ -1199,10 +1216,10 @@ the most bound particle is located does not
 necessarily correspond to the densest projected peak in 2D in the presence of 
 significant DM substructures.   
 
-\subsection{Offset between galaxy summary statistic and the most bound particle}
+\subsection{Offset between galaxy summary statistics and the most bound particle}
 As another sanity check, we computed the offsets between different galaxy summary
 statistics and the most bound particle. 
-Interested reader can refer to Table
+Interested readers can refer to Table
 \ref{tab:most_bound_particle_offset_distributions} for the different
 percentile and robust estimates of the distribution of offsets from the most bound 
 particle. 
@@ -1217,7 +1234,7 @@ to the most bound particle computed by each method is as follows:
 			center of mass
 \end{itemize}
 
-In fact, most of the BCG offsets are very small except for two clusters with ID 13
+In fact, most of the BCG offsets are very small except for the two clusters with ID 13
 and 33. Both clusters have  values of $\nu > 1.5 $ over each and every projection. 
 From the projected density map, we further confirm that
 both clusters have significant substructures. It is therefore possible for the
@@ -1231,7 +1248,7 @@ statistics.
 
 \subsection{Galaxy-DM Offset in Illustris}
 \label{subsec:galaxyDMoffset}
-\subsubsection{The two-dimensional distribution and distribution of $\Delta y$}
+\subsubsection{The two-dimensional distribution and the distribution of $\Delta y$}
 The 2D distribution of $\Delta s$ from most methods peak at
 around zero ($\lesssim 4$ kpc) with high rotational symmetry. 
 The possible sources of offset asymmetry come from clusters with unusual configurations,
@@ -1324,8 +1341,8 @@ relationship between the pairs of variables
 We describe the significance of the correlation 
 based on the p-value reported by {\sc{Scipy}} of seeing the level of 
 correlation by chance assuming the pair of 
-quantities has no correlation. If the p-value is greater than 0.1, we call the
-correlation as insignificant.
+quantities has no correlation. If the p-value is greater than 0.1, we consider the
+correlation insignificant.
 As a reference, the correlation between the 
 two unrelaxedness criteria defined in section \ref{subsubsec:relaxedness}
 for the 43 selected clusters is as high as 0.82. 
@@ -1338,7 +1355,7 @@ maximum of the offset, and the median of $\nu$, over all the projections of
 each cluster. 
 Then we compute the correlation between these summary statistics to the other physical quantities that
 are unique for each cluster.
-Overall, other than substructures as represented by median($\nu$), and the two
+Overall, other than substructures that are represented by median($\nu$), and the two
 unrelaxedness criteria of each cluster
 projection, the projected offsets do not have significant correlation 
 with other physical attributes of the clusters.
@@ -1390,13 +1407,13 @@ This means the observations are mainly consistent with the null hypothesis:
 It is possible to see offset values as extreme as reported by observations
 in a CDM universe $n_{\rm CDM}$, i.e. 
 \begin{equation}
-\offset_{\rm obs} \gtrsim n_{\rm CDM}. 
+\offset_{\rm obs} \approx n_{\rm CDM}. 
 \end{equation}
 However, this result does {\it not} mean that the CDM model is more probable than the SIDM model. 
 We will discuss the full physical implications of this result after discussing
-all the factors can affect this result. 
+all the factors that can affect this result. 
 In Section \ref{subsec:non_SIDM_offsets},
-we will first show our offset distribution results compare with
+we will first show our offset distribution results compared with
 studies that investigate other causes of offsets that do not have a SIDM origin.
 Then, in Section \ref{subsec:limitation_of_pvalue}
 we will explore the factors that can affect our computation of the p-value due
@@ -1464,11 +1481,12 @@ to create scientifically accurate luminosity contours
 that resemble 
 the DM distribution if the member galaxy
 data is of high completeness and purity (Visit
-\href{https://goo.gl/kZUWrg}{https://goo.gl/kZUWrg}). The KDE is more than a method for
+\href{https://goo.gl/kZUWrg}{https://goo.gl/kZUWrg}). Thus, 
+the KDE is more than a method for
 identifying the luminosity peaks
-(as the high resolution figures need to be downloaded, the 
-corresponding Jupyter notebooks may take some time and several refresh of the
-web page before they are rendered properly).
+\footnote{as the high resolution figures need to be downloaded, the 
+corresponding Jupyter notebooks may take some time and several refreshes of the
+web page before they are rendered properly}.
 
 % In real observations, missing selection of member galaxies, or 
 % foreground objects can both affect the inference of the galaxy spatial 
@@ -1481,9 +1499,9 @@ web page before they are rendered properly).
 \subsection{Comparison of the offset results to studies of clusters and groups}
 \label{subsec:non_SIDM_offsets}
 Our results showing the offset distributions are highly relevant to two types of
-observational studies that have non SIDM goals: 
+observational studies: 
 The first type includes lensing studies that aim to study the general properties of 
-galaxy clusters. The main goal of these studies are to estimate the spatial maps or 
+galaxy clusters. The main goal of these studies is to estimate the spatial maps or 
 the mass of the DM distribution of galaxy clusters. 
 The second type focuses on inferring cosmological parameters from the 
 mass function of galaxy groups. To do so, these studies stack galaxy 
@@ -1526,7 +1544,9 @@ By fitting elliptical NFW models to the weak lensing data, \cite{Oguri2010}
 showed a long tail distribution for $\Delta s_{\rm BCG}$, which they fit with two 2D Gaussians.
 The first tighter 2D Gaussian had a standard deviation being 90
 $h^{-1}$ kpc for describing the
-offset for most clusters, the long tail spans around 1 Mpc was fit by a second 2D
+offset for most clusters, a substantially larger width than we found for the
+68-th percentile of $\offset_{\rm BCG}$. 
+The long tail of the offsets from \cite{Oguri2010} spanning around 1 Mpc was fit by a second 2D
 Gaussian with a standard deviation of 420 $h^{-1}$ kpc. This second component
 in the tail region contains $\sim$ 10\% of the clusters in the study and is
 consistent with the portion of extreme outliers that we have.   
@@ -1543,7 +1563,7 @@ the second most massive galaxies. \cite{Johnston2007b} and
 the one sigma level offsets for misidentified BCGs at 380 $h^{-1}$ kpc, and 410 
 $h^{-1}$ kpc respectively. This is consistent with the 95-th percentile of the
 unrelaxed and the full sample of the BCG in our study and also the tail of the
-$|\Delta s_{\rm BCG}|$ for \cite{Cui2015}. If one wishes to use BCG with high
+$|\Delta s_{\rm BCG}|$ for \cite{Cui2015}. If one wishes to use the BCG with high
 confidence, it may be necessary to set a stringent standard of the morphological
 characteristics such as requiring a large half light radius for classifying a BCG.
 
@@ -1557,14 +1577,16 @@ alone can lead to hundred-kpc-level offsets between the most bound particle
 \cite{Dietrich2012} ray-traced through the DM substructures in the MR simulation 
 as mock lensing observation of 512 clusters.  
 Without any smoothing or shape noise, \cite{Dietrich2012} showed 
-90\% of the lensing peak and the 
-most bound particle, which is a proxy for the BCG, agree to 2.0 $h^{-1}$ kpc
+that 90\% the distance between the lensing peak and the 
+most bound particle (a proxy for the BCG) is around 2.0 $h^{-1}$ kpc
 (0.65 arcsec at z = 0.3). 
 With shape noise,
 even at the source galaxy density of space-based quality optical data of n = 80
 arcmin$^{-1}$, fitting NFW halos and using the center as the DM gave a 
 distribution of $|\Delta s_{\rm BCG}|$ with a mode at around 9 arcsecs (this is
-approximately the 1 standard deviation estimate in 2D). 
+approximately the 1 standard deviation estimate in 2D --- see Section
+\ref{subsec:hypothesis_test} for how the transformation of a 2D Gaussian
+distribution is related to a 1D Rayleigh distribution). 
 Lowering the source galaxy density to 30 arcmin$^{-2}$ increased the mode
 to 22 arcsec ($\sim$ 90 kpc at z = 0.3) with a 95-th percentile at 85 arcsec 
 ($\sim 400$ kpc at z = 0.3, comparable to \citealt{Oguri2010}). 
@@ -1592,7 +1614,7 @@ to uncertainty of similar order of magnitude as the peak
 estimate, but with a lower signal. 
 In fact, there have been several contentious lensing studies (\citealt{Clowe2012},
 \citealt{Jee2014b}, \citealt{Wittman2014}, \citealt{Cook2012})
-reporting how mass peaks of DM can appear or disappear based on
+reporting how the mass peaks of DM can appear or disappear based on
 different selection and treatment of the source galaxies for lensing. 
 It is therefore hard to use morphological features, such as the tail or the shape 
 of a peak,
@@ -1608,10 +1630,9 @@ morphological patterns.
 
 Now we turn to exploring complementary methods for summarizing
 the galaxy population of a cluster, and show that  the luminosity peak 
-is the second best choice than the BCG for summarizing the galaxy statistic.
+is the second best choice after the BCG for summarizing the galaxy statistic.
 There can be several bright galaxies that have about the same brightness 
-for a cluster (or the subcluster). It is not easy to tell which galaxy is the
-brightest.  
+in a cluster (or a subcluster). There may not be a physically dominant galaxy.  
 Bright galaxies in the dense region of the cluster are the possible progenitors 
 of the BCG and therefore a reasonable choice when there is no unique BCG. 
 \cite{George2012a}, for example, examined 129 X-ray selected non-merging galaxy 
@@ -1681,11 +1702,12 @@ $|\Delta s_{\rm KDE}|$ from all the Illustris samples are below 50 kpc.
 % a more sophisticated stacking model is needed.
  
   
-\subsection{Comparison to the studies of merging cluster observations for SIDM
-constraints}
+\subsection{Comparison to merging cluster observations for SIDM constraints 
+}
 \label{subsec:limitation_of_pvalue}
-We showed that $\offset_{\rm obs} \gtrsim n_{\rm CDM}$, there are
-reasons why we think the p-values may be underestimated.
+We showed that it is possible for observed offsets $\offset_{\rm obs}$ to be 
+compatible with the distribution of $n_{\rm CDM}$ as part of the p-value test. 
+However, there are reasons why we think the p-values may be underestimated.
 Our study, by design, presents some of the most ideal observational conditions. 
 Our goal is to investigate how the minimum level of statistical noise would 
 compare to the SIDM signal.
@@ -1704,17 +1726,15 @@ This contribution can add large spatial variance to the estimate of ${\bf
 s}_{\rm gal}$. 
 Second, our DM mass map has assumed a resolution that is only achieved for clusters 
 with many strong lensing constraints. 
-Most analyses of clusters have DM maps with lower resolution . 
+Most analyses of clusters have DM maps with lower resolution. 
 The observed galaxy clusters can also have high stellar contamination
-if the cluster happens to locate near the plane of the Milky Way 
+if the cluster happens to be located near the plane of the Milky Way 
 (such as the Sausage cluster; \citealt{Jee2015}). 
 Such stellar contamination can decrease the number density of the visible source galaxies for the
 lensing analysis, resulting in a degraded resolution of the DM mass map and a
 biased estimate of ${\bf s}_{\rm DM}$. 
   
-Third, when we compare our results to other studies, we do not know if 
-those studies have used estimator
-of ${\bf s}_{\rm gal}$ with comparable precision as our methods, especially for
+Third, most studies have {\it not} used estimators of comparable precision, especially for
 the estimate of the luminosity peak. We have used the cross-validated KDE that
 minimizes the fitting error. Not only does the algorithm help
 determine the eigenvalues of the bandwidth matrix for smoothing, 
@@ -1723,7 +1743,7 @@ Most literature does not treat the inference of the smoothing bandwidth
 of the data to be a regression problem that aims to minimize the fitting error.  
 % It is unclear if such results will enjoy the same accuracy level as what
 % we demonstrated. 
-If scientists hand tune the smoothing bandwidth, it is hard to
+If scientists hand tune the smoothing bandwidth, it is difficult to
 avoid setting the bandwidth to fit the preconception of how the density
 contours of the cluster 
 should look like, and inadvertently biasing $\Delta s$. We therefore strongly
@@ -1750,7 +1770,7 @@ procedures that minimize the fitting error.
 % fair comparison to observation by matching the method of offset inference. 
 
 Other complications may arise from the mismatch of the physical properties of 
-our cluster samples with the observed clusters, although the actual effect the
+our cluster samples with the observed clusters, although the actual effect of the
 property mismatch is inconclusive. 
 For the full sample of Illustris clusters in Table \ref{tab:p_val_table}, 
 each cluster has the same number of projections. 
@@ -1802,15 +1822,14 @@ change of our estimation of $n$.
 % To avoid any report from this study directly quoting a p-value, we did not
 % combine the p-values from the different observations. 
 Due to the above possible discrepancies, we did not combine the p-values from
-the observations.
-This is because the computation of p-value does not fully
+the observations. The computation of p-value does not fully
 take the uncertainties of the observations into account. 
 % We are unable to take the quoted uncertainties of the lensing estimates 
 % from Table \ref{tab:offset_results} into account. 
 % are only 
 % from the lensing estimate, but not the error estimates of the galaxy summary 
 % statistic. 
-Any future studies that wish to claim significance or rejection based on a 
+Any future studies that wish to claim significance based on a 
 p-value comparison to a simulation will 
 need to carefully track down and simulate the contribution of uncertainties 
 from each aspect of the cluster analysis. 
@@ -1836,11 +1855,11 @@ The non-deterministic nature of particle interactions means that it is not easy
 to predict the offsets analytically without simulations.
 Furthermore, there is no consensus on what type of clusters might best show the
 effects of SIDM, which depend on the model of the SIDM.
-Currently, the studies of SIDM have been restricted to those with isotropic
+Currently, the studies of SIDM in mergers have been restricted to those with isotropic
 scattering and velocity-independent cross sections.   
 The two main classes of SIDM that are studied include those with 
-frequent, short-range interactions that can be broadly be modeled by an
-effective drag force, and those with rare, longer range interactions those
+frequent, long-range interactions that can be broadly be modeled by an
+effective drag force, and those with rare, shorter range interactions those
 effects are not well approximated by a drag-force \citep{Kahlhoefer14}. 
 Here we examine the offsets $\offset_\SIDM$ provided by different cluster merger 
 simulations that contain SIDM physics and compare to our offset results. 
@@ -1870,7 +1889,7 @@ This means:
 and combined with our previous comparison with the observed level of offsets,
 we have:
 \begin{equation}
-	\offset_{\rm obs} \gtrsim n > \offset_\SIDM.
+	\Var(\offset_{\rm obs}) \approx \Var(n) > \Var(\offset_\SIDM).
 \end{equation}
 There are several implications from this result showing that the 
 noise could dominate the signal. 
@@ -1881,11 +1900,12 @@ $\offset_\SIDM$ detection, one should choose to use either the KDE or the
 BCG method for inferring the offset.
 Second, if an analysis of an individual cluster assumed $\offset_{\rm obs} \approx \offset_\SIDM$ 
 for constraining $\sigma_\SIDM$,
-while instead $\offset_{\rm obs} \approx n$ is a better approximation, it  
-can lead to an over estimation of $\sigma_\SIDM$. 
-To give confident estimate of $\sigma_\SIDM$, one may need 
-a large number of clusters to better evaluate 
-the statistical contributions from each term in eq. \ref{eq:signal_and_noise}.
+while instead $\offset_{\rm obs} \approx n + \offset_\SIDM$ with $n >
+\offset_\SIDM$ is a better approximation, it  
+can lead to an overestimation of $\sigma_\SIDM$. 
+% To give confident estimate of $\sigma_\SIDM$, one may need 
+% a large number of clusters to better evaluate 
+% the statistical contributions from each term in eq. \ref{eq:signal_and_noise}.
 
 \subsection{Prospect of detecting SIDM with confidence based on our results} 
 \label{subsec:prospect_of_detecting_SIDM}
@@ -1938,7 +1958,7 @@ The offset ($\Delta y_\SIDM$) has an approximately zero mean, and a 3-sigma leve
 $\sim 40$ kpc for $\sigma_\SIDM = 1~\centi\meter^2 / \gram$.  
 We assume a noise level as estimated by the distribution of $\Delta y_{\rm KDE}'$
 for the non-relaxed samples (one-sigma level at 32 kpc). This choice matches 
-how Kim et al. used the DM and the galaxy peaks for their
+how Kim et al. (in prep.) used the DM and the galaxy peaks for their
 offset measurements. 
 Then a rough estimate of the difference in the standard deviation of the observed offset 
 between a CDM
@@ -1947,7 +1967,12 @@ model and a model with $\sigma_\SIDM = 1~\centi\meter^2 / \gram$ is:
 &	\sqrt{\Var(\Delta y_\SIDM) + \Var(n)} - \sqrt{\Var(n)} \\ 
 &=	\sqrt{(40 / 3)^2 + 32^2} - 32 \approx 3~\mathrm{kpc} 
 \end{align}
-which is a subtle $\sim 9 \%$ difference between the CDM and the SIDM models. 
+which is a subtle $\sim 9 \%$ difference between the CDM and the SIDM model with
+$\sigma_\SIDM = 1~\centi \meter^2 / \gram$. 
+Note that this assumed values of $\Var(\Delta y_\SIDM)$  
+ignores the possibility
+that future studies may find ways to select mergers at a stage when $\Delta y_\SIDM$
+of each cluster merger is around its maximum possible value. 
 
 We can also examine the difference of the standard deviation of the observed
 offset level between the following two models with 
@@ -1960,7 +1985,7 @@ at $\sim 50$ kpc for $\sigma_\SIDM =
 \sqrt{\Var_{1\centi\meter^2/\gram}(\Delta y_{\SIDM}) +\Var(n)}\label{eq:variance_difference}\\ 
 &=\sqrt{(50 / 3)^2 + 32^2} - \sqrt{(40 / 3)^2 + 32^2} \approx 1~\mathrm{kpc} 
 \end{align}
-which is a even smaller $\sim 3\%$ difference between the two models. 
+which is an even smaller $\sim 3\%$ difference between the two models. 
 If the distribution of noise from observations has larger variance than what we
 have shown, eq. \ref{eq:variance_difference} will show even less discrepancy
 between the different SIDM models. 
@@ -1972,7 +1997,7 @@ statistical framework.
 Instead of the variance, an alternative statistical parameter 
 may provide characterize the offset distribution with 
 higher sensitivity than what we have illustrated above.
-Regardless of the implementation detail,
+Regardless of the implementation details,
 a good statistical model will enable the computation of a Bayes factor based
 on all the important contributions to the observed offset.
 The Bayes factor is the ratio of the posterior probability of a fit of SIDM model to data,
@@ -1982,11 +2007,11 @@ over those of a CDM model:
 	obs})}{Pr(\sigma_{\SIDM} = 0 | \offset_{\rm obs})}.
 	\label{eq:Bayes_factor}
 \end{equation}
-This ratio will show if a SIDM model of with an assumed cross section value, $\sigma$,
+This ratio will show if a SIDM model with an assumed cross section value, $\sigma$,
 is favored over a CDM model. Such a comparison will provide better
 insight to the best-fit $\sigma_\SIDM$ value than our hypothesis test.
 Our current hypothesis test can only quantify the compatibility between a CDM
-model and the data. 
+model and the data but it does not describe the SIDM model. 
 % we recommend a model comparison using \ref{eq:signal_and_noise}
 % there needs to be understanding of the
 % different contributions in \ref{eq:signal_and_noise}
@@ -2008,7 +2033,7 @@ From Kim et al. (in prep.), the clusters with a high chance of giving high
 $\offset_\SIDM$ signals are massive cluster mergers with relatively low merger
 velocities, small impact parameters and large halo concentrations.
 Under such restrictive selection criteria for cluster samples, 
-the Illustris simulation may not contain 
+the Illustris simulation does not contain 
 many analogous clusters for computing the denominator term in
 \ref{eq:Bayes_factor}.
 The results of this study, however,
@@ -2045,17 +2070,22 @@ galaxy-DM offset using the Illustris simulation. We concluded that:
 
 \begin{itemize}
 		\item the locations of the most gravitationally bound particle are consistent 
-				with the BCG for systems with little substructures.  \\
+				with the BCG for systems with little substructure.  \\
 
 		\item the BCG has the smallest one-sigma offset level to the dominant DM
-			peak.\\
+			peak (68-th percentile of $\Delta y_{\rm BCG} \approx 3$ kpc for $1.2 <
+			\nu < 2.2$).\\
 
-		\item the identified BCG can have a large offset from the DM peak due to a
-			combination of effects from substructures and projection. \\
+		\item the identified BCG offsets have a heavy tail at $\Delta y_{\rm BCG} >
+			160$ kpc for $1.2 < \nu < 2.2$. 
+		 This heavy tail is due to a combination of effects from substructures and 
+		 projection and is not seen in the relaxed sample with $\nu < 1.2$. \\
 
 		\item the KDE peak of the luminosity map after careful cross-validation 
-			gives the second tightest one-sigma offset level from the DM peak.  
-			The length of the tail of the $\Delta y_{\rm KDE}'$ distribution 
+			gives the second tightest one-sigma offset level ($\pm 32$ kpc for $1.2 <
+			\nu < 2.2$) from the DM peak.  
+			The length of the tail of the $\Delta y_{\rm KDE}'$ distribution
+			($\lesssim \pm 124$ kpc at the 99-th percentile)
 			is smaller than those of the BCG.
 			\\
 
@@ -2064,8 +2094,9 @@ galaxy-DM offset using the Illustris simulation. We concluded that:
 			dominant component. We do not endorse this method for drawing scientific
 			conclusions nor visualization.\\  
 
-		\item the variance of the galaxy-DM offset measured from different methods
-			of inferring the galaxy peak is large. It is unfair to compare
+		\item the variances of the galaxy-DM offset measured from different methods
+			of inferring the galaxy peak can differ by factors of a few. 
+			One should not compare
 			offset values computed with different galaxy peak inference methods.\\
 
 		\item with high completeness and purity of member galaxy data, the
@@ -2079,23 +2110,27 @@ Second, we have examined the implications of our results for studies that make u
 $\offset_{\rm obs}$ for constraining $\sigma_\SIDM$. We have shown that 
 \begin{itemize}
 		\item it is possible to see $\Delta s$ as extreme as those in observed merging 
-			galaxy clusters assuming that $\Lambda$CDM is the true underlying physical model. 
-	i.e. $\offset_{\rm obs} \approx n_{\rm CDM}$.\\
+			galaxy clusters assuming that $\Lambda$CDM is the true underlying physical model, 
+	i.e. $\Var(\offset_{\rm obs}) \approx \Var(n_{\rm CDM})$.\\
 
 		\item the contribution of statistical uncertainty to the galaxy-DM offsets 
 			for $\Lambda$CDM clusters is {\it not} negligible when compared to the reported  
-			levels of maximum offset from staged SIDM simulations ($\sim 50$ kpc).\\ 
+			levels of maximum offset from staged SIDM simulations ($\sim 50$ kpc),
+			i.e. $\Var(n_{\rm CDM}) \gtrsim \max(\Delta y_{\SIDM})$
+			\\ 
 		
 		\item to maximize the SIDM signal, one should use either the BCG or the
 			cross validated KDE method for measuring the offset.
-		  Only the 68-th percentile of the galaxy-DM offsets derived from BCG ($y_{\rm BCG}$) and 
+			For the non-relaxed samples in our study ($1.2 < \nu < 2.2$),
+		  only the 68-th percentile of the galaxy-DM offsets derived from BCG ($y_{\rm BCG}$) and 
 			the cross-validated KDE luminosity peak	($y_{\rm KDE}'$)
 			are smaller than the maximum SIDM offset ($50$ kpc) reported from SIDM simulations. 
 			Other methods have one-sigma uncertainty levels that overwhelm the
 			SIDM offset signal.\\ 
 
-		\item it is possible for SIDM models with small $\sigma_\SIDM$ values to be
-			indistinguishable from one another. 
+		\item it is possible for SIDM models with small $\sigma_\SIDM$ values 
+			($\sigma_\SIDM = 0, 1, 3~\centi\meter^2 / \gram$) to be
+			nearly indistinguishable in terms of measured offsets. 
 			Using a rough estimate of $\Delta y_\SIDM$ and an optimistic estimate of the
 			noise level, we have shown that the offset variance between the
 			SIDM models with small $\sigma_\SIDM$ values to only differ by $< 10\%$.
@@ -2106,7 +2141,7 @@ assuming $\offset_{\rm obs} \approx \offset_\SIDM$ while instead $\offset_{\rm o
 \approx n$ is true, the estimate(s) of $\sigma_\SIDM$ will be biased.
 To use the estimated noise level from our study, one should also match the
 offset inference method.
-For more secured constraints of $\sigma_\SIDM$,
+For more secure constraints of $\sigma_\SIDM$,
 we advocate future studies to formulate a statistical model 
 to properly take the contributions shown in eq. \ref{eq:signal_and_noise} into 
 account.
@@ -2121,10 +2156,11 @@ Karen Ng would like to thank Professor Thomas Lee for the helpful discussion of
 the construction of the p-value hypothesis test. We are immensely grateful for 
 the technical review and comments from Prof. Maru\v{s}a Brada\v{c} and Prof. Annika Peter.  
 Part of the work before the conception of this paper was discussed during 
-the AstroHack week 2014. This work made use of {\sc IPython}
-\citep{Perez2007}.\ifthenelse{\boolean{thesis}}{}{Part of this work was performed under the Hubble Space Telescope grant
+the AstroHack week 2014. 
+Part of this work was performed under the Hubble Space Telescope grant
 HST-GO-13343.01-A, the National Science Foundation grant 
 1518246 and under the auspices of the U.S. Department Of Energy by 
 Lawrence Livermore National Laboratory (LLNL) 
 under Contract DE-AC52-07NA27344; 
-LLNL-JRNL-XXXXXX-Draft.}
+This work made use of {\sc IPython}
+\citep{Perez2007}.\ifthenelse{\boolean{thesis}}{}{LLNL-JRNL-XXXXXX-Draft.}
